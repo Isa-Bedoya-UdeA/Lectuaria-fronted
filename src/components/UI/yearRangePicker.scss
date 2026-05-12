@@ -1,0 +1,61 @@
+@use "@/styles/vars" as *;
+
+.yearRangePicker {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .yearRangePicker__label {
+        font-family: $title;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-color;
+    }
+
+    .yearRangePicker__inputs {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+
+        .MuiTextField-root {
+            flex: 1;
+            min-width: 120px;
+        }
+    }
+
+    .yearRangePicker__clear {
+        align-self: flex-start;
+        font-family: $text;
+        font-size: 0.85rem;
+        color: $gray-dark;
+    }
+}
+
+// Responsive styles for MUI DatePicker dialogs
+.MuiPickersPopper-root {
+    .MuiPaper-root {
+        max-width: 100vw;
+        max-height: 100vh;
+        
+        @media (max-width: 480px) {
+            width: 100vw;
+            height: 100vh;
+            max-width: 100vw;
+            max-height: 100vh;
+            margin: 0;
+            border-radius: 0;
+        }
+    }
+    
+    .MuiDayCalendar-weekContainer {
+        @media (max-width: 480px) {
+            margin: 0;
+        }
+    }
+    
+    .MuiMultiSectionDigitalClock-root {
+        @media (max-width: 480px) {
+            max-width: 100%;
+        }
+    }
+}

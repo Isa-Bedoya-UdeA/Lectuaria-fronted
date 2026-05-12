@@ -1,0 +1,343 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.bookCard {
+	max-width: 15rem;
+	border-radius: 1rem;
+	overflow: hidden;
+	box-shadow: 0 0 10px $gray;
+	text-align: left;
+	transition: 0.2s transform ease;
+
+	.bookCard__header {
+		position: relative;
+		aspect-ratio: 3/4;
+		overflow: hidden;
+
+		.bookCard__images {
+			position: absolute;
+			z-index: 2;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+			display: flex;
+
+			img {
+				width: 100%;
+				height: 100%;
+				flex-shrink: 0;
+				object-fit: cover;
+				object-position: center;
+				transition: 0.2s transform ease;
+			}
+		}
+
+		.bookCard__tools {
+			position: absolute;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+
+			.bookCard__fav {
+				position: absolute;
+				z-index: 2;
+				right: 1rem;
+				top: 1rem;
+
+				svg {
+					color: $error;
+				}
+
+				.fav path {
+					fill: $error;
+				}
+			}
+
+			.bookCard__share {
+				position: absolute;
+				z-index: 2;
+				right: 1rem;
+				top: 1rem;
+
+				svg {
+					color: $gray-dark;
+				}
+
+				.fav path {
+					fill: $gray-dark;
+				}
+			}
+
+			.bookCard__action {
+				position: absolute;
+				z-index: 2;
+				left: 1rem;
+				top: 1rem;
+
+				svg {
+					border-radius: 0.4rem;
+					padding: 0.2rem;
+					transition: all 0.2s ease;
+				}
+
+				&--edit svg {
+					color: $secondary;
+				}
+
+				&--remove svg {
+					color: $error;
+				}
+
+				&:hover svg {
+					background-color: $white;
+					transform: scale(1.1);
+				}
+			}
+
+			.bookCard__remove {
+				position: absolute;
+				z-index: 2;
+				right: 1rem;
+				top: 3.5rem;
+
+				svg {
+					color: $error;
+					transition: all 0.2s ease;
+				}
+			}
+
+			.bookCard__edit {
+				position: absolute;
+				z-index: 2;
+				right: 1rem;
+				top: 6rem;
+
+				svg {
+					color: $secondary;
+					transition: all 0.2s ease;
+				}
+			}
+
+			.bookCard__delete {
+				position: absolute;
+				z-index: 2;
+				right: 1rem;
+				top: 6rem;
+
+				svg {
+					color: $error;
+					transition: all 0.2s ease;
+				}
+			}
+
+			.bookCard__details {
+				position: absolute;
+				z-index: 2;
+				bottom: 1rem;
+				left: 1rem;
+
+				button,
+				svg {
+					color: $white;
+					text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+				}
+
+				@media (hover: hover) {
+					opacity: 0;
+					transition: opacity 0.3s ease;
+				}
+			}
+		}
+	}
+
+	&.list {
+		display: flex;
+		max-width: 100%;
+		height: 12rem;
+		background-color: $white;
+
+		.bookCard__header {
+			width: 8rem;
+			height: 100%;
+			flex-shrink: 0;
+			aspect-ratio: auto;
+
+			.bookCard__images {
+				width: 90%;
+				height: 90%;
+				overflow: hidden;
+				border-radius: 0.5rem;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+			}
+
+			.bookCard__tools {
+				.bookCard__details {
+					bottom: 0.8rem;
+					left: 0.5rem;
+
+					button {
+						padding: 0.3rem 0.6rem;
+						font-size: 0.8rem;
+					}
+				}
+			}
+		}
+
+		.bookCard__content {
+			flex: 1;
+			padding: 1.5rem;
+			justify-content: center;
+
+			h3 {
+				font-size: 1rem;
+			}
+
+			.bookCard__authors {
+				font-size: 0.8rem;
+				color: $gray-dark;
+			}
+
+			.bookCard__genres {
+				margin-top: 0.5rem;
+				font-size: 0.8rem;
+			}
+
+			.bookCard__count {
+				font-size: 0.8rem;
+				visibility: hidden;
+			}
+
+			.MuiRating-root {
+				font-size: 1rem;
+			}
+		}
+
+		&:hover {
+			transform: scale(1.01);
+		}
+	}
+
+	.bookCard__content {
+		padding: 1.25rem;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+
+		.bookCard__add {
+			margin: 0.5rem 0;
+		}
+	}
+
+	.bookCard__actions {
+		flex-direction: row;
+		align-items: center;
+		gap: 1.5rem;
+		margin-top: auto;
+
+		.bookCard__add-list {
+			width: auto;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-top: 1rem;
+	}
+
+	&__rating-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	&__count {
+		font-size: 0.85rem;
+		color: rgba(0, 0, 0, 0.6);
+	}
+
+	.bookCard__genres {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		color: $primary;
+
+		span {
+			background-color: $primary-light;
+			color: $primary;
+			padding: 0.2rem 0.5rem;
+			border-radius: 1rem;
+			font-size: 0.8rem;
+		}
+	}
+
+	.bookCard__stars {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		.bookCard__count {
+			color: $gray-2;
+		}
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.bookCard {
+		&.list {
+			.bookCard__content {
+				.bookCard__count {
+					visibility: visible;
+				}
+			}
+		}
+	}
+}
+
+@media (hover: hover) and (min-width: 700px) {
+	.bookCard:hover {
+		transform: translateY(-0.2rem);
+
+		.bookCard__header {
+			.bookCard__images {
+				img:first-child {
+					transform: scale(1.1);
+				}
+			}
+
+			.bookCard__tools {
+				.bookCard__details {
+					opacity: 1;
+				}
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.bookCard {
+		&.list {
+			height: 10rem;
+		}
+	}
+}
+
+@media screen and (min-width: 1200px) {
+	.bookCard {
+		// Estilos para pantallas grandes
+	}
+}
+
+@keyframes faded {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}

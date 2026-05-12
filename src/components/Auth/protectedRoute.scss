@@ -1,0 +1,110 @@
+@use "@/styles/vars" as *;
+
+.protected {
+	&__loading {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		height: 60vh;
+		gap: 20px;
+
+		.spinner {
+			width: 50px;
+			height: 50px;
+			border: 5px solid $primary-light;
+			border-top: 5px solid $primary;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+	}
+
+	&__denied {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 80vh;
+		padding: 40px 20px;
+		background-color: $bg-light;
+	}
+
+	&__card {
+		max-width: 500px;
+		width: 100%;
+		background: $white;
+		border-radius: 24px; // Rounded like premium designs
+		padding: 48px 32px;
+		text-align: center;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 24px;
+		border: 1px solid rgba($primary, 0.05);
+
+		h1 {
+			font-family: $title;
+			font-size: 2rem;
+			color: $text-color;
+			margin: 0;
+			line-height: 1.2;
+		}
+
+		p {
+			font-family: $text;
+			color: $gray-dark;
+			font-size: 1.1rem;
+			margin: 0;
+			line-height: 1.6;
+
+			strong {
+				color: $primary;
+				font-weight: 600;
+			}
+		}
+	}
+
+	&__icon {
+		width: 100px;
+		height: 100px;
+		background: $primary-light;
+		color: $primary;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 8px;
+
+		&.error {
+			background: rgba($error, 0.1);
+			color: $error;
+		}
+
+		svg {
+			width: 50px;
+			height: 50px;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+		gap: 12px;
+		margin-top: 8px;
+
+		button {
+			width: 100%;
+			padding: 14px;
+		}
+	}
+}

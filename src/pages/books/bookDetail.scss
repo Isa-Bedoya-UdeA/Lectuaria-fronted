@@ -1,0 +1,371 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.bookDetail {
+	background-color: $bg-normal;
+	padding: 1rem;
+
+	&__container {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: center;
+		gap: 1rem;
+		max-width: 70rem;
+		margin: 0 auto;
+
+		h1,
+		h2,
+		h3,
+		p {
+			margin: 0;
+		}
+
+		.bookDetail__book {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 1rem;
+
+			&__cover {
+				width: 100%;
+				max-width: 20rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+
+				img {
+					width: 100%;
+					height: auto;
+					border-radius: 1rem;
+					flex-shrink: 0;
+				}
+
+				.bookDetail__book__tools {
+					display: flex;
+					flex-direction: column;
+					gap: 0.5rem;
+
+					button {
+						width: 100%;
+					}
+				}
+			}
+
+			&__content {
+				margin-top: 3rem;
+
+				.bookDetail__content__header {
+					display: flex;
+					flex-direction: column;
+					gap: 0.5rem;
+
+					.bookDetails__genres {
+						display: flex;
+						gap: 0.5rem;
+						flex-wrap: wrap;
+
+						span {
+							background-color: $primary-light;
+							color: $primary;
+							border-radius: 1rem;
+							padding: 0.2rem 0.7rem;
+						}
+					}
+
+					.bookDetails__authors {
+						font-weight: 500;
+						color: $gray-dark;
+					}
+
+					.bookDetails__stars {
+						display: flex;
+						align-items: center;
+						gap: 0.2rem;
+						margin-bottom: 1rem;
+
+						svg {
+							color: inherit;
+						}
+					}
+
+					.bookDetail__details {
+						background-color: $primary-light;
+						border: 1px solid $gray-2;
+						padding: 1rem;
+						border-radius: 1rem;
+						display: grid;
+						grid-template-columns: 100%;
+						gap: 0.5rem;
+						margin-bottom: 1rem;
+						margin-top: 1rem;
+
+						.bookDetail__details__item {
+							display: flex;
+							gap: 0.5rem;
+							flex-direction: column;
+
+							&__label {
+								display: flex;
+								align-items: center;
+								gap: 0.5rem;
+								color: $primary;
+
+								svg {
+									color: $primary;
+								}
+							}
+						}
+					}
+				}
+
+				.bookDetail__reviews {
+					flex-direction: column;
+					gap: 1rem;
+
+					h2 {
+						margin-bottom: 1rem;
+					}
+
+					.bookDetail__loginPrompt {
+						display: flex;
+						flex-direction: column;
+						gap: 1rem;
+					}
+
+					.bookDetail__myReview {
+						margin-bottom: 2rem;
+						padding: 1.5rem;
+						background-color: $white;
+						border-radius: 1rem;
+						border: 1px solid $gray;
+						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+						display: flex;
+						flex-direction: column;
+						gap: 1rem;
+
+						p {
+							font-weight: 600;
+							color: $text-color;
+						}
+
+						.MuiRating-root {
+							svg {
+								color: inherit;
+							}
+						}
+
+						textarea {
+							width: 100%;
+							padding: 1rem;
+							border: 1px solid $gray;
+							border-radius: 0.5rem;
+							background-color: $bg-light;
+							color: $text-color;
+							font-family: inherit;
+							font-size: 0.95rem;
+							resize: vertical;
+							min-height: 4rem;
+							transition:
+								border-color 0.2s ease,
+								box-shadow 0.2s ease;
+
+							&:focus {
+								outline: none;
+								border-color: $primary;
+								box-shadow: 0 0 0 3px rgba($primary, 0.2);
+							}
+						}
+
+						.bookDetail__editActions {
+							display: flex;
+							flex-direction: column;
+							gap: 0.5rem;
+						}
+					}
+
+					.bookDetails__otherReviews {
+						margin-top: 1rem;
+						display: flex;
+						flex-direction: column;
+						gap: 1rem;
+					}
+
+					.bookDetails__userReview {
+						margin-bottom: 2rem;
+
+						h3 {
+							margin-bottom: 1rem;
+						}
+					}
+
+					.bookDetails__reviewSeparator {
+						border: none;
+						height: 2px;
+						background: linear-gradient(
+							to right,
+							transparent,
+							$gray,
+							transparent
+						);
+						margin: 2rem 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.bookDetail {
+		padding: 2rem;
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.bookDetail {
+		padding: 3rem;
+
+		.bookDetail__book {
+			flex-direction: row;
+			align-items: flex-start;
+			justify-content: center;
+			gap: 2rem;
+
+			&__content {
+				margin-top: 0;
+				width: 100%;
+			}
+
+			&__editActions {
+				display: flex;
+				gap: 1rem;
+				margin-top: 1rem;
+			}
+		}
+
+		.bookDetails__reviewSeparator {
+			border: none;
+			height: 2px;
+			background: linear-gradient(
+				to right,
+				transparent,
+				$gray-2,
+				transparent
+			);
+			margin: 2rem 0;
+		}
+
+		.bookDetail__book__content
+			.bookDetail__reviews
+			.bookDetail__myReview
+			.bookDetail__editActions {
+			flex-direction: row;
+		}
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.bookDetail {
+		padding: 4rem;
+
+		.bookDetail__book {
+			&__content {
+				.bookDetail__content__header {
+					.bookDetail__details .bookDetail__details__item {
+						flex-direction: row;
+						align-items: center;
+					}
+				}
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 1000px) {
+	.bookDetail {
+		padding: 5rem;
+
+		.bookDetail__book {
+			&__cover .bookDetail__book__tools {
+				flex-direction: row;
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 1100px) {
+	.bookDetail {
+		padding: 5rem;
+
+		.bookDetail__book {
+			&__content {
+				width: auto;
+
+				.bookDetail__content__header {
+					.bookDetail__details {
+						grid-template-columns: repeat(2, 1fr);
+					}
+				}
+
+				.bookDetail__reviews button {
+					max-width: fit-content;
+				}
+			}
+		}
+	}
+}
+
+.share-modal {
+	max-width: 500px;
+	width: 90%;
+
+	.modal-body {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		padding: 1.5rem;
+	}
+
+	.share-message {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		label {
+			font-family: $text;
+			font-size: 0.9rem;
+			font-weight: 600;
+			color: $text-color;
+		}
+
+		textarea {
+			border-radius: 0.5rem;
+			background-color: $gray;
+			border: 1px solid $gray-2;
+			padding: 0.75rem;
+			font-family: inherit;
+			font-size: 0.9rem;
+			resize: vertical;
+			min-height: 80px;
+
+			&:focus {
+				outline: none;
+				border-color: $secondary;
+			}
+
+			&::placeholder {
+				color: $gray-dark;
+			}
+		}
+	}
+
+	.modal-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		padding: 1rem 1.5rem;
+		border-top: 1px solid $gray-2;
+	}
+}

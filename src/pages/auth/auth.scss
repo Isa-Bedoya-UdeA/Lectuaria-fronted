@@ -1,0 +1,217 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.auth {
+	width: 100%;
+	background-color: $bg-normal;
+	padding: 2rem 0;
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+
+	
+	h1,
+	p {
+		margin: 0;
+	}
+
+	.auth__header {
+		text-align: center;
+		width: 90%;
+		max-width: 25rem;
+		margin: 0 auto;
+
+		h1,
+		p {
+			margin-bottom: 1rem;
+		}
+	}
+
+	form {
+		flex-shrink: 0;
+		width: 100%;
+
+		.auth__userRole {
+			display: flex;
+			justify-content: center;
+			gap: 1rem;
+			background-color: $gray;
+			border-radius: 0.7rem;
+			padding: 0.3rem;
+			max-width: fit-content;
+			margin: 0 auto;
+			margin-bottom: 2rem;
+			flex-wrap: wrap;
+
+			button {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem 2rem;
+				border: none;
+				background: none;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				color: $gray-dark;
+
+				svg {
+					color: $gray-dark;
+				}
+
+				&.selected {
+					background-color: $white;
+					border-radius: 0.5rem;
+					color: $primary;
+
+					svg {
+						color: $primary;
+					}
+				}
+			}
+		}
+
+		.auth__form {
+			background-color: $bg-light;
+			border-radius: 1rem;
+			box-shadow: 0 0 10px $gray;
+			padding: 2rem;
+			width: 100%;
+			max-width: 28rem;
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+			width: 100%;
+    margin: 0 auto;
+
+			.auth__group {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+
+				label {
+					font-weight: 600;
+					font-size: 0.9rem;
+				}
+
+				input,
+				select,
+				textarea {
+					border-radius: 0.5rem;
+					background-color: $gray;
+					border: 1px solid $gray-2;
+					padding: 0.6rem 1rem;
+					font-family: inherit;
+					font-size: 0.9rem;
+
+					&:focus {
+						outline: none;
+						border-color: $secondary;
+					}
+				}
+
+				.auth__passwordWrapper {
+					position: relative;
+					display: flex;
+					align-items: center;
+
+					input {
+						width: 100%;
+						padding-right: 3rem;
+					}
+
+					.auth__passwordToggle {
+						position: absolute;
+						right: 0.8rem;
+						background: none;
+						border: none;
+						padding: 0;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						cursor: pointer;
+						color: $gray-dark;
+						transition: color 0.3s ease;
+
+						&:hover {
+							color: $secondary;
+						}
+
+						svg {
+							width: 20px;
+							height: 20px;
+						}
+					}
+				}
+
+				.auth__error {
+					color: $error;
+					font-size: 0.85rem;
+				}
+			}
+
+			.password-requirements {
+				display: flex;
+				flex-direction: column;
+				gap: 0.25rem;
+				padding: 0 0.5rem;
+
+				.requirement {
+					display: flex;
+					align-items: center;
+					gap: 0.5rem;
+					font-size: 0.85rem;
+					color: $gray-2;
+					transition: color 0.3s ease;
+
+					svg {
+						font-size: 1rem;
+					}
+
+					&.satisfied {
+						color: $success;
+					}
+
+					&.unsatisfied-submitted {
+						color: $error;
+					}
+				}
+			}
+
+			.auth__other {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.auth {
+		padding: 3rem 0;
+
+		.MuiPaper-root {
+			flex-direction: row;
+		}
+
+		form {
+			.auth__other {
+				flex-direction: row;
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.auth {
+		padding: 4rem 0;
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.auth {
+		padding: 5rem 0;
+	}
+}

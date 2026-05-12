@@ -1,0 +1,162 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.userProfile {
+    width: 100%;
+    background-color: $bg-normal;
+    padding: 2rem 0;
+
+    .userProfile__container {
+        max-width: 50rem;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .userProfile__loading,
+    .userProfile__error,
+    .userProfile__not-found {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: $gray-dark;
+    }
+
+    .userProfile__card {
+        background-color: $bg-light;
+        border-radius: 1rem;
+        box-shadow: 0 0 10px $gray;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+
+        .userProfile__avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        .userProfile__info {
+            text-align: center;
+            width: 100%;
+
+            .userProfile__name {
+                font-family: $title;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: $text-color;
+                margin: 0 0 0.5rem 0;
+            }
+
+            .userProfile__username {
+                font-size: 0.9rem;
+                color: $gray-dark;
+                margin: 0 0 1rem 0;
+            }
+
+            .userProfile__bio {
+                font-family: $text;
+                font-size: 0.95rem;
+                color: $gray-dark;
+                line-height: 1.6;
+                margin: 0 0 1.5rem 0;
+            }
+
+            .userProfile__stats {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+
+                .userProfile__stat {
+                    background-color: $gray;
+                    border-radius: 0.5rem;
+                    padding: 1rem;
+                    text-align: center;
+
+                    h3 {
+                        font-family: $title;
+                        font-size: 1.5rem;
+                        font-weight: 700;
+                        color: $primary;
+                        margin: 0 0 0.25rem 0;
+                    }
+
+                    p {
+                        font-family: $text;
+                        font-size: 0.85rem;
+                        color: $gray-dark;
+                        margin: 0;
+                    }
+                }
+            }
+
+            .userProfile__actions {
+                display: flex;
+                gap: 1rem;
+            }
+        }
+    }
+
+    .userProfile__reviews {
+        h2 {
+            font-family: $title;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: $text-color;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .userProfile__reviewsList {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .userProfile__empty {
+            text-align: center;
+            color: $gray-dark;
+            padding: 2rem 0;
+        }
+
+        .userProfile__pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+    }
+}
+
+@media screen and (min-width: 500px) {
+    .userProfile {
+        .userProfile__card {
+            flex-direction: row;
+            text-align: left;
+
+            .userProfile__info {
+                text-align: left;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 700px) {
+    .userProfile {
+        padding: 3rem 0;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .userProfile {
+        padding: 4rem 0;
+    }
+}

@@ -1,0 +1,30 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.notFound {
+    
+}
+
+@media screen and (min-width: 500px) {
+    .notFound {
+
+    }
+}
+
+@media screen and (min-width: 700px) {
+    .notFound {
+
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .notFound {
+
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .notFound {
+
+    }
+}

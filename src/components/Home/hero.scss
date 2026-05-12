@@ -1,0 +1,109 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.hero {
+	position: relative;
+	width: 100%;
+	background-image: url("/images/hero.png");
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	min-height: 40vh;
+
+	&::after {
+		content: "";
+		position: absolute;
+		z-index: 2;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		background-color: $bg-hero;
+		backdrop-filter: blur(5px);
+		transition: 0.2s backdrop-filter ease;
+	}
+
+	.hero__container {
+		position: relative;
+		min-height: 40vh;
+		z-index: 3;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		gap: 1rem;
+		color: $white;
+		width: 90%;
+		margin: 0 auto;
+		padding: 2rem 0;
+
+		h1,
+		p {
+			margin: 0;
+
+			span {
+				color: $secondary;
+			}
+		}
+
+		p {
+			color: $gray-2;
+		}
+
+		.hero__btns {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 1rem;
+
+			a,
+			button {
+				width: 100%;
+				display: flex;
+				justify-content: center;
+			}
+
+			.btn-outlined {
+				color: $white;
+				border: 1px solid $white;
+				background-color: rgba(255, 255, 255, 0.3);
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 400px) {
+	.hero {
+		.hero__container h1 {
+			font-size: 2.5rem;
+		}
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.hero {
+		.hero__container {
+			align-items: start;
+			text-align: left;
+
+			h1 {
+				font-size: 3rem;
+			}
+
+			.hero__btns {
+				flex-direction: row;
+
+				a,
+				button {
+					width: auto;
+				}
+			}
+		}
+
+		&:hover {
+			&::after {
+				backdrop-filter: blur(0);
+			}
+		}
+	}
+}

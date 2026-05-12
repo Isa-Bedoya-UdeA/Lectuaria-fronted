@@ -1,0 +1,299 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+header {
+	position: fixed;
+	inset: 0;
+	width: 100%;
+	height: 4rem;
+	z-index: 999;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	background-color: $bg-blur;
+	backdrop-filter: blur(10px);
+	padding: 1rem 2rem;
+	box-shadow: 0 4px 6px -2px $gray;
+	border-bottom: 1px solid $gray;
+
+	&:has(.header__nav.active) {
+		background-color: $white;
+	}
+
+	.header__icon a {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+
+		svg {
+			background-color: $primary;
+			color: $white;
+			padding: 0.5rem;
+			width: 2.5rem;
+			height: 2.5rem;
+			border-radius: 0.5rem;
+		}
+
+		span {
+			font-weight: 700;
+			display: none;
+		}
+	}
+
+	.header__menu {
+		.header__nav {
+			display: none;
+			position: fixed;
+			left: 0;
+			top: 4rem;
+			background-color: $white;
+			width: 100%;
+			padding: 1rem;
+
+			&.active {
+				display: block;
+				box-shadow: 0 4px 6px -2px $gray-2;
+			}
+
+			ul {
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 1rem;
+
+				li {
+					list-style: none;
+					width: 100%;
+					border-radius: 0.5rem;
+
+					&:has(a.active) {
+						background-color: $secondary;
+
+						a {
+							color: $white;
+							width: 100%;
+						}
+					}
+
+					a {
+						display: block;
+						padding: 0.5rem 1rem;
+					}
+				}
+			}
+		}
+	}
+
+	.header__tools {
+		display: flex;
+		gap: 1rem;
+
+		.header__account,
+		.navbar__toggle {
+			display: flex;
+			align-items: center;
+		}
+
+		.header__account:focus-visible {
+			outline: none;
+		}
+
+		a.active svg path {
+			fill: $secondary;
+		}
+
+		& > a > button {
+			padding-right: 1rem;
+		}
+
+		.header__lists {
+			display: none;
+		}
+
+		.header__notifications {
+			display: block;
+		}
+	}
+}
+
+.header__notifications-popover {
+	.MuiPopover-paper {
+		width: 20rem;
+		max-width: 20rem;
+		max-height: 30rem;
+		overflow: hidden;
+	}
+}
+
+.notifications-dropdown {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid $gray;
+
+		h3 {
+			margin: 0;
+			font-size: 1rem;
+			font-weight: 700;
+			color: $text-color;
+		}
+
+		&__actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		&__action-btn {
+			background: none;
+			border: none;
+			color: $gray-dark;
+			cursor: pointer;
+			padding: 0.25rem;
+			border-radius: 4px;
+			transition: all 0.2s ease;
+
+			&:hover {
+				color: $primary;
+				background-color: rgba($primary, 0.1);
+			}
+
+			svg {
+				display: block;
+			}
+		}
+
+		&__mark-all {
+			background: none;
+			border: none;
+			color: $primary;
+			cursor: pointer;
+			font-size: 0.8rem;
+			font-weight: 600;
+			padding: 0;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	&__list {
+		max-height: 20rem;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 0.5rem 0;
+	}
+
+	&__empty {
+		text-align: center;
+		color: $gray-dark;
+		font-size: 0.9rem;
+		margin: 1rem 0;
+	}
+}
+
+.MuiPopover-paper,
+.MuiPaper-root {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1rem;
+	border-radius: 1rem !important;
+	width: 10rem;
+	right: 1rem;
+	top: 3rem;
+
+	.logout-btn {
+		background: none;
+		border: none;
+		color: $error;
+		text-align: left;
+		cursor: pointer;
+		font-weight: 600;
+		padding: 0;
+		border-top: 1px solid $gray;
+		padding-top: 1rem;
+		font-size: 1rem;
+		width: 100%;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+
+.header__notifications-popover .MuiPaper-root {
+	width: auto !important;
+	min-width: 12rem;
+}
+
+@media screen and (min-width: 260px) {
+	header .header__tools .header__lists {
+		display: flex;
+	}
+}
+
+@media screen and (min-width: 360px) {
+	header {
+		.header__icon a span {
+			display: block;
+		}
+	}
+}
+
+@media screen and (min-width: 600px) {
+	header {
+		.navbar__toggle {
+			display: none;
+		}
+
+		.header__menu {
+			justify-self: start;
+			padding-left: 2rem;
+			width: 100%;
+
+			.header__nav,
+			.header__nav.active {
+				display: block;
+				position: relative;
+				inset: 0;
+				background: none;
+				box-shadow: none;
+				padding: 0;
+
+				ul {
+					flex-direction: row;
+
+					li {
+						border: none;
+						width: fit-content;
+						transition:
+							0.2s background-color ease,
+							0.2s border ease;
+
+						&:not(:has(a.active)):hover {
+							background-color: $primary-light;
+							border: 1px solid $gray;
+						}
+					}
+				}
+			}
+		}
+
+		.header__tools {
+			.navbar__toggle {
+				display: none;
+			}
+		}
+	}
+}

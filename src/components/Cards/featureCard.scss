@@ -1,0 +1,38 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.featureCard {
+	background-color: #fff;
+	border: 1px solid $gray;
+	border-radius: 1rem;
+	padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+	svg {
+		background-color: $primary-light;
+		color: $primary;
+		width: 2.7rem;
+		height: 2.7rem;
+		padding: 0.5rem;
+		border-radius: 0.5rem;
+		transition:
+			0.2s background-color ease,
+			0.2s color ease;
+	}
+
+	p, h3{
+        margin: 0;
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.featureCard {
+		svg:hover {
+			background-color: $primary;
+			color: $primary-light;
+		}
+	}
+}

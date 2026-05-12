@@ -1,0 +1,67 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.featuredBooks {
+	width: 100%;
+	background-color: $bg-normal;
+	padding: 2rem 0;
+	text-align: center;
+
+	h2,
+	p {
+		margin: 0;
+	}
+
+	.featuredBooks__container {
+		width: 90%;
+		max-width: 80rem;
+		margin: 0 auto;
+
+		.featuredBooks__header,
+		.featuredBooks__header > div {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.featuredBooks__header {
+			margin: 0 auto;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.featuredBooks__grid {
+			margin-top: 2rem;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(10rem, 15rem));
+			gap: 1rem;
+			justify-content: center;
+		}
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.featuredBooks {
+		padding: 3rem 0;
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.featuredBooks {
+		padding: 4rem 0;
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.featuredBooks {
+		padding: 5rem 0;
+
+		.featuredBooks__container {
+			.featuredBooks__header {
+				flex-direction: row;
+				text-align: left;
+				justify-content: space-between;
+			}
+		}
+	}
+}

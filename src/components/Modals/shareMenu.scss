@@ -1,0 +1,47 @@
+@use "@/styles/vars" as *;
+
+.shareMenu {
+    .MuiPaper-root {
+        background-color: $bg-light;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        min-width: 200px;
+        width: fit-content;
+        overflow: hidden;
+
+        @media (max-width: 480px) {
+            width: 90vw;
+            min-width: auto;
+        }
+    }
+
+    .MuiMenuItem-root {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-family: $text;
+        font-size: 0.9rem;
+        color: $text-color;
+        transition: background-color 0.2s ease;
+        white-space: normal;
+
+        @media (max-width: 480px) {
+            padding: 0.75rem;
+            gap: 0.5rem;
+        }
+
+        &:hover {
+            background-color: $gray;
+        }
+
+        svg {
+            color: $gray-dark;
+            flex-shrink: 0;
+        }
+
+        span {
+            font-weight: 500;
+        }
+    }
+}

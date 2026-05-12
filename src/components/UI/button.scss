@@ -1,0 +1,96 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.button {
+	&.btn-normal {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 0.9rem;
+		gap: 0.5rem;
+
+		&.btn-text {
+			color: $primary;
+			background: none;
+			border: none;
+
+			svg {
+				color: $primary;
+			}
+		}
+
+		&.btn-contained,
+		&.btn-outlined {
+			padding: 0.5rem 1rem;
+			border-radius: 0.5rem;
+		}
+
+		&.btn-contained {
+			color: $primary-light;
+			background-color: $primary;
+			border: none;
+
+			svg {
+				color: $primary-light;
+			}
+		}
+
+		&.btn-outlined {
+			border: 1px solid $primary;
+			color: $primary;
+		}
+	}
+
+	&.btn-icon {
+		background-color: $primary-light;
+		border-radius: 50%;
+		width: 2rem;
+		height: 2rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.button {
+	}
+}
+
+@media screen and (min-width: 600px) {
+	.button {
+		&.btn-normal {
+			transition:
+				0.2s background-color ease,
+				0.2s transform ease;
+
+			svg {
+				transition: 0.2s transform ease;
+			}
+
+			&.btn-contained:hover {
+				background-color: $primary-hover;
+			}
+
+			&.button:has(svg):hover svg {
+				transform: translateX(0.2rem);
+			}
+
+			&.btn-contained:not(:has(svg)):hover,
+			&.btn-outlined:not(:has(svg)):hover {
+				transform: translateY(-0.2rem);
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.button {
+	}
+}
+
+@media screen and (min-width: 1200px) {
+	.button {
+	}
+}

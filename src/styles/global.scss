@@ -1,0 +1,89 @@
+@use "./vars" as *;
+
+/* MOBILE FIRST */
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	padding: 0 !important;
+	margin: 0;
+	font-family: $text;
+	font-size: 0.9rem;
+	color: $text-color;
+	background-color: $bg-light;
+	overflow: visible !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: $title;
+}
+
+p {
+	color: $gray-dark;
+}
+
+.alert {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: fit-content;
+
+	@media screen and (min-width: 500px) {
+		flex-direction: row;
+	}
+}
+
+button,
+input,
+textarea,
+a,
+::placeholder {
+	font-family: $text;
+	color: $text-color;
+}
+
+::placeholder {
+	color: $gray-dark;
+}
+
+a {
+	text-decoration: none;
+}
+
+button,
+input {
+	border: none;
+	background: none;
+	padding: 0;
+}
+
+svg {
+	color: $text-color;
+}
+
+.bookCard__stars svg {
+	color: inherit;
+}
+
+main {
+	margin-top: 4rem;
+}
+
+@media screen and (min-width: 500px) {
+}
+
+@media screen and (min-width: 700px) {
+}
+
+@media screen and (min-width: 900px) {
+}
+
+@media screen and (min-width: 1200px) {
+}

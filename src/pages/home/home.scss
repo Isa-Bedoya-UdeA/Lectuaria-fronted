@@ -1,0 +1,28 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.home {
+	h2 {
+		font-size: 2rem;
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.home {
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.home {
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.home {
+	}
+}
+
+@media screen and (min-width: 1200px) {
+	.home {
+	}
+}

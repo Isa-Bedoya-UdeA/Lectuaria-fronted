@@ -1,0 +1,26 @@
+import useSEO from "@/hooks/useSEO";
+import CTA from "@/components/Home/CTA";
+import FeaturedBooks from "@/components/Home/FeaturedBooks";
+import Features from "@/components/Home/Features";
+import Hero from "@/components/Home/Hero";
+import { SITE_INFO } from "@/constants/siteInfo";
+import "./home.scss";
+
+const Home = () => {
+    useSEO({
+        title: `Inicio | ${SITE_INFO.name}`,
+        description: "Bienvenido a Lectuaria, la mejor comunidad para amantes de los libros en Medellín, Colombia. Descubre, comparte y conecta.",
+        keywords: "libros, lectura, Medellín, Colombia, biblioteca, comunidad, reseñas"
+    });
+
+    return (
+        <main className="home">
+            <Hero />
+            <Features />
+            <FeaturedBooks />
+            <CTA />
+        </main>
+    );
+}
+
+export default Home;

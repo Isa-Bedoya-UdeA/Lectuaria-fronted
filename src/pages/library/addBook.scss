@@ -1,0 +1,417 @@
+@use "@/styles/vars" as *;
+
+.addBook {
+	width: 100%;
+	background-color: $bg-normal;
+	padding: 2rem;
+
+	.MuiPaper-root {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+
+		@media screen and (min-width: 500px) {
+			flex-direction: row;
+		}
+	}
+
+	.addBook__container {
+		width: 100%;
+		max-width: 60rem;
+		margin: 0 auto;
+	}
+
+	.addBook__back {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: $primary;
+		text-decoration: none;
+		font-weight: 600;
+		margin-bottom: 2rem;
+		width: fit-content;
+		transition: transform 0.2s ease;
+
+		&:hover {
+			transform: translateX(-5px);
+		}
+
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	.addBook__header {
+		text-align: center;
+		margin-bottom: 3rem;
+
+		h1 {
+			margin-bottom: 0.5rem;
+			color: $primary;
+			font-family: $title;
+			font-size: 2.2rem;
+			font-weight: 800;
+		}
+
+		p {
+			margin: 0;
+			color: $gray-dark;
+			font-size: 1.1rem;
+		}
+	}
+
+	.addBook__form {
+		background-color: $white;
+		border-radius: 1.5rem;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+		padding: 2.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 2.5rem;
+		border: 1px solid rgba($primary, 0.05);
+
+		.error-text {
+			color: $error;
+			font-size: 0.85rem;
+			font-weight: 600;
+			margin-top: 0.3rem;
+		}
+
+		.hint {
+			font-size: 0.85rem;
+			color: $gray-dark;
+			font-style: italic;
+			margin-top: 0.4rem;
+		}
+
+		/* ISBN SECTION */
+		.addBook__isbn-section {
+			background-color: $bg-light;
+			padding: 2.5rem;
+			border-radius: 1.25rem;
+			border: 1px dashed $gray-2;
+
+			.addBook__isbn-group {
+				width: 100%;
+
+				.addBook__isbn-field-wrapper {
+					display: flex;
+					flex-direction: column;
+					gap: 1rem;
+
+					label {
+						font-weight: 700;
+						color: $bg-dark;
+						font-size: 1rem;
+					}
+
+					.addBook__isbn-input-row {
+						display: flex;
+						flex-direction: column;
+						gap: 1rem;
+
+						input {
+							flex: 1;
+							border-radius: 0.5rem;
+							background-color: $gray;
+							border: 1px solid $gray-2;
+							padding: 0.6rem 1rem;
+							font-size: 0.9rem;
+							height: 48px;
+							color: $text-color;
+
+							&:focus {
+								outline: none;
+								border-color: $secondary;
+							}
+						}
+
+						button {
+							width: 100%;
+							justify-content: center;
+							height: 48px;
+						}
+
+						@media screen and (min-width: 768px) {
+							flex-direction: row;
+							align-items: flex-start;
+
+							button {
+								width: fit-content;
+								min-width: 140px;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		.addBook__row {
+			display: flex;
+			flex-direction: column;
+			gap: 2rem;
+
+			@media screen and (min-width: 768px) {
+				flex-direction: row;
+
+				.addBook__group {
+					flex: 1;
+				}
+			}
+		}
+
+		.addBook__group {
+			display: flex;
+			flex-direction: column;
+			gap: 0.6rem;
+			width: 100%;
+
+			label {
+				font-weight: 700;
+				font-size: 0.95rem;
+				color: $bg-dark;
+				margin-left: 0.2rem;
+			}
+
+			input,
+			select,
+			textarea {
+				border-radius: 0.75rem;
+				background-color: $bg-normal;
+				border: 1px solid $gray-2;
+				padding: 0.9rem 1.2rem;
+				font-family: inherit;
+				font-size: 1rem;
+				width: 100%;
+				transition: all 0.2s ease;
+				color: $text-color;
+
+				&:focus {
+					outline: none;
+					border-color: $primary;
+					box-shadow: 0 0 0 3px rgba($primary, 0.1);
+					background-color: $white;
+				}
+
+				&:disabled {
+					background-color: $gray;
+					cursor: not-allowed;
+					opacity: 0.7;
+				}
+			}
+
+			textarea {
+				resize: vertical;
+				min-height: 120px;
+			}
+
+			/* Custom Select styling to hide double borders / fix arrow */
+			&.select-wrapper {
+				position: relative;
+
+				select {
+					appearance: none;
+					cursor: pointer;
+					padding-right: 2.5rem;
+				}
+
+				&::after {
+					content: "▼";
+					position: absolute;
+					right: 1.2rem;
+					bottom: 1.1rem;
+					font-size: 0.8rem;
+					color: $gray-dark;
+					pointer-events: none;
+				}
+			}
+		}
+
+		/* TAG SYSTEM STYLES */
+		.tag-input-container {
+			display: flex;
+			flex-direction: column;
+			background-color: $bg-normal;
+			border: 1px solid $gray-2;
+			border-radius: 0.75rem;
+			padding: 0.5rem;
+			min-height: 48px;
+			transition: all 0.2s ease;
+
+			&:focus-within {
+				border-color: $primary;
+				background-color: $white;
+				box-shadow: 0 0 0 3px rgba($primary, 0.1);
+			}
+
+			.tag-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-bottom: 0.5rem;
+
+				&:empty {
+					margin-bottom: 0;
+				}
+
+				.tag-pill {
+					display: flex;
+					align-items: center;
+					gap: 0.4rem;
+					background-color: $primary-light;
+					color: $primary;
+					padding: 0.3rem 0.8rem;
+					border-radius: 2rem;
+					font-size: 0.85rem;
+					font-weight: 700;
+					border: 1px solid rgba($primary, 0.15);
+
+					button {
+						background: none;
+						border: none;
+						color: $primary;
+						font-size: 1.2rem;
+						cursor: pointer;
+						line-height: 1;
+						padding: 0;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						opacity: 0.7;
+
+						&:hover {
+							opacity: 1;
+						}
+					}
+				}
+			}
+
+			input {
+				background: none !important;
+				border: none !important;
+				box-shadow: none !important;
+				padding: 0.4rem 0.7rem !important;
+				font-size: 0.95rem !important;
+				min-width: 150px;
+			}
+		}
+
+		/* COVER SECTION */
+		.addBook__cover-modes {
+			display: flex;
+			background-color: $bg-normal;
+			padding: 0.4rem;
+			border-radius: 0.75rem;
+			border: 1px solid $gray-2;
+			gap: 0.4rem;
+			width: fit-content;
+			flex-wrap: wrap;
+
+			button {
+				padding: 0.6rem 1.2rem;
+				border: none;
+				background: none;
+				border-radius: 0.5rem;
+				font-size: 0.9rem;
+				font-weight: 600;
+				color: $gray-dark;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				min-width: auto;
+
+				&.btn-contained {
+					background-color: $white;
+					color: $primary;
+					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+				}
+
+				&:hover:not(.btn-contained) {
+					background-color: rgba($primary, 0.05);
+					color: $primary;
+				}
+			}
+		}
+
+		.addBook__cover-preview {
+			margin-top: 1.5rem;
+			display: flex;
+			justify-content: center;
+			background-color: $bg-normal;
+			padding: 2rem;
+			border-radius: 1rem;
+			border: 1px dashed $gray-2;
+
+			img {
+				max-width: 200px;
+				max-height: 300px;
+				height: auto;
+				object-fit: contain;
+				border-radius: 0.5rem;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+			}
+		}
+
+		/* AVAILABILITY */
+		.addBook__availability {
+			background-color: $bg-light;
+			padding: 2rem;
+			border-radius: 1.25rem;
+			border: 1px solid rgba($primary, 0.1);
+
+			h3 {
+				margin: 0;
+				margin-bottom: 1.5rem;
+				color: $primary;
+				font-family: $title;
+				font-size: 1.4rem;
+				font-weight: 700;
+			}
+
+			.addBook__availability-options {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 1.5rem;
+
+				@media screen and (min-width: 600px) {
+					grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				}
+
+				select {
+					background-color: $white;
+				}
+
+				input {
+					background-color: $white;
+				}
+			}
+		}
+
+		.addBook__submit {
+			padding-top: 2rem;
+			border-top: 1px solid $gray-2;
+
+			button {
+				width: 100%;
+				padding: 1.2rem;
+				font-size: 1.1rem;
+				letter-spacing: 0.5px;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.addBook {
+		padding: 1.5rem 1rem;
+
+		.addBook__form {
+			padding: 1.5rem;
+			gap: 1.5rem;
+		}
+
+		.addBook__header h1 {
+			font-size: 1.8rem;
+		}
+	}
+}

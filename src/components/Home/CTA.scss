@@ -1,0 +1,60 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.cta {
+	width: 100%;
+	width: 90%;
+	margin: 0 auto;
+	padding: 2rem 0;
+
+	.cta__container {
+		background-color: $primary;
+		color: $white;
+		padding: 2rem;
+		border-radius: 1rem;
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		max-width: 30rem;
+		margin: 0 auto;
+
+		h2, p {
+			margin: 0;
+		}
+
+		p {
+			color: $gray-2;
+		}
+
+		a > button {
+			color: $white !important;
+			background-color: $secondary !important;
+		}
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.cta {
+		padding: 3rem 0;
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.cta {
+		padding: 4rem 0;
+
+		.cta__container {
+			a > button:hover {
+				background-color: $secondary-hover !important;
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.cta {
+		padding: 5rem 0;
+	}
+}

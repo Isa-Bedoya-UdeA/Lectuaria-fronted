@@ -1,0 +1,41 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.features {
+	text-align: center;
+	width: 90%;
+	max-width: 80rem;
+	margin: 0 auto;
+	padding: 2rem 0;
+
+    .features__header {
+        max-width: 30rem;
+        margin: 0 auto;
+    }
+
+	.features__grid {
+		margin-top: 2rem;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(10rem, 17rem));
+		justify-content: center;
+		gap: 1rem;
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.features {
+		padding: 3rem 0;
+	}
+}
+
+@media screen and (min-width: 700px) {
+	.features {
+		padding: 4rem 0;
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.features {
+        padding: 5rem 0;
+	}
+}

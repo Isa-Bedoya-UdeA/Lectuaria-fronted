@@ -1,0 +1,109 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.friendCard {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.85rem 1rem;
+	border-radius: 0.75rem;
+	border: 1px solid $gray;
+	background-color: $white;
+	transition: box-shadow 0.2s ease;
+
+	&:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	}
+
+	.friendCard__info {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+
+		p,
+		small {
+			margin: 0;
+			display: block;
+		}
+
+		p {
+			font-weight: 600;
+			font-size: 0.95rem;
+		}
+
+		small {
+			font-size: 0.78rem;
+			color: $gray-dark;
+		}
+
+		.friendCard__username {
+			color: $primary;
+			text-decoration: none;
+			transition: color 0.2s ease;
+
+			&:hover {
+				color: $primary-hover;
+				text-decoration: underline;
+			}
+		}
+	}
+
+	.friendCard__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+
+		button {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 0.15rem;
+			background: none;
+			border: none;
+			cursor: pointer;
+			padding: 0.4rem;
+			border-radius: 0.4rem;
+			transition: background-color 0.2s ease, color 0.2s ease;
+			color: $gray-dark;
+
+			svg {
+				transition: color 0.2s ease;
+			}
+
+			span {
+				font-size: 0.65rem;
+				color: $gray-dark;
+			}
+
+			&:hover {
+				background-color: $gray;
+			}
+		}
+	}
+
+	// Status-specific button hover colors
+	&.friends .friendCard__actions button:hover svg {
+		color: $error;
+	}
+
+	&.none .friendCard__actions button:hover svg {
+		color: $primary;
+	}
+
+	&.pending_sent .friendCard__actions button:hover svg {
+		color: $error;
+	}
+
+	&.pending_received .friendCard__actions {
+		button:first-child:hover svg {
+			color: $success;
+		}
+
+		button:last-child:hover svg {
+			color: $error;
+		}
+	}
+}
