@@ -1,0 +1,245 @@
+@use "@/styles/vars" as *;
+
+.topRated {
+	width: 100%;
+	min-height: 100vh;
+	background-color: $bg-normal;
+
+	&__container {
+		width: 90%;
+		max-width: 80rem;
+		margin: 0 auto;
+		padding: 2rem 0;
+	}
+
+	&__header {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		margin-bottom: 2rem;
+
+		h1 {
+			margin: 0;
+			color: $primary;
+			font-size: 2rem;
+		}
+
+		p {
+			margin: 0;
+			color: $text-color;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 1rem;
+	}
+
+	&__filterbtn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: none;
+		border: 1px solid $primary;
+		color: $primary;
+		padding: 0.5rem 1rem;
+		border-radius: 8px;
+		cursor: pointer;
+		font-family: $text;
+		font-weight: 600;
+		transition: all 0.2s ease;
+
+		&:hover {
+			background: rgba($primary, 0.1);
+		}
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		position: relative;
+	}
+
+	&__filters {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+		background: $bg-light;
+		padding: 1.5rem;
+		border-radius: 12px;
+		border: 1px solid rgba($primary, 0.1);
+
+		h2, h3 {
+			margin: 0;
+			color: $text-color;
+		}
+
+		h2 {
+			font-size: 1.25rem;
+			color: $primary;
+		}
+
+		h3 {
+			font-size: 1rem;
+			margin-bottom: 0.5rem;
+		}
+	}
+
+	&__close__filters {
+		display: none;
+	}
+
+	&__genres {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+
+		.chip {
+			border: 1px solid rgba($primary, 0.2);
+			background: $bg-normal;
+			
+			&.selected {
+				background: $primary;
+				color: white;
+				border-color: $primary;
+			}
+		}
+	}
+
+	&__year {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	&__select {
+		padding: 0.5rem;
+		border-radius: 8px;
+		border: 1px solid rgba($primary, 0.2);
+		background-color: $bg-normal;
+		color: $text-color;
+		font-family: $text;
+		outline: none;
+
+		&:focus {
+			border-color: $primary;
+		}
+	}
+
+	&__clear {
+		width: 100%;
+		color: $error;
+	}
+
+	&__apply {
+		width: 100%;
+	}
+
+	&__container__items {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+		flex: 1;
+	}
+
+	&__topbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid rgba($primary, 0.1);
+	}
+
+	&__count {
+		margin: 0;
+		font-weight: 600;
+		color: $text-color;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1.5rem;
+	}
+
+	&__empty {
+		text-align: center;
+		padding: 3rem;
+		background: $bg-light;
+		border-radius: 12px;
+		color: $text-color;
+	}
+
+	&__error {
+		color: $error;
+		padding: 1rem;
+		background: rgba($error, 0.1);
+		border-radius: 8px;
+		text-align: center;
+	}
+}
+
+// Para móviles, los filtros son un modal lateral
+@media screen and (max-width: 899px) {
+	.topRated {
+		&__filters {
+			position: fixed;
+			top: 0;
+			right: -100%;
+			width: 100%;
+			max-width: 300px;
+			height: 100vh;
+			z-index: 1000;
+			border-radius: 0;
+			border-left: 1px solid rgba($primary, 0.2);
+			transition: right 0.3s ease;
+			overflow-y: auto;
+			box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+
+			&.open {
+				right: 0;
+			}
+		}
+
+		&__close__filters {
+			display: block;
+			background: none;
+			border: none;
+			color: $text-color;
+			position: absolute;
+			top: 1rem;
+			right: 1rem;
+			cursor: pointer;
+			
+			&:hover {
+				color: $primary;
+			}
+		}
+	}
+}
+
+@media screen and (min-width: 900px) {
+	.topRated {
+		&__actions {
+			display: none; // Ocultar botón de filtros en desktop
+		}
+
+		&__body {
+			flex-direction: row;
+			align-items: flex-start;
+		}
+
+		&__filters {
+			width: 300px;
+			flex-shrink: 0;
+			position: sticky;
+			top: 2rem;
+		}
+
+		&__apply {
+			display: none; // Ocultar botón de aplicar en desktop, se aplica auto
+		}
+	}
+}

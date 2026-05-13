@@ -56,7 +56,9 @@ const AddToListModal = ({ isOpen, onClose, bookId, bookTitle }: AddToListModalPr
                     <>
                         <div className="addToList__list">
                             {isLoading && <p>Cargando listas...</p>}
-                            {lists.map(list => (
+                            {lists
+                                .filter(list => list.name !== "Favoritos") // Filtrar lista de favoritos
+                                .map(list => (
                                 <button
                                     key={list.id}
                                     className="addToList__item"
@@ -70,6 +72,7 @@ const AddToListModal = ({ isOpen, onClose, bookId, bookTitle }: AddToListModalPr
                                 </button>
                             ))}
                         </div>
+                        
                         <Button
                             variant="text"
                             className="addToList__new-btn"

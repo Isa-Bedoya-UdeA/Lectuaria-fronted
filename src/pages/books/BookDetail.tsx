@@ -5,7 +5,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useBookDetail } from "@/hooks/useBookDetail";
 import { useRating } from "@/hooks/useRating";
 import { useReviews } from "@/hooks/useReviews";
+import { useFavorites } from "@/hooks/useFavorites";
 import { useFriendship } from "@/hooks/useFriendship";
+import { useSimilarBooks } from "@/hooks/useSimilarBooks";
 import { useState, useEffect } from "react";
 import { SITE_INFO } from "@/constants/siteInfo";
 import useSEO from "@/hooks/useSEO";
@@ -16,8 +18,10 @@ import AddToListModal from "@/components/Modals/AddToListModal";
 import ShareMenu from "@/components/Modals/ShareMenu";
 import FriendSelector from "@/components/Cards/FriendSelector";
 import LibraryCard from "@/components/Cards/LibraryCard";
+import BookCard from "@/components/Cards/BookCard";
 import { type Review } from "@/types";
 import { ratingService } from "@/services/ratingService";
+import { addToFavorites, removeFromFavorites } from "@/services/favoriteService";
 import * as bookShareService from "@/services/bookShareService";
 import Toast, { type ToastType } from "@/components/UI/Toast";
 
@@ -56,7 +60,29 @@ const BookDetail = () => {
         deleteReview: removeReview
     } = useReviews();
 
+    // Hook para manejar favoritos
+    const {
+        checkBookIsFavorite,
+        addBookToFavorites,
+        removeBookFromFavorites,
+        isLoading: isFavoriteLoading
+    } = useFavorites();
+
     const [isFavorite, setIsFavorite] = useState(false);
+
+    // Cargar estado de favoritos cuando se carga el libro
+    useEffect(() => {
+        const loadFavoriteStatus = async () => {
+            try {
+                const favoriteStatus = await checkBookIsFavorite(book?.id || 0);
+                setIsFavorite(favoriteStatus);
+            } catch (err) {
+                console.error("Error checking favorite status:", err);
+            }
+        };
+
+        loadFavoriteStatus();
+    }, [book?.id, checkBookIsFavorite]);
     const [isAddListOpen, setIsAddListOpen] = useState(false);
     const [reviewText, setReviewText] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,6 +100,12 @@ const BookDetail = () => {
 
     const { friends, loadFriends } = useFriendship();
 
+    const { 
+        books: similarBooks, 
+        isLoading: isSimilarLoading, 
+        fetchSimilarBooks 
+    } = useSimilarBooks();
+
     // Cargar el libro y las reseñas cuando cambie el ISBN
     useEffect(() => {
         if (isbn) {
@@ -88,8 +120,9 @@ const BookDetail = () => {
     useEffect(() => {
         if (book?.id) {
             fetchReviews(book.id);
+            fetchSimilarBooks(book.id);
         }
-    }, [book?.id, fetchReviews]);
+    }, [book?.id, fetchReviews, fetchSimilarBooks]);
 
     // Inicializar tempRating y reviewText con la calificación actual del usuario
     useEffect(() => {
@@ -134,7 +167,23 @@ const BookDetail = () => {
         navigate(backPath);
     };
 
-    const handleToggleFavorite = () => setIsFavorite(prev => !prev);
+    const handleToggleFavorite = async () => {
+        if (!book?.id || !user) return;
+
+        try {
+            if (isFavorite) {
+                await removeBookFromFavorites(book.id);
+                setToast({ message: "Eliminado de favoritos", type: "success" });
+            } else {
+                await addBookToFavorites(book.id);
+                setToast({ message: "Añadido a favoritos", type: "success" });
+            }
+            setIsFavorite(!isFavorite);
+        } catch (error: any) {
+            const errorMessage = error?.response?.data?.message || error?.message || "Error al actualizar favoritos";
+            setToast({ message: errorMessage, type: "error" });
+        }
+    };
 
     const handleToggleShare = (event: React.MouseEvent<HTMLButtonElement>) => {
         setShareMenuAnchor(event.currentTarget);
@@ -176,7 +225,7 @@ const BookDetail = () => {
                 friendIds: selectedFriends,
                 message: shareMessage
             });
-            
+
             if (result.failedShares === 0) {
                 setToast({ message: result.message, type: "success" });
                 setIsShareModalOpen(false);
@@ -189,9 +238,9 @@ const BookDetail = () => {
             } else {
                 // Algunos fallaron, otros fueron exitosos
                 const errorMessage = result.errorMessages.join(". ");
-                setToast({ 
-                    message: `${result.message}. Errores: ${errorMessage}`, 
-                    type: "warning" 
+                setToast({
+                    message: `${result.message}. Errores: ${errorMessage}`,
+                    type: "warning"
                 });
                 setIsShareModalOpen(false);
                 setSelectedFriends([]);
@@ -272,6 +321,8 @@ const BookDetail = () => {
                 setToast({ message: "Calificación guardada correctamente", type: "success" });
                 setTempRating(0);
                 setReviewText("");
+                setIsEditing(false);
+                setEditingReview(null);
                 fetchReviews(book?.id || 0);
                 fetchBook(parseInt(isbn || "0", 10));
                 loadUserRating();
@@ -314,12 +365,18 @@ const BookDetail = () => {
             // Resetear estados comunes de edición/formulario
             setIsEditing(false);
             setEditingReview(null);
-
             setTempRating(0);
             setReviewText("");
-            fetchReviews(book?.id || 0);
-            fetchBook(parseInt(isbn || "0", 10));
-            loadUserRating();
+
+            // Recargar datos después de resetear el estado de edición
+            await Promise.all([
+                fetchReviews(book?.id || 0),
+                fetchBook(parseInt(isbn || "0", 10)),
+                loadUserRating() // Recargar rating del usuario para actualizar las condiciones
+            ]);
+
+            // No need for timeouts or reload, React state handles this
+
         } catch (error) {
             setToast({ message: "Error al guardar la reseña", type: "error" });
         } finally {
@@ -519,21 +576,9 @@ const BookDetail = () => {
                         <div className="bookDetail__reviews">
                             <h2>Reseñas</h2>
 
-                            {user && user.userRole === 'NORMAL' ? (
-                                (() => {
-                                    // Usamos los datos de useRating como fuente de verdad para el usuario actual
-                                    // ya que reviews solo trae la página actual del listado general
-                                    const hasExistingRating = userRating > 0;
-                                    const userReview = hasExistingRating ? {
-                                        id: reviewId || 0,
-                                        userId: user.id,
-                                        rating: userRating,
-                                        reviewText: hookReviewText,
-                                        reviewStatus: reviewStatus,
-                                        isOwnReview: true
-                                    } : null;
-
-                                    return isEditing ? (
+                            {user && user.userRole === 'NORMAL' && (
+                                <>
+                                    {isEditing ? (
                                         // Si está en modo edición, mostrar formulario precargado
                                         <form className="bookDetail__myReview" onSubmit={handleSubmitReview}>
                                             <p>Editar tu calificación</p>
@@ -563,11 +608,11 @@ const BookDetail = () => {
                                                 </Button>
                                             </div>
                                         </form>
-                                    ) : userReview && (userReview.reviewText || userReview.rating > 0) ? (
-                                        // Si tiene review o calificación pero no está editando, no mostrar formulario aquí (se mostrará en su propia tarjeta abajo)
+                                    ) : userRating > 0 && hookReviewText ? (
+                                        // Si tiene calificación y texto de reseña, no mostrar formulario (se mostrará en su propia tarjeta abajo)
                                         null
-                                    ) : (
-                                        // Si no tiene review y no está editando, mostrar formulario para nueva review
+                                    ) : userRating === 0 ? (
+                                        // Si no tiene calificación, mostrar formulario para nueva review
                                         <form className="bookDetail__myReview" onSubmit={handleSubmitReview}>
                                             <p>Tu calificación</p>
                                             <Rating
@@ -587,13 +632,17 @@ const BookDetail = () => {
                                                 rows={4}
                                                 maxLength={2000}
                                             />
-                                            <Button type="submit" disabled={tempRating === 0 || isSubmitting || ratingLoading}>
-                                                {isSubmitting ? "Publicando..." : "Publicar reseña"}
-                                            </Button>
+                                            <div className="bookDetail__editActions">
+                                                <Button type="submit" disabled={tempRating === 0 || isSubmitting || ratingLoading}>
+                                                    {isSubmitting ? "Publicando..." : "Publicar reseña"}
+                                                </Button>
+                                            </div>
                                         </form>
-                                    );
-                                })()
-                            ) : user ? (
+                                    ) : null
+                                    }
+                                </>
+                            )}
+                            {user ? (
                                 <div className="bookDetail__loginPrompt">
                                     <p>Los bibliotecarios no pueden calificar libros. Solo los usuarios lectores pueden dejar calificaciones.</p>
                                 </div>
@@ -683,6 +732,20 @@ const BookDetail = () => {
                         </div>
                     </article>
                 </section>
+
+                {/* Libros Similares */}
+                {similarBooks && similarBooks.length > 0 && (
+                    <section className="bookDetail__similar">
+                        <h2>Libros Similares</h2>
+                        <div className="bookDetail__similar-carousel">
+                            {similarBooks.map((similarBook) => (
+                                <div className="bookDetail__similar-item" key={similarBook.id}>
+                                    <BookCard book={similarBook} />
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+                )}
             </div>
 
             {toast && (
@@ -764,8 +827,8 @@ const BookDetail = () => {
                             <Button variant="outlined" onClick={() => setIsShareModalOpen(false)}>
                                 Cancelar
                             </Button>
-                            <Button 
-                                onClick={handleSendShare} 
+                            <Button
+                                onClick={handleSendShare}
                                 disabled={selectedFriends.length === 0 || isSubmitting}
                             >
                                 {isSubmitting ? "Enviando..." : "Compartir"}

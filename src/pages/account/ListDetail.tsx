@@ -10,11 +10,15 @@ import BookCard from "@/components/Cards/BookCard";
 import Button from "@/components/UI/Button";
 import Modal from "@/components/UI/Modal";
 import ShareMenu from "@/components/Modals/ShareMenu";
+import MoveBookModal from "@/components/Modals/MoveBookModal";
 import { useUserLists } from "@/hooks/useUserLists";
 import { Chip } from "@mui/material";
 import { getListShares, removeListShare, createPublicShareLink } from "@/services/listShareService";
 import type { UserListShare } from "@/types/notifications";
 import { useAuth } from "@/context/AuthContext";
+import { useFriendship } from "@/hooks/useFriendship";
+import FriendSelector from "@/components/Cards/FriendSelector";
+import * as listShareService from "@/services/listShareService";
 
 const ListDetail = () => {
     const { id } = useParams<{ id: string }>();
@@ -30,6 +34,12 @@ const ListDetail = () => {
     const [shareMenuAnchor, setShareMenuAnchor] = useState<HTMLElement | null>(null);
     const [shares, setShares] = useState<UserListShare[]>([]);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
+    const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+    const [bookToMove, setBookToMove] = useState<{ id: number; title: string } | null>(null);
+    const [selectedFriends, setSelectedFriends] = useState<number[]>([]);
+    const [shareMessage, setShareMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { friends, loadFriends } = useFriendship();
 
     // Verificar si el usuario actual es el dueño de la lista
     const isOwner = list && user ? list.userId === user.id : false;
@@ -80,17 +90,52 @@ const ListDetail = () => {
         setShareMenuAnchor(null);
     };
 
-    const handleShareWithFriends = async () => {
+    const handleShareWithFriends = () => {
         handleCloseShareMenu();
-        if (!list) return;
+        loadFriends();
+        setIsShareModalOpen(true);
+    };
+
+    const handleSendShare = async () => {
+        if (!list?.id || selectedFriends.length === 0) return;
+        setIsSubmitting(true);
         try {
-            const sharesData = await getListShares(list.id);
-            setShares(sharesData);
-            setIsShareModalOpen(true);
+            const result = await listShareService.shareListWithFriends(list.id, {
+                friendIds: selectedFriends,
+                message: shareMessage
+            });
+            
+            if (result.failedShares === 0) {
+                setToast({ message: result.message, type: "success" });
+                setIsShareModalOpen(false);
+                setSelectedFriends([]);
+                setShareMessage("");
+            } else if (result.successfulShares === 0) {
+                // Todos fallaron
+                const errorMessage = result.errorMessages.join(". ");
+                setToast({ message: errorMessage || result.message, type: "error" });
+            } else {
+                // Algunos fallaron, otros fueron exitosos
+                const errorMessage = result.errorMessages.join(". ");
+                setToast({ 
+                    message: `${result.message}. Errores: ${errorMessage}`, 
+                    type: "warning" 
+                });
+                setIsShareModalOpen(false);
+                setSelectedFriends([]);
+                setShareMessage("");
+            }
         } catch (err: any) {
-            const errorMessage = err?.message || "Error al cargar información de compartición";
-            setToast({ message: errorMessage, type: "error" });
+            setToast({ message: "Error al compartir la lista", type: "error" });
+        } finally {
+            setIsSubmitting(false);
         }
+    };
+
+    const handleMoveBook = (bookId: number, bookTitle: string) => {
+        if (!list) return;
+        setBookToMove({ id: bookId, title: bookTitle });
+        setIsMoveModalOpen(true);
     };
 
     const handleCopyLink = async () => {
@@ -192,7 +237,12 @@ const ListDetail = () => {
                     {(list.books || []).length > 0 ? (
                         <div className="listDetail__grid">
                             {(list.books || []).map(book => (
-                                <BookCard key={book.id} book={book} onRemoveFromList={handleRemoveBook} />
+                                <BookCard 
+                                    key={book.id} 
+                                    book={book} 
+                                    onRemoveFromList={handleRemoveBook} 
+                                    onMoveBook={handleMoveBook}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -213,44 +263,57 @@ const ListDetail = () => {
                 confirmText="Eliminar permanentemente"
                 cancelText="Cancelar"
             />
-            <Modal
-                isOpen={isShareModalOpen}
-                onClose={() => setIsShareModalOpen(false)}
-                title="Compartir lista con amigos"
-                message=""
-                confirmText=""
-                cancelText="Cerrar"
-                hideFooter
-            >
-                <div className="share-modal-content">
-                    {shares.length > 0 && (
-                        <div className="share-modal-section">
-                            <h3>Compartido con amigos</h3>
-                            <div className="shares-list">
-                                {shares.map(share => (
-                                    <div key={share.id} className="share-item">
-                                        <span>{share.receiverName}</span>
-                                        <Button variant="text" onClick={() => handleRemoveShare(share.id)}>
-                                            Eliminar
-                                        </Button>
-                                    </div>
-                                ))}
+            {isShareModalOpen && (
+                <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsShareModalOpen(false); }}>
+                    <div className="modal-content share-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Compartir con amigos</h2>
+                            <button className="close-btn" onClick={() => setIsShareModalOpen(false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="m15 9l-6 6m0-6l6 6" /></g></svg>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <FriendSelector
+                                friends={friends}
+                                selectedFriends={selectedFriends}
+                                onSelectionChange={setSelectedFriends}
+                            />
+                            <div className="share-message">
+                                <label>Mensaje (opcional)</label>
+                                <textarea
+                                    value={shareMessage}
+                                    onChange={(e) => setShareMessage(e.target.value)}
+                                    placeholder="Añade un mensaje personalizado..."
+                                    maxLength={500}
+                                    rows={3}
+                                    onClick={(e) => e.stopPropagation()}
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                />
                             </div>
                         </div>
-                    )}
-                    {shares.length === 0 && (
-                        <p>No has compartido esta lista con ningún amigo.</p>
-                    )}
+                        <div className="modal-footer">
+                            <Button variant="outlined" onClick={() => setIsShareModalOpen(false)}>
+                                Cancelar
+                            </Button>
+                            <Button 
+                                onClick={handleSendShare} 
+                                disabled={selectedFriends.length === 0 || isSubmitting}
+                            >
+                                {isSubmitting ? "Enviando..." : "Compartir"}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-            </Modal>
-
-            {toast && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast(null)}
-                />
             )}
+            <MoveBookModal
+                isOpen={isMoveModalOpen}
+                onClose={() => setIsMoveModalOpen(false)}
+                onMoveComplete={() => fetchListDetails()}
+                bookId={bookToMove?.id || 0}
+                bookTitle={bookToMove?.title || ""}
+                currentListId={list.id}
+                currentListName={list.name}
+            />
         </main>
     );
 };

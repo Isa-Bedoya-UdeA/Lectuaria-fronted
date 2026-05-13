@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useUserProfile } from "@/hooks/useUserProfile";
-import { useFriendship } from "@/hooks/useFriendship";
-import { useAuth } from "@/context/AuthContext";
-import Button from "@/components/UI/Button";
-import { SITE_INFO } from "@/constants/siteInfo";
 import useSEO from "@/hooks/useSEO";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { SITE_INFO } from "@/constants/siteInfo";
+import { useAuth } from "@/context/AuthContext";
+import { useFriendship } from "@/hooks/useFriendship";
+import FriendReviewCard from "@/components/Cards/FriendReviewCard";
+import FriendBookCard from "@/components/Cards/FriendBookCard";
+import Button from "@/components/UI/Button";
 import { Avatar } from "@mui/material";
 import { cyan } from "@mui/material/colors";
 import "./userProfile.scss";
@@ -13,8 +15,8 @@ import "./userProfile.scss";
 const UserProfile = () => {
     const { usernameSlug } = useParams<{ usernameSlug: string }>();
     const { user } = useAuth();
-    const { profile, isLoading, error, fetchProfile } = useUserProfile(usernameSlug || "");
-    const { sendRequest, removeFriend } = useFriendship();
+    const { profile, isLoading, error, fetchProfile, friendActivity } = useUserProfile(usernameSlug || "");
+    const { sendRequest, removeFriend, isPending } = useFriendship();
 
     const getInitials = (fullName: string): string => {
         return fullName
@@ -94,8 +96,7 @@ const UserProfile = () => {
     }
 
     const isSelf = user && user.id === profile.id;
-    const isFriend = profile.friendshipStatus === "ACCEPTED";
-    const isPending = profile.friendshipStatus === "PENDING";
+    const isFriend = profile?.friendshipStatus === "ACCEPTED";
 
     return (
         <main className="userProfile">
@@ -138,6 +139,91 @@ const UserProfile = () => {
                         )}
                     </article>
                 </section>
+
+                {/* Sección de actividad - solo visible si es amigo */}
+                {isFriend && friendActivity && friendActivity.length > 0 && (
+                    <section className="userProfile__activity">
+                        <h2 className="userProfile__activity-title">Actividad reciente</h2>
+                        <div className="userProfile__activity-sections">
+                            {/* Reseñas recientes */}
+                            {friendActivity
+                                .filter(activity => activity.activityType === 'BOOK_REVIEWED')
+                                .length > 0 && (
+                                    <div className="userProfile__activity-section">
+                                        <h3 className="userProfile__section-title">Reseñas recientes</h3>
+                                        <div className="userProfile__section-content">
+                                            {friendActivity
+                                                .filter(activity => activity.activityType === 'BOOK_REVIEWED')
+                                                .slice(0, 3).map(review => (
+                                                    <FriendReviewCard
+                                                        key={review.id}
+                                                        review={{
+                                                            id: review.id.toString(),
+                                                            bookId: review.bookId || 0,
+                                                            userId: review.userId,
+                                                            userName: review.userName,
+                                                            createdAt: review.createdAt,
+                                                            updatedAt: review.updatedAt || review.createdAt,
+                                                            rating: review.rating || 0,
+                                                            reviewText: review.reviewText || "",
+                                                            status: (review.status as "draft" | "published" | "hidden" | "DRAFT" | "PUBLISHED") || "published",
+                                                            helpfulCount: review.helpfulCount || 0
+                                                        }}
+                                                        bookTitle={review.bookTitle || ""}
+                                                        bookIsbn={review.bookIsbn || ""}
+                                                    />
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+                            
+                            {/* Libros añadidos a listas */}
+                            {friendActivity
+                                .filter(activity => activity.activityType === 'BOOK_ADDED_TO_LIST')
+                                .length > 0 && (
+                                    <div className="userProfile__activity-section">
+                                        <h3 className="userProfile__section-title">Libros añadidos a listas</h3>
+                                        <div className="userProfile__section-content">
+                                            {friendActivity
+                                                .filter(activity => activity.activityType === 'BOOK_ADDED_TO_LIST')
+                                                .slice(0, 3).map(book => {
+                                                    console.log('FriendBookCard book data:', {
+                                                        bookId: book.bookId,
+                                                        listId: book.listId,
+                                                        listName: book.listName,
+                                                        isPublic: book.isPublic,
+                                                        publicToken: book.publicToken,
+                                                        visibility: book.visibility
+                                                    });
+                                                    
+                                                    return (
+                                                        <FriendBookCard
+                                                            key={book.id}
+                                                            book={{
+                                                                id: book.bookId || 0,
+                                                                isbn: parseInt(book.bookIsbn || "0"),
+                                                                title: book.bookTitle || "",
+                                                                coverUrl: book.bookCoverUrl,
+                                                                authors: book.bookAuthors || [],
+                                                                genres: [],
+                                                                averageRating: 0,
+                                                                ratingsCount: 0
+                                                            }}
+                                                            listName={book.listName || ""}
+                                                            listId={book.listId as number || 0}
+                                                            isPublic={book.isPublic || false}
+                                                            publicToken={book.publicToken || undefined}
+                                                            visibility={book.visibility}
+                                                        />
+                                                    );
+                                                })
+                                            }
+                                        </div>
+                                    </div>
+                                )}
+                        </div>
+                    </section>
+                )}
             </div>
         </main>
     );

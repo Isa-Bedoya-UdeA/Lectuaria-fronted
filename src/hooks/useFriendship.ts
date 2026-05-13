@@ -132,6 +132,7 @@ export const useFriendship = () => {
         searchResults,
         loading,
         error,
+        isPending: loading,
         loadFriends,
         loadPendingRequests,
         searchUsers,

@@ -42,7 +42,7 @@
 				position: absolute;
 				z-index: 2;
 				right: 1rem;
-				top: 1rem;
+				top: 4rem;
 
 				svg {
 					color: $error;
@@ -103,6 +103,40 @@
 				svg {
 					color: $error;
 					transition: all 0.2s ease;
+				}
+			}
+
+			.bookCard__remove-list {
+				position: absolute;
+				z-index: 2;
+				left: 1rem;
+				top: 1rem;
+
+				svg {
+					color: $error;
+					transition: all 0.2s ease;
+				}
+
+				&:hover svg {
+					color: $error;
+					transform: scale(1.1);
+				}
+			}
+
+			.bookCard__move {
+				position: absolute;
+				z-index: 2;
+				right: 1rem;
+				top: 7rem;
+
+				svg {
+					color: $primary;
+					transition: all 0.2s ease;
+				}
+
+				&:hover svg {
+					color: $secondary;
+					transform: scale(1.1);
 				}
 			}
 
@@ -326,11 +360,6 @@
 	}
 }
 
-@media screen and (min-width: 1200px) {
-	.bookCard {
-		// Estilos para pantallas grandes
-	}
-}
 
 @keyframes faded {
 	0% {

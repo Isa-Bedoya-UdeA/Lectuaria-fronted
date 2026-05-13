@@ -1,7 +1,6 @@
-/* MOBILE FIRST */
 @use "@/styles/vars" as *;
 
-.featuredBooks {
+.newBooks {
 	width: 100%;
 	background-color: $bg-normal;
 	padding: 2rem 0;
@@ -12,54 +11,32 @@
 		margin: 0;
 	}
 
-	.featuredBooks__container {
+	&__container {
 		width: 90%;
 		max-width: 80rem;
 		margin: 0 auto;
-		display: flex;
-		flex-direction: column;
-		gap: 3rem;
 
-		.featuredBooks__section {
-			display: flex;
-			flex-direction: column;
-			gap: 1.5rem;
-		}
-
-		.featuredBooks__header,
-		.featuredBooks__header > div {
+		.newBooks__header,
+		.newBooks__header > div {
 			display: flex;
 			flex-direction: column;
 			gap: 1rem;
 		}
 
-		.featuredBooks__header {
+		.newBooks__header {
 			margin: 0 auto;
 			align-items: center;
 			justify-content: center;
 		}
 
-		.featuredBooks__empty {
-			padding: 2rem;
-			text-align: center;
-			background-color: rgba($primary, 0.05);
-			border: 1px dashed rgba($primary, 0.3);
-			border-radius: 8px;
-			color: $gray-dark;
-			margin: 1rem 0;
-			
-			p {
-				margin: 0;
-			}
-		}
-
-		.featuredBooks__carousel-container {
+		.newBooks__carousel-container {
 			position: relative;
 			display: flex;
 			align-items: center;
 			width: 100%;
+			margin-top: 2rem;
 
-			.featuredBooks__nav-button {
+			.newBooks__nav-button {
 				position: absolute;
 				top: 50%;
 				transform: translateY(-50%);
@@ -96,7 +73,7 @@
 			}
 		}
 
-		.featuredBooks__carousel {
+		.newBooks__carousel {
 			display: flex;
 			overflow-x: auto;
 			gap: 1.5rem;
@@ -120,7 +97,7 @@
 				border-radius: 4px;
 			}
 
-			.featuredBooks__carousel-item {
+			.newBooks__carousel-item {
 				flex: 0 0 240px;
 				scroll-snap-align: start;
 			}
@@ -129,12 +106,12 @@
 }
 
 @media screen and (min-width: 500px) {
-	.featuredBooks {
+	.newBooks {
 		padding: 3rem 0;
 
-		.featuredBooks__container {
-			.featuredBooks__carousel {
-				.featuredBooks__carousel-item {
+		&__container {
+			.newBooks__carousel {
+				.newBooks__carousel-item {
 					flex: 0 0 260px;
 				}
 			}
@@ -143,12 +120,12 @@
 }
 
 @media screen and (min-width: 700px) {
-	.featuredBooks {
+	.newBooks {
 		padding: 4rem 0;
 
-		.featuredBooks__container {
-			.featuredBooks__carousel {
-				.featuredBooks__carousel-item {
+		&__container {
+			.newBooks__carousel {
+				.newBooks__carousel-item {
 					flex: 0 0 280px;
 				}
 			}
@@ -157,19 +134,19 @@
 }
 
 @media screen and (min-width: 900px) {
-	.featuredBooks {
+	.newBooks {
 		padding: 5rem 0;
 
-		.featuredBooks__container {
-			.featuredBooks__header {
+		&__container {
+			.newBooks__header {
 				flex-direction: row;
 				text-align: left;
 				justify-content: space-between;
 				width: 100%;
 			}
 
-			.featuredBooks__carousel {
-				.featuredBooks__carousel-item {
+			.newBooks__carousel {
+				.newBooks__carousel-item {
 					flex: 0 0 300px;
 				}
 			}
@@ -177,3 +154,8 @@
 	}
 }
 
+@media screen and (min-width: 500px) {
+	.newBooks {
+		padding: 3rem 0;
+	}
+}

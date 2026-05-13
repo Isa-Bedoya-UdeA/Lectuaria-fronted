@@ -236,10 +236,7 @@ export const getBooksByGenres = async (
  * Get top-rated books
  */
 export const getTopRatedBooks = async (
-	params: Omit<
-		BookQueryParams,
-		"keyword" | "keywords" | "genreId" | "genreIds"
-	> = {},
+	params: BookQueryParams = {},
 ): Promise<PaginatedResponse<BookSummary>> => {
 	try {
 		const response = await api.get<PaginatedResponse<BookSummary>>(
@@ -373,5 +370,25 @@ export const updateBook = async (
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to update book" };
+	}
+};
+
+export const getFeaturedSections = async (): Promise<import("../types").FeaturedSections> => {
+	try {
+		const response = await api.get<import("../types").FeaturedSections>("/books/featured");
+		return response.data;
+	} catch (error: unknown) {
+		const apiError = error as { response?: { data?: ApiError } };
+		throw apiError.response?.data || { message: "Failed to fetch featured sections" };
+	}
+};
+
+export const getSimilarBooks = async (bookId: number): Promise<BookSummary[]> => {
+	try {
+		const response = await api.get<BookSummary[]>(`/books/${bookId}/similar`);
+		return response.data;
+	} catch (error: unknown) {
+		const apiError = error as { response?: { data?: ApiError } };
+		throw apiError.response?.data || { message: "Failed to fetch similar books" };
 	}
 };

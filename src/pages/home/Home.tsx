@@ -3,6 +3,7 @@ import CTA from "@/components/Home/CTA";
 import FeaturedBooks from "@/components/Home/FeaturedBooks";
 import Features from "@/components/Home/Features";
 import Hero from "@/components/Home/Hero";
+import NewBooks from "@/components/Home/NewBooks";
 import { SITE_INFO } from "@/constants/siteInfo";
 import "./home.scss";
 
@@ -18,6 +19,7 @@ const Home = () => {
             <Hero />
             <Features />
             <FeaturedBooks />
+            <NewBooks />
             <CTA />
         </main>
     );

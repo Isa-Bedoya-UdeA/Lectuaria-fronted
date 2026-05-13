@@ -99,7 +99,11 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete }: Notification
                 if (notification.message.includes("libro")) {
                     navigate(`/books/${notification.referenceId}`);
                 } else if (notification.message.includes("lista")) {
-                    navigate(`/lists/${notification.referenceId}`);
+                    if (notification.shareToken) {
+                        navigate(`/shared/${notification.shareToken}`);
+                    } else {
+                        navigate(`/lists/${notification.referenceId}`);
+                    }
                 }
                 break;
         }

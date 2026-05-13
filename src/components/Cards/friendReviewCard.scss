@@ -1,0 +1,83 @@
+@use "@/styles/vars" as *;
+
+.friendReviewCard {
+    display: block;
+    background: $white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+        @media (min-width: 768px) {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    &__book-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        gap: 0.5rem;
+    }
+
+    &__book-link {
+        text-decoration: none;
+        color: inherit;
+        flex: 1;
+    }
+
+    &__book-title {
+        font-family: $title;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-color;
+        margin: 0 0 0.25rem 0;
+        line-height: 1.2;
+    }
+
+    &__rating {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    &__rating-value {
+        font-family: $text;
+        font-size: 0.8rem;
+        color: $gray-dark;
+        font-weight: 500;
+    }
+
+    &__review-content {
+        margin-top: 0.75rem;
+    }
+
+    &__review-text {
+        font-family: $text;
+        font-size: 0.9rem;
+        color: $text-color;
+        line-height: 1.5;
+        margin: 0 0 0.5rem 0;
+    }
+
+    &__review-meta {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 0.5rem;
+    }
+
+    &__date {
+        font-family: $text;
+        font-size: 0.75rem;
+        color: $gray-2;
+    }
+}

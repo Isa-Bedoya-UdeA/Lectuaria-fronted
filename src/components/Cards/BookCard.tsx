@@ -7,14 +7,16 @@ import AddToListModal from "../Modals/AddToListModal";
 import ShareMenu from "../Modals/ShareMenu";
 import FriendSelector from "../Cards/FriendSelector";
 import Button from "../UI/Button";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { PATHS } from "@/constants/routes";
 import { useAuth } from "@/context/AuthContext";
 import { useRating } from "@/hooks/useRating";
 import { useFriendship } from "@/hooks/useFriendship";
+import { useFavorites } from "@/hooks/useFavorites";
 import * as bookShareService from "@/services/bookShareService";
+import MoveBookModal from "../Modals/MoveBookModal";
 
 // Nota: Los estados de favorito/compartir/lista son locales para UI
 // En producción, se sincronizarían con el backend vía API
@@ -23,10 +25,10 @@ interface BookCardProps {
     book: BookSummary;
     viewMode?: 'grid' | 'list';
     onRemoveFromList?: (bookId: number) => void;
+    onMoveBook?: (bookId: number, bookTitle: string, currentListId: number, currentListName: string) => void;
 }
 
-const BookCard = ({ book, viewMode = 'grid', onRemoveFromList }: BookCardProps) => {
-    const [isFavorite, setIsFavorite] = useState(false);
+const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: BookCardProps) => {
     const [shareMenuAnchor, setShareMenuAnchor] = useState<HTMLElement | null>(null);
     const [isMenuClosing, setIsMenuClosing] = useState(false);
     const isMenuOpenRef = useRef(false);
@@ -39,9 +41,34 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList }: BookCardProps) 
     const { user } = useAuth();
     const { friends, loadFriends } = useFriendship();
     const [isAddListOpen, setIsAddListOpen] = useState(false);
+    const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
 
     // Hook para manejar calificaciones
     const { userRating, averageRating, ratingsCount, isLoading, rateBook } = useRating(book.id);
+
+    // Hook para manejar favoritos
+    const { 
+        checkBookIsFavorite, 
+        addBookToFavorites, 
+        removeBookFromFavorites,
+        isLoading: isFavoriteLoading 
+    } = useFavorites();
+    
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    // Cargar estado de favorito al montar el componente
+    useEffect(() => {
+        const loadFavoriteStatus = async () => {
+            try {
+                const favoriteStatus = await checkBookIsFavorite(book.id);
+                setIsFavorite(favoriteStatus);
+            } catch (err) {
+                console.error("Error checking favorite status:", err);
+            }
+        };
+        
+        loadFavoriteStatus();
+    }, [book.id, checkBookIsFavorite]);
 
     const handleCardClick = (e?: React.MouseEvent) => {
         if (isMenuClosing || isMenuOpenRef.current || isNavigatingRef.current) {
@@ -52,9 +79,21 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList }: BookCardProps) 
         navigate(`${PATHS.BOOKS}/${book.isbn}`);
     };
 
-    const handleToggleFavorite = (e: React.MouseEvent) => {
+    const handleToggleFavorite = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        setIsFavorite(prev => !prev);
+        try {
+            if (isFavorite) {
+                await removeBookFromFavorites(book.id);
+                setIsFavorite(false);
+                setToast({ message: "Libro eliminado de favoritos", type: "success" });
+            } else {
+                await addBookToFavorites(book.id);
+                setIsFavorite(true);
+                setToast({ message: "Libro añadido a favoritos", type: "success" });
+            }
+        } catch (err: any) {
+            setToast({ message: "Error al gestionar favoritos", type: "error" });
+        }
     };
 
     const handleToggleShare = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -130,6 +169,13 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList }: BookCardProps) 
     const handleAddToList = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsAddListOpen(true);
+    };
+
+    const handleMoveBook = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (onMoveBook) {
+            onMoveBook(book.id, book.title, book.userAddedId || 0, "Lista actual");
+        }
     };
 
     // Tooling states
@@ -211,6 +257,17 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList }: BookCardProps) 
                                     title="Quitar de esta lista"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 9l-6 6m0-6l6 6m6-3a9 9 0 1 1-18 0a9 9 0 0 1 18 0" /></svg>
+                                </Button>
+                            )}
+                            {onMoveBook && (
+                                <Button
+                                    layout="icon"
+                                    className="bookCard__move"
+                                    onClick={handleMoveBook}
+                                    aria-label="Mover libro a otra lista"
+                                    title="Mover libro a otra lista"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3L4 7l4 4M4 7h16m-4 14l4-4l-4-4m4 4H4"/></svg>
                                 </Button>
                             )}
                             <Button
@@ -405,6 +462,32 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList }: BookCardProps) 
                 bookId={book.id}
                 bookTitle={book.title}
             />
+
+            {/* Modal para mover libro */}
+            {isMoveModalOpen && createPortal(
+                <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsMoveModalOpen(false); }}>
+                    <div className="modal-content move-modal" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Mover libro</h2>
+                            <button className="close-btn" onClick={() => setIsMoveModalOpen(false)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="m15 9l-6 6m0-6l6 6" /></g></svg>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <p>¿Deseas mover "{book.title}" a otra lista?</p>
+                            <Button onClick={() => {
+                                if (onMoveBook && book.userAddedId) {
+                                    onMoveBook(book.id, book.title, book.userAddedId, "Lista actual");
+                                }
+                                setIsMoveModalOpen(false);
+                            }}>
+                                Mover a otra lista
+                            </Button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
 
             {/* Modal para compartir con amigos */}
             {isShareModalOpen && createPortal(

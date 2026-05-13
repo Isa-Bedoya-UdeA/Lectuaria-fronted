@@ -146,5 +146,12 @@ export interface BookQueryParams {
     libraryIds?: number[]; // For library filter
     startYear?: number; // For year range filter
     endYear?: number; // For year range filter
+    year?: number; // For exact year filter (used in top-rated)
     formatTypes?: string[]; // For format filter (array of "physical" and/or "digital")
+}
+
+export interface FeaturedSections {
+    mostReadThisMonth: BookSummary[];
+    topRated: BookSummary[];
+    nextUpdateAt: string;
 }

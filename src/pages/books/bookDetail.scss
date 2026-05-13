@@ -369,3 +369,53 @@
 		border-top: 1px solid $gray-2;
 	}
 }
+
+.bookDetail__similar {
+	margin-top: 4rem;
+	padding-top: 2rem;
+	border-top: 2px solid rgba($primary, 0.1);
+
+	h2 {
+		margin-bottom: 1.5rem;
+		color: $primary;
+	}
+
+	.bookDetail__similar-carousel {
+		display: flex;
+		overflow-x: auto;
+		gap: 1.5rem;
+		padding-bottom: 1rem;
+		scroll-snap-type: x mandatory;
+		scrollbar-width: thin;
+		scrollbar-color: $primary $bg-light;
+		
+		&::-webkit-scrollbar {
+			height: 8px;
+		}
+		&::-webkit-scrollbar-track {
+			background: $bg-light;
+			border-radius: 4px;
+		}
+		&::-webkit-scrollbar-thumb {
+			background: $primary;
+			border-radius: 4px;
+		}
+
+		.bookDetail__similar-item {
+			flex: 0 0 240px;
+			scroll-snap-align: start;
+		}
+
+		@media screen and (min-width: 500px) {
+			.bookDetail__similar-item {
+				flex: 0 0 260px;
+			}
+		}
+
+		@media screen and (min-width: 700px) {
+			.bookDetail__similar-item {
+				flex: 0 0 280px;
+			}
+		}
+	}
+}

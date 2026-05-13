@@ -11,6 +11,7 @@ export interface Notification {
     notificationType: NotificationType;
     message: string;
     referenceId: number | null;
+    shareToken?: string;
     read: boolean;
     createdAt: string;
 }
