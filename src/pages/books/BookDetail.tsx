@@ -639,7 +639,7 @@ const BookDetail = () => {
                                     }
                                 </>
                             )}
-                            {user ? (
+                            {user && user.userRole === 'LIBRARIAN' ? (
                                 <div className="bookDetail__loginPrompt">
                                     <p>Los bibliotecarios no pueden calificar libros. Solo los usuarios lectores pueden dejar calificaciones.</p>
                                 </div>
