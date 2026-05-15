@@ -295,13 +295,29 @@ const Header = () => {
                                         Mi biblioteca
                                     </NavLink>
                                 ) : (
-                                    <NavLink
-                                        to={PATHS.PROFILE}
-                                        className={({ isActive }) => isActive ? "active-link" : ""}
-                                        onClick={handleClose}
-                                    >
-                                        Mi cuenta
-                                    </NavLink>
+                                    <>
+                                        <NavLink
+                                            to={PATHS.PROFILE}
+                                            className={({ isActive }) => isActive ? "active-link" : ""}
+                                            onClick={handleClose}
+                                        >
+                                            Mi cuenta
+                                        </NavLink>
+                                        <NavLink
+                                            to={`${PATHS.PROFILE}?tab=amigos`}
+                                            className={({ isActive }) => isActive ? "active-link" : ""}
+                                            onClick={handleClose}
+                                        >
+                                            Mis amigos
+                                        </NavLink>
+                                        <NavLink
+                                            to={PATHS.SHARED_WITH_ME}
+                                            className={({ isActive }) => isActive ? "active-link" : ""}
+                                            onClick={handleClose}
+                                        >
+                                            Compartidos conmigo
+                                        </NavLink>
+                                    </>
                                 )}
                                 <button className="logout-btn" onClick={handleLogout}>
                                     Cerrar Sesión

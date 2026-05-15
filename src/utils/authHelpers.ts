@@ -6,7 +6,7 @@ import type { UserRole } from "../types/auth";
  */
 export const formatUserRole = (role: UserRole): string => {
 	const roles: Record<UserRole, string> = {
-		NORMAL: "Usuario",
+		READER: "Usuario",
 		LIBRARIAN: "Biblioteca",
 		ADMIN: "Administrador",
 	};

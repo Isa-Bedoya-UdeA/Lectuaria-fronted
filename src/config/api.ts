@@ -102,6 +102,7 @@ export const setAuthToken = (token: string): void => {
 export const clearAuthData = (): void => {
 	localStorage.removeItem("accessToken");
 	localStorage.removeItem("userRole");
+	localStorage.removeItem("isAuthenticated");
 };
 
 export default api;

@@ -141,7 +141,7 @@ const BookDetail = () => {
 
     // Cargar amigos cuando el usuario está autenticado
     useEffect(() => {
-        if (user && user.userRole === "NORMAL") {
+        if (user && user.userRole === "READER") {
             loadFriends();
         }
     }, [user, loadFriends]);
@@ -453,7 +453,7 @@ const BookDetail = () => {
                             <span>Ver disponibilidad en bibliotecas</span>
                         </Button>
                         <div className="bookDetail__book__tools">
-                            {user && user.userRole === 'NORMAL' && (
+                            {user && user.userRole === 'READER' && (
                                 <Button
                                     variant="outlined"
                                     onClick={handleToggleFavorite}
@@ -478,7 +478,7 @@ const BookDetail = () => {
                                 onCopyLink={handleCopyLink}
                             />
                         </div>
-                        {user?.userRole === 'NORMAL' && (
+                        {user?.userRole === 'READER' && (
                             <Button
                                 variant="outlined"
                                 onClick={handleOpenListModal}
@@ -576,7 +576,7 @@ const BookDetail = () => {
                         <div className="bookDetail__reviews">
                             <h2>Reseñas</h2>
 
-                            {user && user.userRole === 'NORMAL' && (
+                            {user && user.userRole === 'READER' && (
                                 <>
                                     {isEditing ? (
                                         // Si está en modo edición, mostrar formulario precargado

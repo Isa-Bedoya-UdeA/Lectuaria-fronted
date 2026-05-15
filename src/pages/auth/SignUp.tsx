@@ -26,7 +26,7 @@ interface SignUpFormInputs {
     password: string;
     confirmPassword: string;
 
-    // Para usuario NORMAL
+    // Para usuario READER
     username?: string;
 
     // Para bibliotecario LIBRARIAN
@@ -68,7 +68,7 @@ const SignUp = () => {
     });
 
     const password = watch("password") || "";
-    const [userRole, setUserRole] = useState<UserRole>("NORMAL");
+    const [userRole, setUserRole] = useState<UserRole>("READER");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [serverError, setServerError] = useState<string | null>(null);
@@ -102,14 +102,14 @@ const SignUp = () => {
             setServerError(null);
             clearAllErrors();
 
-            if (userRole === "NORMAL") {
-                // Registro de usuario normal
+            if (userRole === "READER") {
+                // Registro de usuario lector
                 await registerService({
                     fullName: data.fullName.trim(),
                     email: data.email.trim().toLowerCase(),
                     password: data.password,
                     confirmPassword: data.confirmPassword,
-                    userRole: "NORMAL",
+                    userRole: "READER",
                     username: data.username?.trim() || "",
                 });
             } else {
@@ -210,8 +210,8 @@ const SignUp = () => {
                 <section className="auth__userRole">
                     <button
                         type="button"
-                        className={userRole === "NORMAL" ? "selected" : ""}
-                        onClick={() => handleRoleChange("NORMAL")}
+                        className={userRole === "READER" ? "selected" : ""}
+                        onClick={() => handleRoleChange("READER")}
                         disabled={isLoading}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
@@ -240,10 +240,10 @@ const SignUp = () => {
                 </section>
 
                 <div className="auth__form">
-                    {/* Campos para usuario NORMAL */}
-                    {userRole === "NORMAL" && (
+                    {/* Campos para usuario READER */}
+                    {userRole === "READER" && (
                         <section className="auth__group">
-                            <label htmlFor="username">Nombre de usuario</label>
+                            <label htmlFor="username">Nombre de usuario *</label>
                             <input
                                 type="text"
                                 placeholder="ej: juan_lector"
@@ -263,7 +263,7 @@ const SignUp = () => {
                     )}
 
                     <section className="auth__group">
-                        <label htmlFor="email">Correo electrónico {userRole === "LIBRARIAN" && "de la cuenta *"}</label>
+                        <label htmlFor="email">Correo electrónico *</label>
                         <input
                             type="email"
                             placeholder="tu@correo.com"
@@ -474,7 +474,7 @@ const SignUp = () => {
                                 Registrando...
                             </>
                         ) : (
-                            `Registrarme como ${userRole === "NORMAL" ? "Usuario" : "Biblioteca"}`
+                            `Registrarme como ${userRole === "READER" ? "Usuario" : "Biblioteca"}`
                         )}
                     </Button>
 

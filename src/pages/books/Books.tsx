@@ -237,6 +237,8 @@ const Books = () => {
                                 <p>Cargando géneros...</p>
                             ) : genresError ? (
                                 <p className="error">Error al cargar géneros</p>
+                            ) : availableGenres.length === 0 ? (
+                                <p className="books__filters-empty">Aún no hay géneros registrados.</p>
                             ) : availableGenres.map(genre => {
                                 const hasBooks = genre.bookCount > 0;
                                 return (
@@ -261,6 +263,8 @@ const Books = () => {
                                 <p>Cargando bibliotecas...</p>
                             ) : librariesError ? (
                                 <p className="error">Error al cargar bibliotecas</p>
+                            ) : availableLibraries.length === 0 ? (
+                                <p className="books__filters-empty">Aún no hay bibliotecas registradas.</p>
                             ) : availableLibraries.map(library => (
                                 <Chip
                                     key={library.id}
@@ -420,11 +424,20 @@ const Books = () => {
                             )}
 
                             {!displayedLoading && !displayedError && displayedBooks.length === 0 && (
-                                <p className="books__empty">No se encontraron libros con los criterios seleccionados</p>
+                                <p className="books__empty">
+                                    {isSearchingMode
+                                        ? "No se encontraron libros con los criterios seleccionados"
+                                        : "Actualmente no tenemos libros en el catálogo"}
+                                </p>
                             )}
                         </div>
 
                         <div className={viewMode === 'grid' ? 'books__grid' : 'books__list'}>
+                            {displayedLoading && (
+                                <div className="books__loading" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>
+                                    Cargando libros...
+                                </div>
+                            )}
                             {!displayedLoading && !displayedError && displayedBooks.map(book => (
                                 <BookCard key={book.id} book={book} viewMode={viewMode} />
                             ))}

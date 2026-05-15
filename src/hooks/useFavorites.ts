@@ -64,7 +64,11 @@ export const useFavorites = () => {
     }, []);
 
     useEffect(() => {
-        loadFavoritesList();
+        // Solo cargar favoritos para lectores, no para bibliotecarios
+        const userRole = localStorage.getItem('userRole');
+        if (userRole !== 'LIBRARIAN') {
+            loadFavoritesList();
+        }
     }, [loadFavoritesList]);
 
     return {

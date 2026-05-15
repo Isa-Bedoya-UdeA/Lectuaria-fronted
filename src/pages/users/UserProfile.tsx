@@ -120,7 +120,7 @@ const UserProfile = () => {
                         <p className="userProfile__username">@{profile.username}</p>
                         {profile.biography && <p className="userProfile__bio">{profile.biography}</p>}
 
-                        {!isSelf && user && user.userRole === "NORMAL" && (
+                        {!isSelf && user && user.userRole === "READER" && (
                             <div className="userProfile__actions">
                                 {isFriend ? (
                                     <Button variant="outlined" onClick={handleRemoveFriend}>

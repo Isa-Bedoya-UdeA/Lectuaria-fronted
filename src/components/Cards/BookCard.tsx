@@ -56,9 +56,13 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
     
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Cargar estado de favorito al montar el componente
+    // Cargar estado de favorito al montar el componente (solo para lectores)
     useEffect(() => {
         const loadFavoriteStatus = async () => {
+            // No cargar favoritos si es bibliotecario
+            if (user?.userRole === 'LIBRARIAN') {
+                return;
+            }
             try {
                 const favoriteStatus = await checkBookIsFavorite(book.id);
                 setIsFavorite(favoriteStatus);
@@ -68,7 +72,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
         };
         
         loadFavoriteStatus();
-    }, [book.id, checkBookIsFavorite]);
+    }, [book.id, checkBookIsFavorite, user?.userRole]);
 
     const handleCardClick = (e?: React.MouseEvent) => {
         if (isMenuClosing || isMenuOpenRef.current || isNavigatingRef.current) {
@@ -81,6 +85,11 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
 
     const handleToggleFavorite = async (e: React.MouseEvent) => {
         e.stopPropagation();
+        // No permitir agregar favoritos si es bibliotecario
+        if (user?.userRole === 'LIBRARIAN') {
+            setToast({ message: "Los bibliotecarios no pueden agregar favoritos", type: "info" });
+            return;
+        }
         try {
             if (isFavorite) {
                 await removeBookFromFavorites(book.id);
@@ -267,7 +276,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
                                     aria-label="Mover libro a otra lista"
                                     title="Mover libro a otra lista"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 3L4 7l4 4M4 7h16m-4 14l4-4l-4-4m4 4H4"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 3L4 7l4 4M4 7h16m-4 14l4-4l-4-4m4 4H4"/></svg>
                                 </Button>
                             )}
                             <Button
@@ -395,7 +404,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
                     {book.genres.length > 2 && ` +${book.genres.length - 2}`}
                 </p>
 
-                {user && user.userRole === 'NORMAL' ? (
+                {user && user.userRole === 'READER' ? (
                     <div className="bookCard__add">
                         <Button
                             variant="outlined"
@@ -411,9 +420,9 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
                 }
 
                 <div className="bookCard__stars">
-                    {user && user.userRole === 'NORMAL' ? (
+                    {user && user.userRole === 'READER' ? (
                         <>
-                            {/* Estrellas interactivas para usuarios normales */}
+                            {/* Estrellas interactivas para usuarios lectores */}
                             <Rating
                                 name={`user-rating-${book.id}`}
                                 value={userRating || averageRating || book.averageRating}

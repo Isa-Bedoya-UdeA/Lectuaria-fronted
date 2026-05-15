@@ -29,6 +29,20 @@
 			justify-content: center;
 		}
 
+		.newBooks__empty {
+			padding: 2rem;
+			text-align: center;
+			background-color: rgba($primary, 0.05);
+			border: 1px dashed rgba($primary, 0.3);
+			border-radius: 8px;
+			color: $gray-dark;
+			margin: 1rem 0;
+
+			p {
+				margin: 0;
+			}
+		}
+
 		.newBooks__carousel-container {
 			position: relative;
 			display: flex;

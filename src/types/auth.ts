@@ -1,16 +1,16 @@
 // src/types/auth.ts
 
 // Roles que coinciden EXACTAMENTE con el backend (UserRole.java)
-export type UserRole = "NORMAL" | "LIBRARIAN" | "ADMIN";
+export type UserRole = "READER" | "LIBRARIAN" | "ADMIN";
 
-// Request para registro de usuario NORMAL
+// Request para registro de usuario READER
 export interface RegisterUserRequest {
 	fullName: string;
 	email: string;
 	password: string;
 	confirmPassword: string;
-	userRole: "NORMAL";
-	username: string; // Requerido para usuarios normales
+	userRole: "READER";
+	username: string; // Requerido para usuarios lectores
 }
 
 // Datos de biblioteca para registro de LIBRARIAN
@@ -68,7 +68,7 @@ export interface ProfileResponse {
 	photoUrl?: string;
 	biography?: string;
 
-	// Campos específicos para LIBRARIAN (null para NORMAL)
+	// Campos específicos para LIBRARIAN (null para READER)
 	libraryId?: number;
 	libraryName?: string;
 	libraryAddress?: string;
@@ -108,7 +108,7 @@ export interface SignInFormInputs {
 	rememberMe?: boolean;
 }
 
-// Form inputs para React Hook Form en SignUp (usuario normal)
+// Form inputs para React Hook Form en SignUp (usuario lector)
 export interface SignUpUserFormInputs {
 	fullName: string;
 	email: string;

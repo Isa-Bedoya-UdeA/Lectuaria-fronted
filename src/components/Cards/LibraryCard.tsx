@@ -22,6 +22,11 @@ const LibraryCard: React.FC<LibraryCardProps> = ({ availability }) => {
             </div>
             
             <div className="library-card__body">
+                {library.description && (
+                    <div className="library-card__description">
+                        <p>{library.description}</p>
+                    </div>
+                )}
                 <div className="library-card__contact">
                     <p><strong>Dirección:</strong> {library.address}</p>
                     <p><strong>Teléfono:</strong> {library.phone}</p>

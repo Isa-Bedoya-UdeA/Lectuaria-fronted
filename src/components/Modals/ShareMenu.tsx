@@ -13,7 +13,7 @@ interface ShareMenuProps {
 const ShareMenu = ({ onShareWithFriends, onCopyLink, anchorEl, onClose, onShareWithFriendsStart }: ShareMenuProps) => {
     const open = Boolean(anchorEl);
     const { user } = useAuth();
-    const isNormalReader = user && user.userRole === 'NORMAL';
+    const isReader = user && user.userRole === 'READER';
 
     const handleShareWithFriends = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -58,7 +58,7 @@ const ShareMenu = ({ onShareWithFriends, onCopyLink, anchorEl, onClose, onShareW
             container={document.body}
             disableAutoFocusItem
         >
-            {isNormalReader && (
+            {isReader && (
                 <MenuItem
                     onClick={handleMenuItemClick(handleShareWithFriends)}
                     onMouseDown={(e) => {

@@ -46,10 +46,10 @@ export const router = createBrowserRouter([
             { path: "/shared/:token", element: <SharedList /> },
 
             // Protected routes for any logged in user
-            { path: PATHS.LISTS, element: <ProtectedRoute allowedRole="NORMAL"><Suspense fallback="..."><Lists /></Suspense></ProtectedRoute> },
-            { path: `${PATHS.LISTS}/:id`, element: <ProtectedRoute allowedRole="NORMAL"><Suspense fallback="..."><ListDetail /></Suspense></ProtectedRoute> },
+            { path: PATHS.LISTS, element: <ProtectedRoute allowedRole="READER"><Suspense fallback="..."><Lists /></Suspense></ProtectedRoute> },
+            { path: `${PATHS.LISTS}/:id`, element: <ProtectedRoute allowedRole="READER"><Suspense fallback="..."><ListDetail /></Suspense></ProtectedRoute> },
             { path: PATHS.PROFILE, element: <ProtectedRoute><Suspense fallback="..."><Profile /></Suspense></ProtectedRoute> },
-            { path: PATHS.SHARED_WITH_ME, element: <ProtectedRoute allowedRole="NORMAL"><Suspense fallback="..."><SharedWithMe /></Suspense></ProtectedRoute> },
+            { path: PATHS.SHARED_WITH_ME, element: <ProtectedRoute allowedRole="READER"><Suspense fallback="..."><SharedWithMe /></Suspense></ProtectedRoute> },
 
             { path: PATHS.MY_LIBRARY, element: <ProtectedRoute allowedRole="LIBRARIAN"><Suspense fallback="..."><MyLibrary /></Suspense></ProtectedRoute> },
             { path: PATHS.ADD_BOOK, element: <ProtectedRoute allowedRole="LIBRARIAN"><Suspense fallback="..."><AddBook /></Suspense></ProtectedRoute> },

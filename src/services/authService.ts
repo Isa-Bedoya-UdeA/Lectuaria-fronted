@@ -40,7 +40,7 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 
 /**
  * Register new user or librarian
- * - For NORMAL users: send username
+ * - For READER users: send username
  * - For LIBRARIAN users: send library object with zone info
  */
 export const register = async (

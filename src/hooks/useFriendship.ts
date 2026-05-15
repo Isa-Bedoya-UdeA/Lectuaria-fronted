@@ -11,7 +11,7 @@ export const useFriendship = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const isReader = user?.userRole === 'NORMAL' || user?.userRole === 'ADMIN';
+    const isReader = user?.userRole === 'READER' || user?.userRole === 'ADMIN';
 
     const loadFriends = useCallback(async () => {
         if (!isReader) return;
