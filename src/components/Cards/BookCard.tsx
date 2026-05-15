@@ -16,7 +16,6 @@ import { useRating } from "@/hooks/useRating";
 import { useFriendship } from "@/hooks/useFriendship";
 import { useFavorites } from "@/hooks/useFavorites";
 import * as bookShareService from "@/services/bookShareService";
-import MoveBookModal from "../Modals/MoveBookModal";
 
 // Nota: Los estados de favorito/compartir/lista son locales para UI
 // En producción, se sincronizarían con el backend vía API
@@ -50,8 +49,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
     const { 
         checkBookIsFavorite, 
         addBookToFavorites, 
-        removeBookFromFavorites,
-        isLoading: isFavoriteLoading 
+        removeBookFromFavorites
     } = useFavorites();
     
     const [isFavorite, setIsFavorite] = useState(false);

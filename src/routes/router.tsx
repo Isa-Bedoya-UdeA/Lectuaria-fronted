@@ -16,12 +16,9 @@ import AddBook from "@/pages/library/AddBook";
 import EditBook from "@/pages/library/EditBook";
 import ProtectedRoute from "@/components/Auth/ProtectedRoute";
 import SharedList from "@/pages/account/SharedList";
-
 const Home = lazy(() => import("@/pages/home/Home"));
 const UserProfile = lazy(() => import("@/pages/users/UserProfile"));
 const SharedWithMe = lazy(() => import("@/pages/shared/SharedWithMe"));
-const TopRated = lazy(() => import("@/pages/books/TopRated"));
-const Popular = lazy(() => import("@/pages/books/Popular"));
 
 export const router = createBrowserRouter([
     {
@@ -34,10 +31,6 @@ export const router = createBrowserRouter([
             { path: `${PATHS.BOOKS}/:isbn`, element: <Suspense fallback="..."><BookDetail /></Suspense> },
             { path: PATHS.SIGNIN, element: <Suspense fallback="..."><SignIn /></Suspense> },
             { path: PATHS.SIGNUP, element: <Suspense fallback="..."><SignUp /></Suspense> },
-
-            // Public routes for featured sections
-            { path: "/top-rated", element: <Suspense fallback="..."><TopRated /></Suspense> },
-            { path: "/popular", element: <Suspense fallback="..."><Popular /></Suspense> },
 
             // Public route for viewing other users' profiles
             { path: "/users/:usernameSlug", element: <Suspense fallback="..."><UserProfile /></Suspense> },

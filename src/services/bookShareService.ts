@@ -1,5 +1,5 @@
 import api from "../config/api";
-import type { BookShareRequestDTO, BookShareResponseDTO, ShareLinkDTO } from "@/types";
+import type { BookShareRequestDTO, ShareLinkDTO } from "@/types";
 
 export const shareBookWithFriends = async (
     bookId: number,

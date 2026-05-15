@@ -21,7 +21,6 @@ import LibraryCard from "@/components/Cards/LibraryCard";
 import BookCard from "@/components/Cards/BookCard";
 import { type Review } from "@/types";
 import { ratingService } from "@/services/ratingService";
-import { addToFavorites, removeFromFavorites } from "@/services/favoriteService";
 import * as bookShareService from "@/services/bookShareService";
 import Toast, { type ToastType } from "@/components/UI/Toast";
 
@@ -64,8 +63,7 @@ const BookDetail = () => {
     const {
         checkBookIsFavorite,
         addBookToFavorites,
-        removeBookFromFavorites,
-        isLoading: isFavoriteLoading
+        removeBookFromFavorites
     } = useFavorites();
 
     const [isFavorite, setIsFavorite] = useState(false);
@@ -101,8 +99,7 @@ const BookDetail = () => {
     const { friends, loadFriends } = useFriendship();
 
     const { 
-        books: similarBooks, 
-        isLoading: isSimilarLoading, 
+        books: similarBooks,
         fetchSimilarBooks 
     } = useSimilarBooks();
 

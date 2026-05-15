@@ -7,7 +7,7 @@ interface LibraryCardProps {
 }
 
 const LibraryCard: React.FC<LibraryCardProps> = ({ availability }) => {
-    const { library, physicalAvailable, digitalAvailable, digitalPlatform } = availability;
+    const { library, physicalAvailable, digitalAvailable } = availability;
 
     return (
         <div className="library-card">

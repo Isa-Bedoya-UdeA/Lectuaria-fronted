@@ -16,7 +16,7 @@ import "@/pages/books/books.scss";
 import Toast, { type ToastType } from "@/components/UI/Toast";
 
 const MyLibrary = () => {
-    const { user, error, clearError } = useAuth();
+    const { user } = useAuth();
 
     // UI control states
     const [isEditingInfo, setIsEditingInfo] = useState(false);

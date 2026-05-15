@@ -25,7 +25,7 @@ const CarouselSection = ({ title, description, books, moreLink }: { title: strin
                     <h2>{title}</h2>
                     <p>{description}</p>
                 </div>
-                {books && books.length > 0 && (
+                {books && books.length > 0 && moreLink && (
                     <a href={moreLink}>
                         <Button variant="text">
                             <span>Ver más</span>
@@ -108,13 +108,13 @@ const FeaturedBooks = () => {
                             title="Más leídos este mes"
                             description="Los libros más populares recientemente"
                             books={sections.mostReadThisMonth}
-                            moreLink="/popular"
+                            moreLink=""
                         />
                         <CarouselSection
                             title="Mejor calificados"
                             description="Las joyas mejor valoradas por la comunidad"
                             books={sections.topRated}
-                            moreLink="/top-rated"
+                            moreLink=""
                         />
                     </>
                 )}

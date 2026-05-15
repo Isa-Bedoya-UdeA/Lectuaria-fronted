@@ -13,8 +13,7 @@ import ShareMenu from "@/components/Modals/ShareMenu";
 import MoveBookModal from "@/components/Modals/MoveBookModal";
 import { useUserLists } from "@/hooks/useUserLists";
 import { Chip } from "@mui/material";
-import { getListShares, removeListShare, createPublicShareLink } from "@/services/listShareService";
-import type { UserListShare } from "@/types/notifications";
+import { createPublicShareLink } from "@/services/listShareService";
 import { useAuth } from "@/context/AuthContext";
 import { useFriendship } from "@/hooks/useFriendship";
 import FriendSelector from "@/components/Cards/FriendSelector";
@@ -32,7 +31,6 @@ const ListDetail = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [shareMenuAnchor, setShareMenuAnchor] = useState<HTMLElement | null>(null);
-    const [shares, setShares] = useState<UserListShare[]>([]);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
     const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
     const [bookToMove, setBookToMove] = useState<{ id: number; title: string } | null>(null);
@@ -149,15 +147,6 @@ const ListDetail = () => {
             setToast({ message: errorMessage, type: "error" });
         }
         handleCloseShareMenu();
-    };
-
-    const handleRemoveShare = async (shareId: number) => {
-        try {
-            await removeListShare(shareId);
-            setShares(shares.filter(s => s.id !== shareId));
-        } catch (err) {
-            setError("Error al eliminar compartición");
-        }
     };
 
     useSEO({
@@ -314,6 +303,13 @@ const ListDetail = () => {
                 currentListId={list.id}
                 currentListName={list.name}
             />
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    onClose={() => setToast(null)}
+                />
+            )}
         </main>
     );
 };

@@ -7,4 +7,5 @@ export * from "./list";
 export * from "./userProfile";
 export * from "./bookShare";
 export * from "./genreWithBookCount";
+export * from "./feature";
 

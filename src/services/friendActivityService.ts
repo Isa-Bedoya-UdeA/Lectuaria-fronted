@@ -1,5 +1,4 @@
 import api from "../config/api";
-import type { UserProfileDTO } from "../types";
 
 /**
  * Types for friend activity
