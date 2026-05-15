@@ -1,6 +1,8 @@
 # Lectuaria Client
 
-[Descripción del proyecto]
+![Vercel Deploy](https://deploy-badge.vercel.app/vercel/lectuaria)
+
+Sistema tipo red social donde los lectores podrán crear reseñas y calificar libros, compartir libros y listas con amigos dentro y fuera del software. Además de buscar libros en las bibliotecas de Medellín y conocer su disponibilidad.
 
 ## Contenido
 
@@ -28,7 +30,7 @@ npm install
 Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```env
-
+VITE_API_BASE_URL=http://localhost:3000/api
 ```
 
 ### 4. Iniciar el Servidor de Desarrollo
@@ -48,7 +50,7 @@ npm start
 
 ## 📁 Estructura del Proyecto
 
-```
+```plain text
 Lectuaria-client/
 ├── src/
 │   ├── components/          # Componentes reutilizables
@@ -72,6 +74,13 @@ Lectuaria-client/
 ```
 
 ## 📦 Dependencias Principales
+
+* Axios
+* MUI
+* Emotion
+* React-hook-form
+* React-router-dom
+* sass
 
 ## 📄 Licencia
 
