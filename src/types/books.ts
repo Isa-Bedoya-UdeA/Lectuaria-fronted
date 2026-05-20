@@ -155,3 +155,21 @@ export interface FeaturedSections {
     topRated: BookSummary[];
     nextUpdateAt: string;
 }
+
+export interface PopularLibraryBookDTO {
+    book: BookSummary;
+    interactions: number;
+    reviewsCount: number;
+    ratingsCount: number;
+}
+
+export interface LibraryStatisticsDTO {
+    totalBooks: number;
+    booksAddedThisMonth: number;
+    mostRepresentedGenres: import("./userProfile").GenreCountDTO[];
+    reviewsOnOwnBooks: number;
+    averageRatingOfOwnBooks: number;
+    mostPopularBooks: PopularLibraryBookDTO[];
+    updatedAt: string;
+    nextRefreshAt: string;
+}

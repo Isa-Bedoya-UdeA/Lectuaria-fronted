@@ -32,3 +32,31 @@ export interface UserReviewDTO {
     bookTitle: string;
     bookId: number;
 }
+
+export interface GenreCountDTO {
+    genreId: number;
+    genreName: string;
+    count: number;
+}
+
+export interface MonthlyBooksReadDTO {
+    month: string;
+    booksRead: number;
+}
+
+export interface YearComparisonDTO {
+    currentYear: number;
+    currentYearBooks: number;
+    previousYear: number;
+    previousYearBooks: number;
+    difference: number;
+}
+
+export interface ReadingStatisticsDTO {
+    totalBooksRead: number;
+    averageRatingGiven: number;
+    mostReadGenres: GenreCountDTO[];
+    booksReadByMonth: MonthlyBooksReadDTO[];
+    yearComparison: YearComparisonDTO;
+    updatedAt: string;
+}

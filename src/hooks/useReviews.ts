@@ -11,7 +11,7 @@ interface UseReviewsReturn {
 	reviews: Review[];
 	isLoading: boolean;
 	error: string | null;
-	fetchReviews: (bookId: number) => Promise<void>;
+	fetchReviews: (bookId: number, sort?: string) => Promise<void>;
 	addReview: (bookId: number, request: ReviewUpsertRequest) => Promise<void>;
 	updateReview: (
 		reviewId: string,
@@ -26,11 +26,11 @@ export function useReviews(): UseReviewsReturn {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchReviews = useCallback(async (bookId: number): Promise<void> => {
+	const fetchReviews = useCallback(async (bookId: number, sort?: string): Promise<void> => {
 		try {
 			setIsLoading(true);
 			setError(null);
-			const data = await getBookReviews(bookId);
+			const data = await getBookReviews(bookId, 0, 10, sort);
 			setReviews(data);
 		} catch (err) {
 			setError((err as Error).message || "Error loading reviews");

@@ -82,6 +82,7 @@ const BookDetail = () => {
         loadFavoriteStatus();
     }, [book?.id, checkBookIsFavorite]);
     const [isAddListOpen, setIsAddListOpen] = useState(false);
+    const [selectedSort, setSelectedSort] = useState<string>("most_recent");
     const [reviewText, setReviewText] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [tempRating, setTempRating] = useState<number>(0); // Estado local para la selección temporal de estrellas
@@ -113,13 +114,19 @@ const BookDetail = () => {
         }
     }, [isbn, fetchBook]);
 
-    // Cargar reseñas cuando se carga el libro
+    // Cargar reseñas cuando cambie el libro o el orden de ordenamiento
     useEffect(() => {
         if (book?.id) {
-            fetchReviews(book.id);
+            fetchReviews(book.id, selectedSort);
+        }
+    }, [book?.id, selectedSort, fetchReviews]);
+
+    // Cargar libros similares cuando cambie el libro
+    useEffect(() => {
+        if (book?.id) {
             fetchSimilarBooks(book.id);
         }
-    }, [book?.id, fetchReviews, fetchSimilarBooks]);
+    }, [book?.id, fetchSimilarBooks]);
 
     // Inicializar tempRating y reviewText con la calificación actual del usuario
     useEffect(() => {
@@ -286,7 +293,7 @@ const BookDetail = () => {
             setDeleteModalOpen(false);
             setReviewToDelete(null);
             fetchBook(parseInt(isbn || "0", 10)); // Recargar el libro para actualizar el promedio de estrellas
-            fetchReviews(book?.id || 0); // Recargar la lista de reseñas
+            fetchReviews(book?.id || 0, selectedSort); // Recargar la lista de reseñas
             loadUserRating(); // Recargar el promedio de estrellas del hook useRating
         } catch (error) {
             setToast({ message: "Error al eliminar la reseña", type: "error" });
@@ -320,7 +327,7 @@ const BookDetail = () => {
                 setReviewText("");
                 setIsEditing(false);
                 setEditingReview(null);
-                fetchReviews(book?.id || 0);
+                fetchReviews(book?.id || 0, selectedSort);
                 fetchBook(parseInt(isbn || "0", 10));
                 loadUserRating();
             } catch (error) {
@@ -367,7 +374,7 @@ const BookDetail = () => {
 
             // Recargar datos después de resetear el estado de edición
             await Promise.all([
-                fetchReviews(book?.id || 0),
+                fetchReviews(book?.id || 0, selectedSort),
                 fetchBook(parseInt(isbn || "0", 10)),
                 loadUserRating() // Recargar rating del usuario para actualizar las condiciones
             ]);
@@ -571,7 +578,22 @@ const BookDetail = () => {
                         </div>
 
                         <div className="bookDetail__reviews">
-                            <h2>Reseñas</h2>
+                            <div className="bookDetail__reviews__header">
+                                <h2>Reseñas</h2>
+                                <div className="bookDetail__reviews__sort">
+                                    <label htmlFor="reviews-sort">Ordenar por:</label>
+                                    <select
+                                        id="reviews-sort"
+                                        value={selectedSort}
+                                        onChange={(e) => setSelectedSort(e.target.value)}
+                                    >
+                                        <option value="most_recent">Más recientes</option>
+                                        <option value="oldest">Más antiguas</option>
+                                        <option value="highest_rating">Mayor calificación</option>
+                                        <option value="lowest_rating">Menor calificación</option>
+                                    </select>
+                                </div>
+                            </div>
 
                             {user && user.userRole === 'READER' && (
                                 <>
@@ -639,18 +661,18 @@ const BookDetail = () => {
                                     }
                                 </>
                             )}
-                            {user && user.userRole === 'LIBRARIAN' ? (
-                                <div className="bookDetail__loginPrompt">
-                                    <p>Los bibliotecarios no pueden calificar libros. Solo los usuarios lectores pueden dejar calificaciones.</p>
-                                </div>
-                            ) : (
+                            {userRating === 0 && !user ? (
                                 <div className="bookDetail__loginPrompt">
                                     <p>Debes iniciar sesión como lector para poder calificar y reseñar este libro.</p>
                                     <Button onClick={() => navigate('/signin')}>
                                         Iniciar sesión
                                     </Button>
                                 </div>
-                            )}
+                            ) : userRating === 0 && user?.userRole === 'LIBRARIAN' ? (
+                                <div className="bookDetail__loginPrompt">
+                                    <p>Los bibliotecarios no pueden calificar libros. Solo los usuarios lectores pueden dejar calificaciones.</p>
+                                </div>
+                            ) : null}
 
                             <div className="bookDetails__otherReviews">
                                 {reviewsLoading ? (
@@ -714,8 +736,8 @@ const BookDetail = () => {
                                                     <ReviewCard key={review.id} review={review} />
                                                 ))
                                         ) : (
-                                            /* Mostrar mensaje de 'No hay reseñas' solo si el usuario actual tampoco tiene una */
-                                            (!user || userRating === 0) && (
+                                            /* Mostrar mensaje de 'No hay reseñas' solo si el usuario es READER, no tiene reseña y no hay otras reseñas */
+                                            (user?.userRole === 'READER' && userRating === 0) && (
                                                 <p className="bookDetail__noReviews">
                                                     {book?.ratingsCount && book.ratingsCount > 0
                                                         ? "Todavía no hay reseñas escritas para este libro, ¡pero ya tiene calificaciones!"

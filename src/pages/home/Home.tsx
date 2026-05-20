@@ -4,6 +4,7 @@ import FeaturedBooks from "@/components/Home/FeaturedBooks";
 import Features from "@/components/Home/Features";
 import Hero from "@/components/Home/Hero";
 import NewBooks from "@/components/Home/NewBooks";
+import RecommendedBooks from "@/components/Home/RecommendedBooks";
 import { SITE_INFO } from "@/constants/siteInfo";
 import "./home.scss";
 
@@ -18,6 +19,7 @@ const Home = () => {
         <main className="home">
             <Hero />
             <Features />
+            <RecommendedBooks />
             <FeaturedBooks />
             <NewBooks />
             <CTA />

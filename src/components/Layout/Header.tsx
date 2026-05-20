@@ -304,6 +304,13 @@ const Header = () => {
                                             Mi cuenta
                                         </NavLink>
                                         <NavLink
+                                            to={`${PATHS.PROFILE}?tab=estadisticas`}
+                                            className={({ isActive }) => isActive ? "active-link" : ""}
+                                            onClick={handleClose}
+                                        >
+                                            Estadísticas de lectura
+                                        </NavLink>
+                                        <NavLink
                                             to={`${PATHS.PROFILE}?tab=amigos`}
                                             className={({ isActive }) => isActive ? "active-link" : ""}
                                             onClick={handleClose}

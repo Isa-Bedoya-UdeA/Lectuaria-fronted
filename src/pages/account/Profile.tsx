@@ -14,9 +14,10 @@ import type { ProfileUpdateRequest } from "@/types/auth";
 import { useFriendship } from "@/hooks/useFriendship";
 import FriendCard from "../../components/Cards/FriendCard";
 import { useUserLists } from "@/hooks/useUserLists";
-import type { UserSearchResponseDTO } from "@/types";
+import type { UserSearchResponseDTO, ReadingStatisticsDTO } from "@/types";
 import type { NotificationPreference } from "@/types/notifications";
 import { getNotificationPreferences, resetNotificationPreferences, updateNotificationPreference } from "@/services/notificationService";
+import { getReadingStatistics } from "@/services/userProfileService";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -49,6 +50,165 @@ function a11yProps(index: number) {
     };
 }
 
+const ReadingStatisticsSection = ({ usernameSlug }: { usernameSlug: string }) => {
+    const [stats, setStats] = useState<ReadingStatisticsDTO | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await getReadingStatistics(usernameSlug);
+                setStats(data);
+            } catch (err) {
+                console.error("Error fetching reading stats:", err);
+                setError("No se pudieron cargar las estadísticas de lectura.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (usernameSlug) {
+            fetchStats();
+        }
+    }, [usernameSlug]);
+
+    if (loading) {
+        return <div className="profile__stats-loading">Cargando tus estadísticas de lectura...</div>;
+    }
+
+    if (error || !stats) {
+        return <div className="profile__stats-error">{error || "No hay estadísticas disponibles."}</div>;
+    }
+
+    const { totalBooksRead, averageRatingGiven, mostReadGenres, booksReadByMonth, yearComparison } = stats;
+    const maxBooks = booksReadByMonth && booksReadByMonth.length > 0
+        ? Math.max(...booksReadByMonth.map(m => m.booksRead), 1)
+        : 1;
+
+    return (
+        <div className="reading-stats">
+            <h2 className="reading-stats__title">Mi Actividad de Lectura</h2>
+            <p className="reading-stats__subtitle">
+                Análisis y métricas de tus libros leídos, calificaciones e intereses literarios.
+            </p>
+
+            <div className="reading-stats__grid">
+                <div className="reading-stats__card">
+                    <div className="reading-stats__card-icon reading-stats__card-icon--primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                    </div>
+                    <div className="reading-stats__card-info">
+                        <span className="reading-stats__card-value">{totalBooksRead}</span>
+                        <span className="reading-stats__card-label">Libros Leídos</span>
+                    </div>
+                </div>
+
+                <div className="reading-stats__card">
+                    <div className="reading-stats__card-icon reading-stats__card-icon--secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                    </div>
+                    <div className="reading-stats__card-info">
+                        <span className="reading-stats__card-value">
+                            {averageRatingGiven > 0 ? averageRatingGiven.toFixed(1) : "N/A"}
+                            {averageRatingGiven > 0 && <span className="reading-stats__card-star"> ⭐</span>}
+                        </span>
+                        <span className="reading-stats__card-label">Calificación Promedio</span>
+                    </div>
+                </div>
+
+                {yearComparison && (
+                    <div className="reading-stats__card reading-stats__card--full">
+                        <div className="reading-stats__card-icon reading-stats__card-icon--success">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10" />
+                                <line x1="12" y1="20" x2="12" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="14" />
+                            </svg>
+                        </div>
+                        <div className="reading-stats__card-info">
+                            <div className="reading-stats__comparison-text">
+                                Comparación anual: <strong>{yearComparison.currentYearBooks} libros</strong> en {yearComparison.currentYear} vs <strong>{yearComparison.previousYearBooks} libros</strong> en {yearComparison.previousYear}.
+                            </div>
+                            <div className={`reading-stats__comparison-badge ${yearComparison.difference >= 0 ? 'positive' : 'negative'}`}>
+                                {yearComparison.difference >= 0 ? (
+                                    <span>+{yearComparison.difference} libros que el año pasado 🎉</span>
+                                ) : (
+                                    <span>{yearComparison.difference} libros que el año pasado</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <div className="reading-stats__details">
+                <div className="reading-stats__section">
+                    <h3 className="reading-stats__section-title">Mis Géneros Preferidos</h3>
+                    {mostReadGenres && mostReadGenres.length > 0 ? (
+                        <div className="reading-stats__genres-list">
+                            {mostReadGenres.map((genre) => {
+                                const maxCount = Math.max(...mostReadGenres.map(g => g.count), 1);
+                                const percentage = (genre.count / maxCount) * 100;
+                                return (
+                                    <div key={genre.genreId} className="reading-stats__genre-item">
+                                        <div className="reading-stats__genre-info">
+                                            <span className="reading-stats__genre-name">{genre.genreName}</span>
+                                            <span className="reading-stats__genre-count">{genre.count} {genre.count === 1 ? 'libro' : 'libros'}</span>
+                                        </div>
+                                        <div className="reading-stats__progress-bar-bg">
+                                            <div
+                                                className="reading-stats__progress-bar-fill"
+                                                style={{ width: `${percentage}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <p className="reading-stats__empty">Aún no hay suficientes lecturas registradas para clasificar tus géneros.</p>
+                    )}
+                </div>
+
+                <div className="reading-stats__section">
+                    <h3 className="reading-stats__section-title">Progreso Mensual</h3>
+                    {booksReadByMonth && booksReadByMonth.length > 0 ? (
+                        <div className="reading-stats__monthly-list">
+                            {booksReadByMonth.map((item, idx) => (
+                                <div key={idx} className="reading-stats__monthly-item">
+                                    <span className="reading-stats__monthly-month">{item.month}</span>
+                                    <div className="reading-stats__monthly-bar-container">
+                                        <div className="reading-stats__monthly-count">{item.booksRead} {item.booksRead === 1 ? 'libro' : 'libros'}</div>
+                                        <div className="reading-stats__monthly-bar-wrapper">
+                                            <div
+                                                className="reading-stats__monthly-bar"
+                                                style={{
+                                                    height: `${Math.min(item.booksRead * 12, 80)}px`,
+                                                    '--bar-width': `${(item.booksRead / maxBooks) * 100}%`
+                                                } as React.CSSProperties}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="reading-stats__empty">Aún no hay registro de progreso mensual de lectura.</p>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Profile = () => {
     const { user, logout, updateProfile, isLoading, error, clearError } = useAuth();
     const [value, setValue] = useState<number>(0);
@@ -78,8 +238,10 @@ const Profile = () => {
             setValue(2);
         } else if (tab === 'notifications') {
             setValue(1);
+        } else if ((tab === 'estadisticas' || tab === 'statistics') && user?.userRole === 'READER') {
+            setValue(4);
         }
-    }, [searchParams]);
+    }, [searchParams, user]);
 
     useEffect(() => {
         if (user && value === 1) {
@@ -258,6 +420,9 @@ const Profile = () => {
                             <Tab label="Notificaciones" {...a11yProps(1)} />
                             <Tab label={`Amigos (${friends.length})`} {...a11yProps(2)} />
                             <Tab label={`Solicitudes (${requests.length})`} {...a11yProps(3)} />
+                            {user?.userRole === "READER" && (
+                                <Tab label="Estadísticas de Lectura" {...a11yProps(4)} />
+                            )}
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0} className="profile__general__tab">
@@ -382,6 +547,11 @@ const Profile = () => {
                             <p className="profile__empty">No tienes solicitudes pendientes.</p>
                         )}
                     </CustomTabPanel>
+                    {user?.userRole === "READER" && (
+                        <CustomTabPanel value={value} index={4} className="profile__statistics__tab">
+                            <ReadingStatisticsSection usernameSlug={user.username} />
+                        </CustomTabPanel>
+                    )}
                 </section>
             </div>
 

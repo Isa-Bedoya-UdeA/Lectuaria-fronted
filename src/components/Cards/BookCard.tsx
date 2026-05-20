@@ -25,9 +25,11 @@ interface BookCardProps {
     viewMode?: 'grid' | 'list';
     onRemoveFromList?: (bookId: number) => void;
     onMoveBook?: (bookId: number, bookTitle: string, currentListId: number, currentListName: string) => void;
+    onHide?: (bookId: number) => Promise<void>;
+    recommendationReason?: string;
 }
 
-const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: BookCardProps) => {
+const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHide, recommendationReason }: BookCardProps) => {
     const [shareMenuAnchor, setShareMenuAnchor] = useState<HTMLElement | null>(null);
     const [isMenuClosing, setIsMenuClosing] = useState(false);
     const isMenuOpenRef = useRef(false);
@@ -41,6 +43,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
     const { friends, loadFriends } = useFriendship();
     const [isAddListOpen, setIsAddListOpen] = useState(false);
     const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+    const [isHiding, setIsHiding] = useState(false);
 
     // Hook para manejar calificaciones
     const { userRating, averageRating, ratingsCount, isLoading, rateBook } = useRating(book.id);
@@ -220,7 +223,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
 
     return (
         <div
-            className={`bookCard ${viewMode}`}
+            className={`bookCard ${viewMode}${isHiding ? ' hiding' : ''}`}
             onClick={handleCardClick}
             onMouseDown={(e) => {
                 if (isMenuClosing || isMenuOpenRef.current || isNavigatingRef.current) {
@@ -404,18 +407,52 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook }: Boo
 
                 {user && user.userRole === 'READER' ? (
                     <div className="bookCard__add">
-                        <Button
-                            variant="outlined"
-                            className="bookCard__add-list"
-                            onClick={handleAddToList}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v14m-7-7h14" /></svg>
-                            Agregar a lista
-                        </Button>
+                        <div className="bookCard__actions-wrapper">
+                            <Button
+                                variant="outlined"
+                                className="bookCard__add-list"
+                                onClick={handleAddToList}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v14m-7-7h14" /></svg>
+                                Agregar a lista
+                            </Button>
+                            {onHide && (
+                                <Button
+                                    variant="outlined"
+                                    className="bookCard__hide-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsHiding(true);
+                                        setTimeout(async () => {
+                                            try {
+                                                await onHide(book.id);
+                                            } catch (err) {
+                                                setIsHiding(false);
+                                                console.error("Error hiding recommendation:", err);
+                                            }
+                                        }, 400);
+                                    }}
+                                    aria-label="Ocultar recomendación"
+                                    title="Ocultar recomendación"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                                        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
+                                            <path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575a1 1 0 0 1 0 .696a10.8 10.8 0 0 1-1.444 2.49m-6.41-.679a3 3 0 0 1-4.242-4.242" />
+                                            <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151a1 1 0 0 1 0-.696a10.75 10.75 0 0 1 4.446-5.143M2 2l20 20" />
+                                        </g>
+                                    </svg>
+                                    Ocultar
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 ) :
                     null
                 }
+
+                {recommendationReason && (
+                    <p className="bookCard__reason">💡 {recommendationReason}</p>
+                )}
 
                 <div className="bookCard__stars">
                     {user && user.userRole === 'READER' ? (

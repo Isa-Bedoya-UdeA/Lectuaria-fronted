@@ -9,10 +9,11 @@ export const getBookReviews = async (
 	bookId: number,
 	page: number = 0,
 	size: number = 10,
+	sort: string = "most_recent",
 ): Promise<Review[]> => {
 	try {
 		const response = await api.get(`/books/${bookId}/reviews`, {
-			params: { page, size },
+			params: { page, size, sort },
 		});
 
 		// Mapear el DTO del backend (BookReviewResponseDTO) a nuestra interfaz Review
