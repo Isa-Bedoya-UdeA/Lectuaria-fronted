@@ -60,3 +60,12 @@ export interface ReadingStatisticsDTO {
     yearComparison: YearComparisonDTO;
     updatedAt: string;
 }
+
+export interface SocialStatisticsDTO {
+    friendsCount: number;
+    listsSharedByFriends: number;
+    listsIShared: number;
+    booksSharedWithFriends: number;
+    booksSharedByFriends: number;
+    updatedAt: string;
+}

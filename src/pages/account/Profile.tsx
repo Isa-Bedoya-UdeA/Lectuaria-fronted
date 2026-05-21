@@ -14,10 +14,10 @@ import type { ProfileUpdateRequest } from "@/types/auth";
 import { useFriendship } from "@/hooks/useFriendship";
 import FriendCard from "../../components/Cards/FriendCard";
 import { useUserLists } from "@/hooks/useUserLists";
-import type { UserSearchResponseDTO, ReadingStatisticsDTO } from "@/types";
+import type { UserSearchResponseDTO, ReadingStatisticsDTO, SocialStatisticsDTO } from "@/types";
 import type { NotificationPreference } from "@/types/notifications";
 import { getNotificationPreferences, resetNotificationPreferences, updateNotificationPreference } from "@/services/notificationService";
-import { getReadingStatistics } from "@/services/userProfileService";
+import { getReadingStatistics, getSocialStatistics } from "@/services/userProfileService";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -83,7 +83,7 @@ const ReadingStatisticsSection = ({ usernameSlug }: { usernameSlug: string }) =>
         return <div className="profile__stats-error">{error || "No hay estadísticas disponibles."}</div>;
     }
 
-    const { totalBooksRead, averageRatingGiven, mostReadGenres, booksReadByMonth, yearComparison } = stats;
+    const { totalBooksRead, reviewsCount, mostReadGenres, booksReadByMonth, yearComparison } = stats;
     const maxBooks = booksReadByMonth && booksReadByMonth.length > 0
         ? Math.max(...booksReadByMonth.map(m => m.booksRead), 1)
         : 1;
@@ -112,15 +112,13 @@ const ReadingStatisticsSection = ({ usernameSlug }: { usernameSlug: string }) =>
                 <div className="reading-stats__card">
                     <div className="reading-stats__card-icon reading-stats__card-icon--secondary">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                         </svg>
                     </div>
                     <div className="reading-stats__card-info">
-                        <span className="reading-stats__card-value">
-                            {averageRatingGiven > 0 ? averageRatingGiven.toFixed(1) : "N/A"}
-                            {averageRatingGiven > 0 && <span className="reading-stats__card-star"> ⭐</span>}
-                        </span>
-                        <span className="reading-stats__card-label">Calificación Promedio</span>
+                        <span className="reading-stats__card-value">{reviewsCount ?? 0}</span>
+                        <span className="reading-stats__card-label">Reseñas Escritas</span>
                     </div>
                 </div>
 
@@ -189,9 +187,9 @@ const ReadingStatisticsSection = ({ usernameSlug }: { usernameSlug: string }) =>
                                         <div className="reading-stats__monthly-count">{item.booksRead} {item.booksRead === 1 ? 'libro' : 'libros'}</div>
                                         <div className="reading-stats__monthly-bar-wrapper">
                                             <div
-                                                className="reading-stats__monthly-bar"
+                                                className={`reading-stats__monthly-bar${item.booksRead === 0 ? ' reading-stats__monthly-bar--zero' : ''}`}
                                                 style={{
-                                                    height: `${Math.min(item.booksRead * 12, 80)}px`,
+                                                    height: `${item.booksRead > 0 ? Math.min(item.booksRead * 12, 80) : 0}px`,
                                                     '--bar-width': `${(item.booksRead / maxBooks) * 100}%`
                                                 } as React.CSSProperties}
                                             />
@@ -205,6 +203,133 @@ const ReadingStatisticsSection = ({ usernameSlug }: { usernameSlug: string }) =>
                     )}
                 </div>
             </div>
+        </div>
+    );
+};
+
+const SocialActivitiesSection = ({ usernameSlug }: { usernameSlug: string }) => {
+    const [stats, setStats] = useState<SocialStatisticsDTO | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const data = await getSocialStatistics(usernameSlug);
+                setStats(data);
+            } catch (err) {
+                console.error("Error fetching social stats:", err);
+                setError("No se pudieron cargar las estadísticas sociales.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (usernameSlug) {
+            fetchStats();
+        }
+    }, [usernameSlug]);
+
+    if (loading) {
+        return <div className="profile__stats-loading">Cargando tus estadísticas sociales...</div>;
+    }
+
+    if (error || !stats) {
+        return <div className="profile__stats-error">{error || "No hay estadísticas disponibles."}</div>;
+    }
+
+    return (
+        <div className="social-stats">
+            <h2 className="social-stats__title">Mi Actividad Social</h2>
+            <p className="social-stats__subtitle">
+                Tu presencia en la comunidad lectora: amigos, listas compartidas y libros intercambiados.
+            </p>
+
+            <div className="social-stats__grid">
+                <div className="social-stats__card">
+                    <div className="social-stats__card-icon social-stats__card-icon--primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </div>
+                    <div className="social-stats__card-info">
+                        <span className="social-stats__card-value">{stats.friendsCount}</span>
+                        <span className="social-stats__card-label">Amigos</span>
+                    </div>
+                </div>
+
+                <div className="social-stats__card">
+                    <div className="social-stats__card-icon social-stats__card-icon--secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                    </div>
+                    <div className="social-stats__card-info">
+                        <span className="social-stats__card-value">{stats.listsSharedByFriends}</span>
+                        <span className="social-stats__card-label">Listas Recibidas de Amigos</span>
+                    </div>
+                </div>
+
+                <div className="social-stats__card">
+                    <div className="social-stats__card-icon social-stats__card-icon--success">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6" />
+                            <line x1="8" y1="12" x2="21" y2="12" />
+                            <line x1="8" y1="18" x2="21" y2="18" />
+                            <line x1="3" y1="6" x2="3.01" y2="6" />
+                            <line x1="3" y1="12" x2="3.01" y2="12" />
+                            <line x1="3" y1="18" x2="3.01" y2="18" />
+                        </svg>
+                    </div>
+                    <div className="social-stats__card-info">
+                        <span className="social-stats__card-value">{stats.listsIShared}</span>
+                        <span className="social-stats__card-label">Listas que Compartí</span>
+                    </div>
+                </div>
+
+                <div className="social-stats__card">
+                    <div className="social-stats__card-icon social-stats__card-icon--purple">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                    </div>
+                    <div className="social-stats__card-info">
+                        <span className="social-stats__card-value">{stats.booksSharedWithFriends}</span>
+                        <span className="social-stats__card-label">Libros Compartidos con Amigos</span>
+                    </div>
+                </div>
+
+                <div className="social-stats__card">
+                    <div className="social-stats__card-icon social-stats__card-icon--highlight">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                        </svg>
+                    </div>
+                    <div className="social-stats__card-info">
+                        <span className="social-stats__card-value">{stats.booksSharedByFriends}</span>
+                        <span className="social-stats__card-label">Libros Recibidos de Amigos</span>
+                    </div>
+                </div>
+            </div>
+
+            {stats.booksSharedWithFriends === 0 && stats.booksSharedByFriends === 0 &&
+             stats.listsSharedByFriends === 0 && stats.listsIShared === 0 && (
+                <p className="social-stats__empty">
+                    Aún no has intercambiado libros ni listas con nadie. ¡Comparte tus lecturas favoritas con tus amigos!
+                </p>
+            )}
         </div>
     );
 };
@@ -240,6 +365,8 @@ const Profile = () => {
             setValue(1);
         } else if ((tab === 'estadisticas' || tab === 'statistics') && user?.userRole === 'READER') {
             setValue(4);
+        } else if ((tab === 'social' || tab === 'actividad') && user?.userRole === 'READER') {
+            setValue(5);
         }
     }, [searchParams, user]);
 
@@ -423,6 +550,9 @@ const Profile = () => {
                             {user?.userRole === "READER" && (
                                 <Tab label="Estadísticas de Lectura" {...a11yProps(4)} />
                             )}
+                            {user?.userRole === "READER" && (
+                                <Tab label="Actividad Social" {...a11yProps(5)} />
+                            )}
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0} className="profile__general__tab">
@@ -550,6 +680,11 @@ const Profile = () => {
                     {user?.userRole === "READER" && (
                         <CustomTabPanel value={value} index={4} className="profile__statistics__tab">
                             <ReadingStatisticsSection usernameSlug={user.username} />
+                        </CustomTabPanel>
+                    )}
+                    {user?.userRole === "READER" && (
+                        <CustomTabPanel value={value} index={5} className="profile__social__tab">
+                            <SocialActivitiesSection usernameSlug={user.username} />
                         </CustomTabPanel>
                     )}
                 </section>

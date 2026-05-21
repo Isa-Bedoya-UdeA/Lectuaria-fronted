@@ -91,50 +91,51 @@ const Books = () => {
     };
 
     // Determinar qué datos mostrar según el modo de filtrado
-    const isSearchingMode = searchQuery.trim().length > 0 || selectedLibraries.length > 0 || selectedGenres.length > 0;
+    const hasFilters = searchQuery.trim().length > 0 || selectedLibraries.length > 0 || selectedGenres.length > 0
+        || minRating > 0 || startYear !== null || endYear !== null || selectedFormats.length > 0;
     const isGenreFilterMode = false; // Simplificado: siempre usar búsqueda múltiple
 
-    const displayedBooks = isSearchingMode
+    const displayedBooks = hasFilters
         ? searchResults
         : isGenreFilterMode
             ? genreBooks
             : books;
 
-    const displayedPagination = isSearchingMode
+    const displayedPagination = hasFilters
         ? searchPagination
         : isGenreFilterMode
             ? genrePagination
             : pagination;
 
-    const displayedLoading = isSearchingMode
+    const displayedLoading = hasFilters
         ? isSearching
         : isGenreFilterMode
             ? isFilteringByGenre
             : isLoading;
 
-    const displayedError = isSearchingMode
+    const displayedError = hasFilters
         ? searchError
         : isGenreFilterMode
             ? genreError
             : error;
 
-    // Ejecutar búsqueda cuando cambie el query, bibliotecas o géneros
+    // Ejecutar búsqueda cuando cambie cualquier filtro (keyword, bibliotecas, géneros, rating, año, formato)
     useEffect(() => {
-        if (searchQuery.trim().length >= 3 || selectedLibraries.length > 0 || selectedGenres.length > 0) {
+        if (hasFilters) {
             const debounceTimer = setTimeout(() => {
                 searchBooksByKeywords(searchQuery.trim(), selectedLibraries, selectedGenres, currentPage - 1, pageSize, startYear, endYear, selectedFormats, minRating);
             }, 300);
             return () => clearTimeout(debounceTimer);
-        } else if (searchQuery.trim().length === 0 && selectedLibraries.length === 0 && selectedGenres.length === 0) {
+        } else {
             fetchBooks({ page: currentPage - 1, size: pageSize, startYear: startYear || undefined, endYear: endYear || undefined, formatTypes: selectedFormats.length > 0 ? selectedFormats : undefined });
         }
-    }, [searchQuery, selectedLibraries, selectedGenres, currentPage, pageSize, searchBooksByKeywords, fetchBooks, startYear, endYear, selectedFormats, minRating]);
+    }, [searchQuery, selectedLibraries, selectedGenres, currentPage, pageSize, searchBooksByKeywords, fetchBooks, startYear, endYear, selectedFormats, minRating, hasFilters]);
 
     // Ejecutar filtro por géneros cuando cambien
     useEffect(() => {
-        if (selectedGenres.length > 0 && !isSearchingMode) {
+        if (selectedGenres.length > 0 && !hasFilters) {
             fetchByGenres(selectedGenres, currentPage - 1, pageSize);
-        } else if (searchQuery.trim().length === 0 && selectedLibraries.length === 0) {
+        } else if (!hasFilters) {
             fetchBooks({
                 page: currentPage - 1,
                 size: pageSize,
@@ -143,7 +144,7 @@ const Books = () => {
                 endYear: endYear || undefined
             });
         }
-    }, [selectedGenres, currentPage, pageSize, fetchByGenres, fetchBooks, searchQuery, selectedLibraries, minRating, startYear, endYear, isSearchingMode]);
+    }, [selectedGenres, currentPage, pageSize, fetchByGenres, fetchBooks, searchQuery, selectedLibraries, minRating, startYear, endYear, hasFilters]);
 
     // Resetear página cuando cambien los filtros
     useEffect(() => {
@@ -342,7 +343,7 @@ const Books = () => {
                             />
                         </div>
 
-                        {(selectedGenres.length > 0 || minRating > 0 || searchQuery || startYear || endYear || selectedFormats.length > 0) && (
+                        {(selectedGenres.length > 0 || selectedLibraries.length > 0 || minRating > 0 || searchQuery || startYear || endYear || selectedFormats.length > 0) && (
                             <Button
                                 type="button"
                                 variant="text"
@@ -425,7 +426,7 @@ const Books = () => {
 
                             {!displayedLoading && !displayedError && displayedBooks.length === 0 && (
                                 <p className="books__empty">
-                                    {isSearchingMode
+                                    {hasFilters
                                         ? "No se encontraron libros con los criterios seleccionados"
                                         : "Actualmente no tenemos libros en el catálogo"}
                                 </p>

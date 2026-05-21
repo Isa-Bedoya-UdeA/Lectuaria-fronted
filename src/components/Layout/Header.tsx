@@ -311,6 +311,13 @@ const Header = () => {
                                             Estadísticas de lectura
                                         </NavLink>
                                         <NavLink
+                                            to={`${PATHS.PROFILE}?tab=social`}
+                                            className={({ isActive }) => isActive ? "active-link" : ""}
+                                            onClick={handleClose}
+                                        >
+                                            Actividad social
+                                        </NavLink>
+                                        <NavLink
                                             to={`${PATHS.PROFILE}?tab=amigos`}
                                             className={({ isActive }) => isActive ? "active-link" : ""}
                                             onClick={handleClose}
