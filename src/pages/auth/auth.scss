@@ -6,10 +6,9 @@
 	background-color: $bg-normal;
 	padding: 2rem 0;
 	display: flex;
-    flex-direction: column;
-    align-items: center;
+	flex-direction: column;
+	align-items: center;
 
-	
 	h1,
 	p {
 		margin: 0;
@@ -30,6 +29,8 @@
 	form {
 		flex-shrink: 0;
 		width: 100%;
+		max-width: 28rem;
+		margin: 0 auto;
 
 		.auth__userRole {
 			display: flex;
@@ -76,12 +77,9 @@
 			box-shadow: 0 0 10px $gray;
 			padding: 2rem;
 			width: 100%;
-			max-width: 28rem;
 			display: flex;
 			flex-direction: column;
 			gap: 1.5rem;
-			width: 100%;
-    margin: 0 auto;
 
 			.auth__group {
 				display: flex;
@@ -184,7 +182,66 @@
 				justify-content: center;
 				gap: 0.5rem;
 			}
+
+			.auth__forgot-link {
+				text-align: center;
+				font-size: 0.9rem;
+				color: $primary;
+				text-decoration: none;
+				transition: color 0.2s ease;
+
+				&:hover {
+					color: $primary-hover;
+					text-decoration: underline;
+				}
+			}
+
+			.auth__success-message {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+				gap: 0.6rem;
+				padding: 1.5rem;
+				background-color: $white;
+				border: 1px solid rgba($success, 0.25);
+				border-radius: 0.8rem;
+
+				svg {
+					color: $success;
+					width: 40px;
+					height: 40px;
+					flex-shrink: 0;
+				}
+
+				h2 {
+					font-family: $title;
+					color: $text-color;
+					margin: 0;
+					font-size: 1rem;
+					font-weight: 700;
+				}
+
+				p {
+					color: $gray-dark;
+					margin: 0;
+					font-size: 0.85rem;
+					line-height: 1.5;
+				}
+
+				.auth__spam-note {
+					font-size: 0.8rem;
+					color: $gray-dark;
+					opacity: 0.7;
+				}
+			}
 		}
+	}
+
+	.auth__success-link {
+		display: flex;
+		justify-content: center;
+		margin-top: 0.75rem;
 	}
 }
 

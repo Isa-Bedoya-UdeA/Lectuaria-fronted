@@ -141,6 +141,10 @@ const SignIn = () => {
                         label="Recordarme"
                     />
 
+                    <Link to={PATHS.FORGOT_PASSWORD} className="auth__forgot-link">
+                        ¿Olvidaste tu contraseña?
+                    </Link>
+
                     <Button type="submit" disabled={isLoading}>
                         {isLoading ? "Iniciando..." : "Iniciar Sesión"}
                     </Button>

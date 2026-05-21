@@ -10,6 +10,8 @@ import Lists from "@/pages/account/Lists";
 import Profile from "@/pages/account/Profile";
 import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
 import ListDetail from "@/pages/account/ListDetail";
 import MyLibrary from "@/pages/library/MyLibrary";
 import AddBook from "@/pages/library/AddBook";
@@ -31,6 +33,8 @@ export const router = createBrowserRouter([
             { path: `${PATHS.BOOKS}/:isbn`, element: <Suspense fallback="..."><BookDetail /></Suspense> },
             { path: PATHS.SIGNIN, element: <Suspense fallback="..."><SignIn /></Suspense> },
             { path: PATHS.SIGNUP, element: <Suspense fallback="..."><SignUp /></Suspense> },
+            { path: PATHS.FORGOT_PASSWORD, element: <Suspense fallback="..."><ForgotPassword /></Suspense> },
+            { path: PATHS.RESET_PASSWORD, element: <Suspense fallback="..."><ResetPassword /></Suspense> },
 
             // Public route for viewing other users' profiles
             { path: "/users/:usernameSlug", element: <Suspense fallback="..."><UserProfile /></Suspense> },

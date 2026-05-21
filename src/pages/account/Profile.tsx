@@ -18,6 +18,7 @@ import type { UserSearchResponseDTO, ReadingStatisticsDTO, SocialStatisticsDTO }
 import type { NotificationPreference } from "@/types/notifications";
 import { getNotificationPreferences, resetNotificationPreferences, updateNotificationPreference } from "@/services/notificationService";
 import { getReadingStatistics, getSocialStatistics } from "@/services/userProfileService";
+import api from "@/config/api";
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -414,6 +415,20 @@ const Profile = () => {
         }
     });
 
+    // Change password state
+    const [showChangePassword, setShowChangePassword] = useState(false);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+    const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+    const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
+    const [changePasswordSuccess, setChangePasswordSuccess] = useState(false);
+    const [changePasswordForm, setChangePasswordForm] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: ""
+    });
+
     // Reset form when user changes or editing starts
     useEffect(() => {
         if (isEditing && user) {
@@ -556,17 +571,131 @@ const Profile = () => {
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0} className="profile__general__tab">
-                        <button
-                            onClick={() => navigate("/lists")}
-                            className="profile__lists_btn"
+<button
+                            className="profile__edit_btn"
+                            onClick={() => setIsEditing(true)}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 7v14m-9-3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4a4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3a3 3 0 0 0-3-3z" /></svg>
-                            <span>Mis listas de lectura</span>
-                        </button>
-                        <button className="profile__edit_btn" onClick={() => setIsEditing(true)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0a2.34 2.34 0 0 0 3.319 1.915a2.34 2.34 0 0 1 2.33 4.033a2.34 2.34 0 0 0 0 3.831a2.34 2.34 0 0 1-2.33 4.033a2.34 2.34 0 0 0-3.319 1.915a2.34 2.34 0 0 1-4.659 0a2.34 2.34 0 0 0-3.32-1.915a2.34 2.34 0 0 1-2.33-4.033a2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" /><circle cx="12" cy="12" r="3" /></g></svg>
                             <span>Editar perfil</span>
                         </button>
+                        <button
+                            className="profile__change-password_btn"
+                            onClick={() => setShowChangePassword(!showChangePassword)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></g></svg>
+                            <span>Cambiar contraseña</span>
+                        </button>
+                        {showChangePassword && (
+                            <div className="profile__change-password-form">
+                                <h3>Cambiar Contraseña</h3>
+                                {changePasswordSuccess && (
+                                    <p className="profile__change-password-success">¡Contraseña actualizada exitosamente!</p>
+                                )}
+                                {changePasswordError && (
+                                    <p className="profile__change-password-error">{changePasswordError}</p>
+                                )}
+                                <div className="profile__change-password-group">
+                                    <label>Contraseña actual</label>
+                                    <div className="profile__passwordWrapper">
+                                        <input
+                                            type={showCurrentPassword ? "text" : "password"}
+                                            placeholder="********"
+                                            value={changePasswordForm.currentPassword}
+                                            onChange={(e) => setChangePasswordForm({ ...changePasswordForm, currentPassword: e.target.value })}
+                                        />
+                                        <button type="button" className="auth__passwordToggle" onClick={() => setShowCurrentPassword(!showCurrentPassword)}>
+                                            {showCurrentPassword ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 18l-.722-3.25M2 8a10.645 10.645 0 0 0 20 0m-2 7l-1.726-2.05M4 15l1.726-2.05M9 18l.722-3.25" /></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M2.062 12.348a1 1 0 0 1 0-.696a10.75 10.75 0 0 1 19.876 0a1 1 0 0 1 0 .696a10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></g></svg>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="profile__change-password-group">
+                                    <label>Nueva contraseña</label>
+                                    <div className="profile__passwordWrapper">
+                                        <input
+                                            type={showNewPassword ? "text" : "password"}
+                                            placeholder="********"
+                                            value={changePasswordForm.newPassword}
+                                            onChange={(e) => setChangePasswordForm({ ...changePasswordForm, newPassword: e.target.value })}
+                                        />
+                                        <button type="button" className="auth__passwordToggle" onClick={() => setShowNewPassword(!showNewPassword)}>
+                                            {showNewPassword ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 18l-.722-3.25M2 8a10.645 10.645 0 0 0 20 0m-2 7l-1.726-2.05M4 15l1.726-2.05M9 18l.722-3.25" /></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M2.062 12.348a1 1 0 0 1 0-.696a10.75 10.75 0 0 1 19.876 0a1 1 0 0 1 0 .696a10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></g></svg>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="profile__change-password-group">
+                                    <label>Confirmar nueva contraseña</label>
+                                    <div className="profile__passwordWrapper">
+                                        <input
+                                            type={showConfirmNewPassword ? "text" : "password"}
+                                            placeholder="********"
+                                            value={changePasswordForm.confirmPassword}
+                                            onChange={(e) => setChangePasswordForm({ ...changePasswordForm, confirmPassword: e.target.value })}
+                                        />
+                                        <button type="button" className="auth__passwordToggle" onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}>
+                                            {showConfirmNewPassword ? (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m15 18l-.722-3.25M2 8a10.645 10.645 0 0 0 20 0m-2 7l-1.726-2.05M4 15l1.726-2.05M9 18l.722-3.25" /></svg>
+                                            ) : (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M2.062 12.348a1 1 0 0 1 0-.696a10.75 10.75 0 0 1 19.876 0a1 1 0 0 1 0 .696a10.75 10.75 0 0 1-19.876 0" /><circle cx="12" cy="12" r="3" /></g></svg>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                                <Button
+                                    onClick={async () => {
+                                        try {
+                                            setChangePasswordLoading(true);
+                                            setChangePasswordError(null);
+                                            setChangePasswordSuccess(false);
+
+                                            if (changePasswordForm.newPassword !== changePasswordForm.confirmPassword) {
+                                                setChangePasswordError("Las contraseñas no coinciden");
+                                                return;
+                                            }
+                                            if (changePasswordForm.newPassword.length < 8) {
+                                                setChangePasswordError("La contraseña debe tener al menos 8 caracteres");
+                                                return;
+                                            }
+                                            if (!/[A-Z]/.test(changePasswordForm.newPassword)) {
+                                                setChangePasswordError("La contraseña debe tener al menos una mayúscula");
+                                                return;
+                                            }
+                                            if (!/\d/.test(changePasswordForm.newPassword)) {
+                                                setChangePasswordError("La contraseña debe tener al menos un número");
+                                                return;
+                                            }
+
+                                            await api.post("/auth/change-password", {
+                                                currentPassword: changePasswordForm.currentPassword,
+                                                newPassword: changePasswordForm.newPassword,
+                                                confirmPassword: changePasswordForm.confirmPassword
+                                            });
+
+                                            setChangePasswordSuccess(true);
+                                            setChangePasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+                                            setTimeout(() => {
+                                                setShowChangePassword(false);
+                                                setChangePasswordSuccess(false);
+                                            }, 2000);
+                                        } catch (err: any) {
+                                            setChangePasswordError(err?.response?.data?.message || "No se pudo cambiar la contraseña");
+                                        } finally {
+                                            setChangePasswordLoading(false);
+                                        }
+                                    }}
+                                    disabled={changePasswordLoading}
+                                >
+                                    {changePasswordLoading ? "Guardando..." : "Guardar nueva contraseña"}
+                                </Button>
+                            </div>
+                        )}
                         <button
                             className="profile__shared_btn"
                             onClick={() => navigate(PATHS.SHARED_WITH_ME)}
