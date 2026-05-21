@@ -54,7 +54,7 @@ export interface YearComparisonDTO {
 
 export interface ReadingStatisticsDTO {
     totalBooksRead: number;
-    averageRatingGiven: number;
+    reviewsCount: number;
     mostReadGenres: GenreCountDTO[];
     booksReadByMonth: MonthlyBooksReadDTO[];
     yearComparison: YearComparisonDTO;
