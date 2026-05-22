@@ -17,7 +17,9 @@ import { useUserLists } from "@/hooks/useUserLists";
 import type { UserSearchResponseDTO, ReadingStatisticsDTO, SocialStatisticsDTO } from "@/types";
 import type { NotificationPreference } from "@/types/notifications";
 import { getNotificationPreferences, resetNotificationPreferences, updateNotificationPreference } from "@/services/notificationService";
+import { getPrivacySettings, updatePrivacySettings } from "@/services/privacyService";
 import { getReadingStatistics, getSocialStatistics } from "@/services/userProfileService";
+import type { Visibility } from "@/types/userProfile";
 import api from "@/config/api";
 
 interface TabPanelProps {
@@ -346,6 +348,18 @@ const Profile = () => {
     const [preferences, setPreferences] = useState<NotificationPreference[]>([]);
     const [preferencesLoading, setPreferencesLoading] = useState(false);
 
+    const [privacySettings, setPrivacySettings] = useState<{
+        profileVisibility: Visibility;
+        reviewsVisibility: Visibility;
+        readingListsVisibility: Visibility;
+        readingListsActivityVisibility: Visibility;
+        friendsVisibility: Visibility;
+    } | null>(null);
+    const [privacyLoading, setPrivacyLoading] = useState(false);
+    const [privacySaving, setPrivacySaving] = useState(false);
+    const [privacySuccess, setPrivacySuccess] = useState(false);
+    const [privacyError, setPrivacyError] = useState<string | null>(null);
+
     const { friends, requests, searchResults, loading, loadFriends, loadPendingRequests, searchUsers, sendRequest, acceptRequest, rejectRequest, cancelRequest, removeFriend } = useFriendship();
     const { lists, fetchLists } = useUserLists({ autoFetch: false });
 
@@ -362,7 +376,7 @@ const Profile = () => {
             setValue(3);
         } else if (tab === 'friends' || tab === 'amigos') {
             setValue(2);
-        } else if (tab === 'notifications') {
+        } else if (tab === 'notifications' || tab === 'settings') {
             setValue(1);
         } else if ((tab === 'estadisticas' || tab === 'statistics') && user?.userRole === 'READER') {
             setValue(4);
@@ -374,6 +388,7 @@ const Profile = () => {
     useEffect(() => {
         if (user && value === 1) {
             fetchNotificationPreferences();
+            fetchPrivacySettings();
         }
     }, [user, value]);
 
@@ -386,6 +401,24 @@ const Profile = () => {
             console.error("Error fetching notification preferences:", error);
         } finally {
             setPreferencesLoading(false);
+        }
+    };
+
+    const fetchPrivacySettings = async () => {
+        setPrivacyLoading(true);
+        try {
+            const data = await getPrivacySettings();
+            setPrivacySettings({
+                profileVisibility: data.profileVisibility,
+                reviewsVisibility: data.reviewsVisibility,
+                readingListsVisibility: data.readingListsVisibility,
+                readingListsActivityVisibility: data.readingListsActivityVisibility,
+                friendsVisibility: data.friendsVisibility
+            });
+        } catch (error) {
+            console.error("Error fetching privacy settings:", error);
+        } finally {
+            setPrivacyLoading(false);
         }
     };
 
@@ -559,7 +592,7 @@ const Profile = () => {
                             aria-label="profile tabs"
                         >
                             <Tab label="General" {...a11yProps(0)} />
-                            <Tab label="Notificaciones" {...a11yProps(1)} />
+                            <Tab label="Configuración" {...a11yProps(1)} />
                             <Tab label={`Amigos (${friends.length})`} {...a11yProps(2)} />
                             <Tab label={`Solicitudes (${requests.length})`} {...a11yProps(3)} />
                             {user?.userRole === "READER" && (
@@ -709,37 +742,165 @@ const Profile = () => {
                         </button>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1} className="profile__notifications__tab">
-                        {preferencesLoading ? (
-                            <p>Cargando preferencias...</p>
+                        {preferencesLoading && privacyLoading ? (
+                            <p>Cargando configuración...</p>
                         ) : (
-                            <div className="profile__preferences">
-                                {preferences.map(pref => (
-                                    <div key={pref.id} className="profile__preference-item">
-                                        <div className="profile__preference-info">
-                                            <h4>{pref.notificationType === 'FRIENDSHIP' ? 'Amistades' : pref.notificationType === 'REVIEW' ? 'Reseñas' : 'Compartidos'}</h4>
-                                            <p>{pref.notificationType === 'FRIENDSHIP' ? 'Recibir notificaciones sobre solicitudes de amistad' : pref.notificationType === 'REVIEW' ? 'Recibir notificaciones cuando amigos publiquen reseñas' : 'Recibir notificaciones cuando compartan libros contigo'}</p>
+                            <>
+                                {/* Privacy Settings */}
+                                <div className="profile__privacy-settings">
+                                    <h3 style={{ margin: "0 0 0.5rem 0", fontSize: "1rem", fontWeight: 700, color: "$text-color" }}>Privacidad</h3>
+                                    <p style={{ margin: "0 0 1rem 0", fontSize: "0.85rem", color: "$gray-dark" }}>
+                                        Controla quién puede ver tu información en los perfiles públicos y de amigos.
+                                    </p>
+
+                                    {privacyError && <p className="profile__privacy-error">{privacyError}</p>}
+                                    {privacySuccess && <p className="profile__privacy-success">¡Configuración guardada!</p>}
+
+                                    {privacySettings && (
+                                        <>
+                                            <div className="profile__privacy-item">
+                                                <div className="profile__privacy-info">
+                                                    <h4>Visibilidad del perfil</h4>
+                                                    <p>Quién puede ver tu perfil cuando te buscan por nombre de usuario.</p>
+                                                </div>
+                                                <select
+                                                    className="profile__privacy-select"
+                                                    value={privacySettings.profileVisibility}
+                                                    onChange={(e) => setPrivacySettings({ ...privacySettings, profileVisibility: e.target.value as Visibility })}
+                                                >
+                                                    <option value="PUBLIC">Público</option>
+                                                    <option value="FRIENDS">Solo amigos</option>
+                                                    <option value="PRIVATE">Privado</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="profile__privacy-item">
+                                                <div className="profile__privacy-info">
+                                                    <h4>Reseñas</h4>
+                                                    <p>Quién puede ver las reseñas publicadas en tu perfil.</p>
+                                                </div>
+                                                <select
+                                                    className="profile__privacy-select"
+                                                    value={privacySettings.reviewsVisibility}
+                                                    onChange={(e) => setPrivacySettings({ ...privacySettings, reviewsVisibility: e.target.value as Visibility })}
+                                                >
+                                                    <option value="PUBLIC">Público</option>
+                                                    <option value="FRIENDS">Solo amigos</option>
+                                                    <option value="PRIVATE">Privado</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="profile__privacy-item">
+                                                <div className="profile__privacy-info">
+                                                    <h4>Listas de lectura</h4>
+                                                    <p>Quién puede ver las listas que has creado.</p>
+                                                </div>
+                                                <select
+                                                    className="profile__privacy-select"
+                                                    value={privacySettings.readingListsVisibility}
+                                                    onChange={(e) => setPrivacySettings({ ...privacySettings, readingListsVisibility: e.target.value as Visibility })}
+                                                >
+                                                    <option value="PUBLIC">Público</option>
+                                                    <option value="FRIENDS">Solo amigos</option>
+                                                    <option value="PRIVATE">Privado</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="profile__privacy-item">
+                                                <div className="profile__privacy-info">
+                                                    <h4>Actividad de libros en listas</h4>
+                                                    <p>Quién puede ver los libros que añades a tus listas en la actividad.</p>
+                                                </div>
+                                                <select
+                                                    className="profile__privacy-select"
+                                                    value={privacySettings.readingListsActivityVisibility}
+                                                    onChange={(e) => setPrivacySettings({ ...privacySettings, readingListsActivityVisibility: e.target.value as Visibility })}
+                                                >
+                                                    <option value="PUBLIC">Público</option>
+                                                    <option value="FRIENDS">Solo amigos</option>
+                                                    <option value="PRIVATE">Privado</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="profile__privacy-item">
+                                                <div className="profile__privacy-info">
+                                                    <h4>Lista de amigos</h4>
+                                                    <p>Quién puede ver tu lista de amigos.</p>
+                                                </div>
+                                                <select
+                                                    className="profile__privacy-select"
+                                                    value={privacySettings.friendsVisibility}
+                                                    onChange={(e) => setPrivacySettings({ ...privacySettings, friendsVisibility: e.target.value as Visibility })}
+                                                >
+                                                    <option value="PUBLIC">Público</option>
+                                                    <option value="FRIENDS">Solo amigos</option>
+                                                    <option value="PRIVATE">Privado</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="profile__privacy-legend">
+                                                <p><strong>Público</strong> — cualquier persona</p>
+                                                <p><strong>Solo amigos</strong> — solo personas que te han aceptado como amigo</p>
+                                                <p><strong>Privado</strong> — solo tú</p>
+                                            </div>
+
+                                            {privacySaving ? (
+                                                <p className="profile__privacy-saving">Guardando...</p>
+                                            ) : (
+                                                <Button
+                                                    onClick={async () => {
+                                                        try {
+                                                            setPrivacySaving(true);
+                                                            setPrivacyError(null);
+                                                            setPrivacySuccess(false);
+                                                            await updatePrivacySettings(privacySettings);
+                                                            setPrivacySuccess(true);
+                                                            setTimeout(() => setPrivacySuccess(false), 3000);
+                                                        } catch (err: any) {
+                                                            setPrivacyError(err?.response?.data?.message || "No se pudo guardar la configuración");
+                                                        } finally {
+                                                            setPrivacySaving(false);
+                                                        }
+                                                    }}
+                                                >
+                                                    Guardar configuración de privacidad
+                                                </Button>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+
+                                {/* Notification Preferences */}
+                                <div className="profile__preferences">
+                                    <h3 style={{ margin: "1.5rem 0 0.5rem 0", fontSize: "1rem", fontWeight: 700, color: "$text-color" }}>Notificaciones</h3>
+                                    {preferences.map(pref => (
+                                        <div key={pref.id} className="profile__preference-item">
+                                            <div className="profile__preference-info">
+                                                <h4>{pref.notificationType === 'FRIENDSHIP' ? 'Amistades' : pref.notificationType === 'REVIEW' ? 'Reseñas' : 'Compartidos'}</h4>
+                                                <p>{pref.notificationType === 'FRIENDSHIP' ? 'Recibir notificaciones sobre solicitudes de amistad' : pref.notificationType === 'REVIEW' ? 'Recibir notificaciones cuando amigos publiquen reseñas' : 'Recibir notificaciones cuando compartan libros contigo'}</p>
+                                            </div>
+                                            <label className="profile__preference-toggle">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={pref.isEnabled}
+                                                    onChange={async () => {
+                                                        try {
+                                                            const updated = await updateNotificationPreference(pref.notificationType, !pref.isEnabled);
+                                                            setPreferences(preferences.map(p => p.id === updated.id ? updated : p));
+                                                        } catch (error) {
+                                                            console.error("Error updating preference:", error);
+                                                        }
+                                                    }}
+                                                />
+                                                <span className="profile__preference-slider"></span>
+                                            </label>
                                         </div>
-                                        <label className="profile__preference-toggle">
-                                            <input
-                                                type="checkbox"
-                                                checked={pref.isEnabled}
-                                                onChange={async () => {
-                                                    try {
-                                                        const updated = await updateNotificationPreference(pref.notificationType, !pref.isEnabled);
-                                                        setPreferences(preferences.map(p => p.id === updated.id ? updated : p));
-                                                    } catch (error) {
-                                                        console.error("Error updating preference:", error);
-                                                    }
-                                                }}
-                                            />
-                                            <span className="profile__preference-slider"></span>
-                                        </label>
-                                    </div>
-                                ))}
-                                <button className="profile__reset-preferences" onClick={handleResetPreferences}>
-                                    Restablecer valores predeterminados
-                                </button>
-                            </div>
+                                    ))}
+                                    <button className="profile__reset-preferences" onClick={handleResetPreferences}>
+                                        Restablecer valores predeterminados
+                                    </button>
+                                </div>
+                            </>
                         )}
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={2} className="profile__friends__tab">

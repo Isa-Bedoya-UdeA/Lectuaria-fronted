@@ -33,7 +33,11 @@ export const useUserProfile = (usernameSlug: string) => {
                 }
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || "Error al cargar el perfil");
+            if (err.response?.status === 403 || err.response?.data?.message?.includes("privado")) {
+                setError("Este perfil es privado");
+            } else {
+                setError(err.response?.data?.message || "Error al cargar el perfil");
+            }
         } finally {
             setIsLoading(false);
         }

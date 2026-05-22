@@ -11,6 +11,7 @@ import Button from "@/components/UI/Button";
 import { Avatar } from "@mui/material";
 import { cyan } from "@mui/material/colors";
 import "./userProfile.scss";
+import { Link } from "react-router-dom";
 
 const UserProfile = () => {
     const { usernameSlug } = useParams<{ usernameSlug: string }>();
@@ -71,6 +72,24 @@ const UserProfile = () => {
     }
 
     if (error && !profile) {
+        // Check if it's a private profile error
+        const isPrivate = error?.includes("privado") || error?.includes("403");
+        if (isPrivate) {
+            return (
+                <main className="userProfile">
+                    <div className="userProfile__container">
+                        <div className="userProfile__private">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            <h2>Perfil privado</h2>
+                            <p>Este perfil es privado y no está disponible para ti.</p>
+                        </div>
+                    </div>
+                </main>
+            );
+        }
         return (
             <main className="userProfile">
                 <div className="userProfile__container">
@@ -97,6 +116,10 @@ const UserProfile = () => {
 
     const isSelf = user && user.id === profile.id;
     const isFriend = profile?.friendshipStatus === "ACCEPTED";
+
+    const showReviews = isSelf || !profile.privacy || profile.privacy.reviewsVisibility !== "PRIVATE";
+    const showReadingLists = isSelf || !profile.privacy || profile.privacy.readingListsVisibility !== "PRIVATE";
+    const showFriends = isSelf || !profile.privacy || profile.privacy.friendsVisibility !== "PRIVATE";
 
     return (
         <main className="userProfile">
@@ -140,13 +163,72 @@ const UserProfile = () => {
                     </article>
                 </section>
 
-                {/* Sección de actividad - solo visible si es amigo */}
+                {/* Reading Lists section */}
+                {showReadingLists && profile.readingLists && profile.readingLists.length > 0 && (
+                    <section className="userProfile__reading-lists">
+                        <h2>Listas de lectura</h2>
+                        <div className="userProfile__reading-lists__grid">
+                            {profile.readingLists.map(list => (
+                                <Link
+                                    key={list.id}
+                                    to={`/lists/${list.id}`}
+                                    className="userProfile__reading-lists__card"
+                                >
+                                    <div style={{
+                                        width: "2rem",
+                                        height: "2rem",
+                                        borderRadius: "0.3rem",
+                                        background: "$primary",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="$white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                                        </svg>
+                                    </div>
+                                    <h3>{list.name}</h3>
+                                    <span>{list.bookCount} {list.bookCount === 1 ? "libro" : "libros"}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {/* Friends section */}
+                {showFriends && profile.friends && profile.friends.length > 0 && (
+                    <section className="userProfile__friends">
+                        <h2>Amigos</h2>
+                        <div className="userProfile__friends__grid">
+                            {profile.friends.map(friend => (
+                                <Link
+                                    key={friend.id}
+                                    to={`/users/${friend.username}`}
+                                    className="userProfile__friends__card"
+                                >
+                                    <Avatar
+                                        sx={{ bgcolor: cyan[500], width: 48, height: 48 }}
+                                        alt={friend.fullName}
+                                        src={friend.photoUrl || undefined}
+                                    >
+                                        {getInitials(friend.fullName)}
+                                    </Avatar>
+                                    <h3>{friend.fullName}</h3>
+                                    <span>@{friend.username}</span>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+                )}
+
+                {/* Activity section - only visible if friend */}
                 {isFriend && friendActivity && friendActivity.length > 0 && (
                     <section className="userProfile__activity">
                         <h2 className="userProfile__activity-title">Actividad reciente</h2>
                         <div className="userProfile__activity-sections">
                             {/* Reseñas recientes */}
-                            {friendActivity
+                            {showReviews && friendActivity
                                 .filter(activity => activity.activityType === 'BOOK_REVIEWED')
                                 .length > 0 && (
                                     <div className="userProfile__activity-section">
@@ -176,7 +258,7 @@ const UserProfile = () => {
                                         </div>
                                     </div>
                                 )}
-                            
+
                             {/* Libros añadidos a listas */}
                             {friendActivity
                                 .filter(activity => activity.activityType === 'BOOK_ADDED_TO_LIST')
@@ -186,38 +268,26 @@ const UserProfile = () => {
                                         <div className="userProfile__section-content">
                                             {friendActivity
                                                 .filter(activity => activity.activityType === 'BOOK_ADDED_TO_LIST')
-                                                .slice(0, 3).map(book => {
-                                                    console.log('FriendBookCard book data:', {
-                                                        bookId: book.bookId,
-                                                        listId: book.listId,
-                                                        listName: book.listName,
-                                                        isPublic: book.isPublic,
-                                                        publicToken: book.publicToken,
-                                                        visibility: book.visibility
-                                                    });
-                                                    
-                                                    return (
-                                                        <FriendBookCard
-                                                            key={book.id}
-                                                            book={{
-                                                                id: book.bookId || 0,
-                                                                isbn: parseInt(book.bookIsbn || "0"),
-                                                                title: book.bookTitle || "",
-                                                                coverUrl: book.bookCoverUrl,
-                                                                authors: book.bookAuthors || [],
-                                                                genres: [],
-                                                                averageRating: 0,
-                                                                ratingsCount: 0
-                                                            }}
-                                                            listName={book.listName || ""}
-                                                            listId={book.listId as number || 0}
-                                                            isPublic={book.isPublic || false}
-                                                            publicToken={book.publicToken || undefined}
-                                                            visibility={book.visibility}
-                                                        />
-                                                    );
-                                                })
-                                            }
+                                                .slice(0, 3).map(book => (
+                                                    <FriendBookCard
+                                                        key={book.id}
+                                                        book={{
+                                                            id: book.bookId || 0,
+                                                            isbn: parseInt(book.bookIsbn || "0"),
+                                                            title: book.bookTitle || "",
+                                                            coverUrl: book.bookCoverUrl,
+                                                            authors: book.bookAuthors || [],
+                                                            genres: [],
+                                                            averageRating: 0,
+                                                            ratingsCount: 0
+                                                        }}
+                                                        listName={book.listName || ""}
+                                                        listId={book.listId as number || 0}
+                                                        isPublic={book.isPublic || false}
+                                                        publicToken={book.publicToken || undefined}
+                                                        visibility={book.visibility}
+                                                    />
+                                                ))}
                                         </div>
                                     </div>
                                 )}

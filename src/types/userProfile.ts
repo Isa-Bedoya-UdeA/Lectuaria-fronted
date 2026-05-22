@@ -2,11 +2,31 @@
 
 export type FriendshipStatus = "NONE" | "PENDING" | "ACCEPTED" | "SELF";
 
+export type Visibility = "PUBLIC" | "FRIENDS" | "PRIVATE";
+
 export interface UserStatsDTO {
     booksRead: number;
     reviewsCount: number;
     friendsCount: number;
     listsCount: number;
+}
+
+export interface UserPrivacySettingsDTO {
+    id?: number;
+    profileVisibility: Visibility;
+    reviewsVisibility: Visibility;
+    readingListsVisibility: Visibility;
+    readingListsActivityVisibility: Visibility;
+    friendsVisibility: Visibility;
+}
+
+export interface UserProfilePrivacyGateDTO {
+    profileVisible: boolean;
+    profileVisibility: Visibility;
+    reviewsVisibility: Visibility;
+    readingListsVisibility: Visibility;
+    readingListsActivityVisibility: Visibility;
+    friendsVisibility: Visibility;
 }
 
 export interface UserProfileDTO {
@@ -17,6 +37,33 @@ export interface UserProfileDTO {
     biography?: string;
     friendshipStatus: FriendshipStatus;
     stats: UserStatsDTO;
+    recentReviews?: UserReviewSummaryDTO[];
+    readingLists?: ReadingListSummaryDTO[];
+    friends?: FriendSummaryDTO[];
+    privacy?: UserProfilePrivacyGateDTO;
+}
+
+export interface UserReviewSummaryDTO {
+    bookId: number;
+    title: string;
+    coverUrl?: string;
+    content?: string;
+    createdAt: string;
+}
+
+export interface ReadingListSummaryDTO {
+    id: number;
+    name: string;
+    description?: string;
+    visibility: string;
+    bookCount: number;
+}
+
+export interface FriendSummaryDTO {
+    id: number;
+    username: string;
+    fullName: string;
+    photoUrl?: string;
 }
 
 export interface UserReviewDTO {
