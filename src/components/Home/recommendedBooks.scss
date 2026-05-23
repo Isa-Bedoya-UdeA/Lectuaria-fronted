@@ -108,10 +108,19 @@
             box-shadow: $shadow-md;
             transition: all $transition-base;
 
+            svg {
+                color: $white;
+            }
+
             &:hover {
                 background-color: $secondary;
                 border-color: $secondary;
                 color: $bg-darker;
+
+                svg {
+                    color: $bg-darker;
+                }
+
                 transform: translateY(-50%) scale(1.05);
             }
 
@@ -141,6 +150,7 @@
         scroll-snap-type: x mandatory;
         scrollbar-width: thin;
         scrollbar-color: $secondary $gray-700;
+        align-items: flex-start;
 
         &::-webkit-scrollbar {
             height: 6px;

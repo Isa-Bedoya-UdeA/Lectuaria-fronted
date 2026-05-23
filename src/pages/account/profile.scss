@@ -900,64 +900,46 @@
 		transition: width 0.6s ease-out;
 	}
 
-	&__monthly-list {
+&__monthly-list {
 		display: flex;
-		align-items: flex-end;
-		justify-content: space-between;
-		gap: 0.5rem;
-		min-height: 120px;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.75rem 1.5rem;
+		min-height: auto;
 		background-color: $bg-light;
 		border: 1px solid $gray;
 		border-radius: 0.8rem;
-		padding: 1.5rem 1rem;
-		overflow-x: auto;
-
-		@media screen and (min-width: 600px) {
-			flex-wrap: wrap;
-			overflow-x: visible;
-			justify-content: flex-start;
-		}
+		padding: 1rem;
 	}
 
 	&__monthly-item {
 		display: flex;
-		flex-direction: column-reverse;
+		flex-direction: row;
 		align-items: center;
-		gap: 0.5rem;
-		flex: 1;
-		min-width: 50px;
+		gap: 0.75rem;
+		flex: 1 1 calc(50% - 1rem);
+		min-width: 160px;
+		padding: 0.35rem 0;
 
 		@media screen and (min-width: 600px) {
 			flex-direction: column;
+			align-items: center;
 			min-width: 70px;
-			flex: 0 0 calc((100% - 5rem) / 6);
+			flex: 0 0 calc((100% - 4rem) / 6);
+			gap: 0.5rem;
 		}
 
 		@media screen and (min-width: 1000px) {
-			flex: 1;
 			min-width: 80px;
 		}
 	}
 
-	&__monthly-month {
-		font-family: $text;
-		font-size: 0.75rem;
-		font-weight: 600;
-		color: $gray-dark;
-		text-transform: capitalize;
-		white-space: nowrap;
-
-		@media screen and (min-width: 600px) {
-			text-align: center;
-		}
-	}
-
-	&__monthly-bar-container {
+	&__monthly-data {
 		display: flex;
-		flex-direction: column-reverse;
 		align-items: center;
-		gap: 0.25rem;
-		width: 100%;
+		gap: 0.75rem;
+		flex: 1;
 
 		@media screen and (min-width: 600px) {
 			flex-direction: column;
@@ -967,55 +949,69 @@
 		}
 	}
 
+	&__monthly-month {
+		font-family: $text;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: $gray-dark;
+		text-transform: capitalize;
+		white-space: nowrap;
+		text-align: left;
+
+		@media screen and (min-width: 600px) {
+			text-align: center;
+			min-width: auto;
+		}
+	}
+
 	&__monthly-bar-wrapper {
 		background-color: $bg-normal;
-		width: 1.25rem;
-		height: 80px;
-		border-radius: 0.5rem 0.5rem 0 0;
-		display: flex;
-		flex-direction: column-reverse;
+		flex: 1;
+		height: 0.75rem;
+		border-radius: 0.5rem;
 		overflow: hidden;
+		min-width: 60px;
 
 		@media screen and (min-width: 600px) {
 			width: 100%;
 			max-width: 3rem;
 			height: 80px;
-			border-radius: 0.5rem 0.5rem 0 0;
+			flex: none;
+			display: flex;
 			flex-direction: column;
+			justify-content: flex-end;
 		}
 	}
 
 	&__monthly-bar {
-		background: linear-gradient(to top, $primary, $primary-hover);
-		width: 100%;
-		border-radius: 0.5rem 0.5rem 0 0;
-		transition: height 0.6s ease-out;
+		background: linear-gradient(to right, $primary, $primary-hover);
+		height: 100%;
+		border-radius: 0.5rem;
+		transition: width 0.6s ease-out;
+		min-width: 4px;
 
 		@media screen and (min-width: 600px) {
 			height: 100% !important;
-			width: var(--bar-width, 0%) !important;
-			min-width: 4px;
+			width: 100% !important;
 			background: linear-gradient(to top, $primary, $primary-hover);
 			border-radius: 0.5rem 0.5rem 0 0;
-			transition: height 0.6s ease-out;
 		}
 
 		&--zero {
-			height: 0 !important;
-			min-height: 0;
+			width: 0 !important;
+			min-width: 0;
 			opacity: 0;
-
-			@media screen and (min-width: 600px) {
-				width: 0 !important;
-			}
 		}
 	}
 
 	&__monthly-count {
 		font-family: $title;
-		font-size: 0.75rem;
+		font-size: 0.8rem;
 		font-weight: 700;
 		color: $primary;
+		min-width: 30px;
+		text-align: right;
+		white-space: nowrap;
 
 		@media screen and (min-width: 600px) {
 			text-align: center;

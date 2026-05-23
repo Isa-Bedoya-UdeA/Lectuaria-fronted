@@ -186,17 +186,18 @@ const ReadingStatisticsSection = ({ usernameSlug }: { usernameSlug: string }) =>
                             {booksReadByMonth.map((item, idx) => (
                                 <div key={idx} className="reading-stats__monthly-item">
                                     <span className="reading-stats__monthly-month">{item.month}</span>
-                                    <div className="reading-stats__monthly-bar-container">
-                                        <div className="reading-stats__monthly-count">{item.booksRead} {item.booksRead === 1 ? 'libro' : 'libros'}</div>
+                                    <div className="reading-stats__monthly-data">
                                         <div className="reading-stats__monthly-bar-wrapper">
                                             <div
                                                 className={`reading-stats__monthly-bar${item.booksRead === 0 ? ' reading-stats__monthly-bar--zero' : ''}`}
                                                 style={{
-                                                    height: `${item.booksRead > 0 ? Math.min(item.booksRead * 12, 80) : 0}px`,
-                                                    '--bar-width': `${(item.booksRead / maxBooks) * 100}%`
-                                                } as React.CSSProperties}
+                                                    width: `${(item.booksRead / maxBooks) * 100}%`
+                                                }}
                                             />
                                         </div>
+                                        <span className="reading-stats__monthly-count">
+                                            {item.booksRead} {item.booksRead === 1 ? 'libro' : 'libros'}
+                                        </span>
                                     </div>
                                 </div>
                             ))}

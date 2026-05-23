@@ -123,11 +123,18 @@
             box-shadow: $shadow-md;
             transition: all $transition-base;
 
+            svg {
+                color: $primary;
+            }
+
             &:hover {
                 background-color: $primary;
-                color: $white;
                 border-color: $primary;
                 transform: translateY(-50%) scale(1.05);
+
+                svg {
+                    color: $white;
+                }
             }
 
             &:active {

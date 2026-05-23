@@ -1,11 +1,141 @@
 /* MOBILE FIRST */
 @use "@/styles/vars" as *;
 
+// BookCard on dark background (RecommendedBooks section)
+.recommendedBooks__carousel-item {
+    .bookCard {
+        background-color: $gray-800;
+        color: $white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+        .bookCard__content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+
+            h3 {
+                color: $white;
+            }
+        }
+
+        .bookCard__authors {
+            color: $gray-400;
+        }
+
+        // Fix genres: white text on semi-transparent secondary bg
+        .bookCard__genres {
+            color: $white;
+            span {
+                background-color: rgba($secondary, 0.25);
+                color: $white;
+                border: 1px solid rgba($secondary, 0.5);
+            }
+        }
+
+        .bookCard__stars {
+            margin-bottom: 0.5rem;
+
+            .MuiRating-root {
+                color: $secondary;
+
+                .MuiRating-iconFilled {
+                    color: $secondary;
+                }
+
+                .MuiRating-iconEmpty {
+                    color: rgba($white, 0.2);
+                    path {
+                        stroke: rgba($white, 0.3);
+                    }
+                }
+            }
+
+            .bookCard__count {
+                color: $gray-400;
+                margin-left: 0.25rem;
+            }
+        }
+
+        .bookCard__count {
+            color: $gray-400;
+        }
+
+        // Fix action buttons on dark bg - no purple border, white SVG
+        .bookCard__add {
+            button {
+                background-color: $secondary;
+                color: $bg-darker;
+                font-weight: 600;
+                border: none;
+
+                svg {
+                    color: $bg-darker;
+                    stroke: $bg-darker;
+                    fill: none;
+                }
+
+                &.btn-outlined {
+                    border: none;
+                    background-color: rgba($secondary, 0.2);
+                    color: $white;
+
+                    svg {
+                        color: $white;
+                        stroke: $white;
+                    }
+                }
+
+                &:hover {
+                    background-color: lighten($secondary, 8%);
+
+                    &.btn-outlined {
+                        background-color: $secondary;
+                        color: $bg-darker;
+
+                        svg {
+                            color: $bg-darker;
+                            stroke: $bg-darker;
+                        }
+                    }
+                }
+            }
+
+            .bookCard__add-list {
+                border: none;
+                background-color: rgba($secondary, 0.2);
+                color: $white;
+
+                svg {
+                    color: $white;
+                    stroke: $white;
+                }
+
+                &:hover {
+                    background-color: $secondary;
+                    color: $bg-darker;
+
+                    svg {
+                        color: $bg-darker;
+                        stroke: $bg-darker;
+                    }
+                }
+            }
+        }
+
+        .bookCard__reason {
+            color: $white;
+            background-color: rgba($secondary, 0.15);
+            border-left: 3px solid $secondary;
+            margin-top: auto;
+        }
+    }
+}
+
 .bookCard {
 	max-width: 15rem;
 	border-radius: 1rem;
 	overflow: hidden;
-	box-shadow: 0 0 10px $gray;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 	text-align: left;
 	transition: 0.2s transform ease;
 
@@ -375,11 +505,8 @@
 		border-radius: 0.5rem;
 		line-height: 1.35;
 		margin: 0;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
 		border-left: 3px solid $primary;
+		word-break: break-word;
 	}
 }
 
