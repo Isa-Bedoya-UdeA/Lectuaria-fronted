@@ -21,6 +21,9 @@ import SharedList from "@/pages/account/SharedList";
 const Home = lazy(() => import("@/pages/home/Home"));
 const UserProfile = lazy(() => import("@/pages/users/UserProfile"));
 const SharedWithMe = lazy(() => import("@/pages/shared/SharedWithMe"));
+const TermsOfUse = lazy(() => import("@/pages/legal/TermsOfUse"));
+const PrivacyPolicy = lazy(() => import("@/pages/legal/PrivacyPolicy"));
+const CookiePolicy = lazy(() => import("@/pages/legal/CookiePolicy"));
 
 export const router = createBrowserRouter([
     {
@@ -41,6 +44,11 @@ export const router = createBrowserRouter([
 
             // Public route for viewing shared lists via token
             { path: "/shared/:token", element: <SharedList /> },
+
+            // Legal pages
+            { path: PATHS.TERMS, element: <Suspense fallback="..."><TermsOfUse /></Suspense> },
+            { path: PATHS.PRIVACY, element: <Suspense fallback="..."><PrivacyPolicy /></Suspense> },
+            { path: PATHS.COOKIES, element: <Suspense fallback="..."><CookiePolicy /></Suspense> },
 
             // Protected routes for any logged in user
             { path: PATHS.LISTS, element: <ProtectedRoute allowedRole="READER"><Suspense fallback="..."><Lists /></Suspense></ProtectedRoute> },

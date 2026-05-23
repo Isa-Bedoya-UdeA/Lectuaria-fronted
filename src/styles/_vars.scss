@@ -1,26 +1,202 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
+// ============================================
+// COLORS - Primary palette
+// ============================================
+
+// Primary - Indigo (main brand color)
 $primary: #3730A3;
-$primary-light: #eeedf7;
-$primary-hover: #312c88;
+$primary-light: #EEEDF7;
+$primary-hover: #2C2894;
+$primary-dark: #1E1B69;
 
+// Secondary - Amber (accent/CTA)
 $secondary: #F59E0B;
-$secondary-light: #f7cc83;
-$secondary-hover: #dc8f0b;
+$secondary-light: #FEF3C7;
+$secondary-hover: #D97706;
+$secondary-dark: #B45309;
 
-$bg-light: #F9FAFB;
-$bg-normal: #f4f5f7;
-$bg-dark: #1c1b32;
-$bg-blur: rgb(238, 237, 247, 0.3);
-$bg-hero: rgba(56, 48, 163, 0.4);
+// ============================================
+// COLORS - Semantic colors
+// ============================================
 
-$text-color: #1E293B;
-$success: #10B981;
-$error: #e4004c;
-$white: #fcfcfc;
+$success: #059669;
+$success-light: #D1FAE5;
+$error: #DC2626;
+$error-light: #FEE2E2;
+$warning: #D97706;
+$warning-light: #FEF3C7;
+$info: #0284C7;
+$info-light: #E0F2FE;
+
+// ============================================
+// COLORS - Backgrounds
+// ============================================
+
+$bg-lightest: #FAFAFA;
+$bg-light: #F3F4F6;
+$bg-normal: #E5E7EB;
+$bg-dark: #1F2937;
+$bg-darker: #111827;
+$bg-blur: rgba(238, 237, 247, 0.85);
+$bg-hero: rgba(55, 48, 163, 0.4);
+
+// ============================================
+// COLORS - Text
+// ============================================
+
+$text-primary: #111827;
+$text-secondary: #4B5563;
+$text-muted: #9CA3AF;
+$text-inverse: #FFFFFF;
+
+// ============================================
+// COLORS - Neutral / Gray scale
+// ============================================
+
+$white: #FFFFFF;
+$gray-50: #F9FAFB;
+$gray-100: #F3F4F6;
+$gray-200: #E5E7EB;
+$gray-300: #D1D5DB;
+$gray-400: #9CA3AF;
+$gray-500: #6B7280;
+$gray-600: #4B5563;
+$gray-700: #374151;
+$gray-800: #1F2937;
+$gray-900: #111827;
 $gray: rgba(176, 189, 204, 0.5);
-$gray-2: #b5c1cc;
-$gray-dark: #777;
+$gray-2: #B5C1CC;
+$gray-dark: #777777;
 
-$title: "Montserrat", sans-serif;
-$text: "Open Sans", sans-serif;
+// ============================================
+// COLORS - Borders & Shadows
+// ============================================
+
+$border-light: rgba(0, 0, 0, 0.08);
+$border-normal: rgba(0, 0, 0, 0.12);
+$border-dark: rgba(0, 0, 0, 0.25);
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+// ============================================
+// TYPOGRAPHY
+// ============================================
+
+$font-display: "Montserrat", system-ui, sans-serif;
+$font-body: "Open Sans", system-ui, sans-serif;
+
+// Font sizes
+$text-xs: 0.75rem;    // 12px
+$text-sm: 0.875rem;   // 14px
+$text-base: 1rem;     // 16px
+$text-lg: 1.125rem;   // 18px
+$text-xl: 1.25rem;    // 20px
+$text-2xl: 1.5rem;    // 24px
+$text-3xl: 1.875rem;  // 30px
+$text-4xl: 2.25rem;   // 36px
+$text-5xl: 3rem;      // 48px
+
+// Line heights
+$leading-tight: 1.25;
+$leading-normal: 1.5;
+$leading-relaxed: 1.625;
+
+// ============================================
+// SPACING
+// ============================================
+
+$space-1: 0.25rem;   // 4px
+$space-2: 0.5rem;    // 8px
+$space-3: 0.75rem;   // 12px
+$space-4: 1rem;      // 16px
+$space-5: 1.25rem;   // 20px
+$space-6: 1.5rem;    // 24px
+$space-8: 2rem;      // 32px
+$space-10: 2.5rem;   // 40px
+$space-12: 3rem;     // 48px
+$space-16: 4rem;     // 64px
+$space-20: 5rem;     // 80px
+$space-24: 6rem;     // 96px
+
+// ============================================
+// BORDER RADIUS
+// ============================================
+
+$radius-sm: 0.25rem;  // 4px
+$radius-md: 0.5rem;   // 8px
+$radius-lg: 0.75rem;  // 12px
+$radius-xl: 1rem;     // 16px
+$radius-2xl: 1.5rem; // 24px
+$radius-full: 9999px;
+
+// ============================================
+// TRANSITIONS
+// ============================================
+
+$transition-fast: 150ms ease;
+$transition-base: 200ms ease;
+$transition-slow: 300ms ease;
+$transition-colors: color $transition-base, background-color $transition-base, border-color $transition-base;
+$transition-transform: transform $transition-base;
+
+// ============================================
+// BREAKPOINTS
+// ============================================
+
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// ============================================
+// Z-INDEX
+// ============================================
+
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 400;
+$z-modal: 500;
+$z-popover: 600;
+$z-tooltip: 700;
+
+// ============================================
+// CONTAINER
+// ============================================
+
+$container-sm: 640px;
+$container-md: 768px;
+$container-lg: 1024px;
+$container-xl: 1280px;
+$container-2xl: 1400px;
+
+// ============================================
+// ACCESSIBILITY - Focus visible
+// ============================================
+
+$focus-ring: 0 0 0 2px $white, 0 0 0 4px $primary;
+$focus-ring-offset: 0 0 0 2px $primary, 0 0 0 4px $white;
+
+// ============================================
+// BACKWARDS COMPATIBILITY ALIASES
+// Keep old variable names working for existing scss files
+// ============================================
+
+// Typography (aliases)
+$title: "Montserrat", system-ui, sans-serif;
+$text: "Open Sans", system-ui, sans-serif;
+
+// Text colors (aliases)
+$text-color: #111827;
+
+// Gray scale aliases
+$gray-dark: #777777;
+
+// Background aliases
+$bg-light: #F3F4F6;
+$bg-normal: #E5E7EB;
+$bg-dark: #1F2937;

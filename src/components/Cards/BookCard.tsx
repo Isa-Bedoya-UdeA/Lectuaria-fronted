@@ -194,11 +194,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
-    const handleEdit = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        navigate(`/my-library/edit-book/${book.id}`);
-    };
-
     const handleEditClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (isBookOwner) {

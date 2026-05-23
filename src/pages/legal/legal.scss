@@ -1,0 +1,129 @@
+/* MOBILE FIRST */
+@use "@/styles/vars" as *;
+
+.legal-page {
+    padding: 6rem 1.5rem 4rem;
+    min-height: 80vh;
+    background-color: $bg-light;
+
+    &__container {
+        max-width: 48rem;
+        margin: 0 auto;
+        background-color: $white;
+        padding: 2rem 1.5rem;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-family: $title;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: $text-color;
+        margin-bottom: 0.5rem;
+    }
+
+    &__updated {
+        font-size: 0.85rem;
+        color: $gray-dark;
+        margin-bottom: 2rem;
+        font-style: italic;
+    }
+
+    &__content {
+        h2 {
+            font-family: $title;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: $primary;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid $primary-light;
+        }
+
+        h3 {
+            font-family: $text;
+            font-size: 1rem;
+            font-weight: 600;
+            color: $text-color;
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        p {
+            font-family: $text;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: $text-color;
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1.5rem 1.5rem;
+            padding-left: 1rem;
+
+            li {
+                font-family: $text;
+                font-size: 0.95rem;
+                line-height: 1.6;
+                color: $text-color;
+                margin-bottom: 0.75rem;
+
+                strong {
+                    color: $text-color;
+                    font-weight: 600;
+                }
+            }
+        }
+
+        a {
+            color: $primary;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+
+            &:hover {
+                color: $primary-hover;
+            }
+
+            &:focus-visible {
+                outline: 2px solid $secondary;
+                outline-offset: 2px;
+                border-radius: 2px;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 600px) {
+    .legal-page {
+        padding: 7rem 2rem 4rem;
+
+        &__container {
+            padding: 3rem 2.5rem;
+
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        &__content {
+            h2 {
+                font-size: 1.4rem;
+            }
+
+            p, li {
+                font-size: 1rem;
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .legal-page {
+        padding: 8rem 2rem 5rem;
+
+        &__container {
+            max-width: 56rem;
+            padding: 3.5rem 3rem;
+        }
+    }
+}

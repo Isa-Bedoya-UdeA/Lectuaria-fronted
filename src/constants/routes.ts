@@ -11,4 +11,7 @@ export const PATHS = {
 	MY_LIBRARY: "/my-library",
 	ADD_BOOK: "/my-library/add-book",
 	EDIT_BOOK: "/my-library/edit-book/:id",
+	TERMS: "/terms",
+	PRIVACY: "/privacy",
+	COOKIES: "/cookies",
 } as const;

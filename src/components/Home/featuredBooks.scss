@@ -2,178 +2,207 @@
 @use "@/styles/vars" as *;
 
 .featuredBooks {
-	width: 100%;
-	background-color: $bg-normal;
-	padding: 2rem 0;
-	text-align: center;
+    width: 100%;
+    background-color: $bg-lightest;
+    padding: 0;
+    text-align: center;
 
-	h2,
-	p {
-		margin: 0;
-	}
+    h2, p { margin: 0; }
 
-	.featuredBooks__container {
-		width: 90%;
-		max-width: 80rem;
-		margin: 0 auto;
-		display: flex;
-		flex-direction: column;
-		gap: 3rem;
+    &__container {
+        width: 90%;
+        max-width: 80rem;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 4rem;
+        padding: 4rem 0;
 
-		.featuredBooks__section {
-			display: flex;
-			flex-direction: column;
-			gap: 1.5rem;
-		}
+        @media screen and (min-width: 768px) {
+            padding: 5rem 0;
+            gap: 5rem;
+        }
+    }
 
-		.featuredBooks__header,
-		.featuredBooks__header > div {
-			display: flex;
-			flex-direction: column;
-			gap: 1rem;
-		}
+    &__section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
 
-		.featuredBooks__header {
-			margin: 0 auto;
-			align-items: center;
-			justify-content: center;
-		}
+        // Alternating background for each section inside featuredBooks
+        &:nth-child(odd) {
+            background-color: $white;
+            padding: 2rem 1.5rem;
+            border-radius: $radius-xl;
+            box-shadow: $shadow-sm;
+        }
 
-		.featuredBooks__empty {
-			padding: 2rem;
-			text-align: center;
-			background-color: rgba($primary, 0.05);
-			border: 1px dashed rgba($primary, 0.3);
-			border-radius: 8px;
-			color: $gray-dark;
-			margin: 1rem 0;
-			
-			p {
-				margin: 0;
-			}
-		}
+        &:nth-child(even) {
+            background-color: $bg-light;
+            padding: 2rem 1.5rem;
+            border-radius: $radius-xl;
+        }
+    }
 
-		.featuredBooks__carousel-container {
-			position: relative;
-			display: flex;
-			align-items: center;
-			width: 100%;
+    &__header {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
 
-			.featuredBooks__nav-button {
-				position: absolute;
-				top: 50%;
-				transform: translateY(-50%);
-				z-index: 10;
-				background-color: $bg-normal;
-				border: 1px solid rgba($primary, 0.2);
-				color: $primary;
-				width: 40px;
-				height: 40px;
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				cursor: pointer;
-				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-				transition: all 0.2s ease;
+        > div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-align: center;
+        }
 
-				&:hover {
-					background-color: $primary;
-					color: white;
-				}
+        h2 {
+            font-family: $font-display;
+            color: $text-primary;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
 
-				&.prev {
-					left: -15px;
-				}
+        p {
+            font-family: $font-body;
+            color: $gray-500;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
 
-				&.next {
-					right: -15px;
-				}
+        a {
+            text-decoration: none;
+        }
 
-				@media screen and (max-width: 500px) {
-					display: none; // Ocultar flechas en móvil, usar scroll táctil
-				}
-			}
-		}
+        @media screen and (min-width: 768px) {
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
 
-		.featuredBooks__carousel {
-			display: flex;
-			overflow-x: auto;
-			gap: 1.5rem;
-			padding-bottom: 1rem;
-			padding-left: 0.5rem; // Padding extra para que la sombra del primero no se corte
-			padding-right: 0.5rem;
-			scroll-behavior: smooth;
-			scroll-snap-type: x mandatory;
-			scrollbar-width: thin;
-			scrollbar-color: $primary $bg-light;
+            > div {
+                text-align: left;
+                max-width: 30ch;
+            }
 
-			&::-webkit-scrollbar {
-				height: 8px;
-			}
-			&::-webkit-scrollbar-track {
-				background: $bg-light;
-				border-radius: 4px;
-			}
-			&::-webkit-scrollbar-thumb {
-				background: $primary;
-				border-radius: 4px;
-			}
+            h2 {
+                font-size: 1.75rem;
+            }
+        }
+    }
 
-			.featuredBooks__carousel-item {
-				flex: 0 0 240px;
-				scroll-snap-align: start;
-			}
-		}
-	}
+    &__empty {
+        padding: 2rem;
+        text-align: center;
+        background-color: $primary-light;
+        border: 1px dashed rgba($primary, 0.3);
+        border-radius: $radius-lg;
+        color: $gray-600;
+
+        p { margin: 0; }
+    }
+
+    &__loading {
+        text-align: center;
+        padding: 3rem;
+        color: $gray-500;
+    }
+
+    &__error {
+        padding: 1.5rem;
+        background-color: $error-light;
+        color: $error;
+        border-radius: $radius-lg;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    &__carousel-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        .featuredBooks__nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            background-color: $white;
+            border: 1px solid $gray-200;
+            color: $primary;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: $shadow-md;
+            transition: all $transition-base;
+
+            &:hover {
+                background-color: $primary;
+                color: $white;
+                border-color: $primary;
+                transform: translateY(-50%) scale(1.05);
+            }
+
+            &:active {
+                transform: translateY(-50%) scale(0.95);
+            }
+
+            &:focus-visible {
+                box-shadow: $focus-ring;
+            }
+
+            &.prev { left: 0.5rem; }
+            &.next { right: 0.5rem; }
+
+            @media screen and (max-width: 640px) {
+                display: none;
+            }
+        }
+    }
+
+    &__carousel {
+        display: flex;
+        overflow-x: auto;
+        gap: 1.5rem;
+        padding: 0.5rem 0.25rem;
+        scroll-behavior: smooth;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: thin;
+        scrollbar-color: $primary $gray-200;
+
+        &::-webkit-scrollbar {
+            height: 6px;
+        }
+        &::-webkit-scrollbar-track {
+            background: $gray-100;
+            border-radius: 3px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: $primary;
+            border-radius: 3px;
+        }
+
+        &-item {
+            flex: 0 0 200px;
+            scroll-snap-align: start;
+
+            @media screen and (min-width: 480px) {
+                flex: 0 0 220px;
+            }
+            @media screen and (min-width: 640px) {
+                flex: 0 0 250px;
+            }
+            @media screen and (min-width: 768px) {
+                flex: 0 0 280px;
+            }
+        }
+    }
 }
-
-@media screen and (min-width: 500px) {
-	.featuredBooks {
-		padding: 3rem 0;
-
-		.featuredBooks__container {
-			.featuredBooks__carousel {
-				.featuredBooks__carousel-item {
-					flex: 0 0 260px;
-				}
-			}
-		}
-	}
-}
-
-@media screen and (min-width: 700px) {
-	.featuredBooks {
-		padding: 4rem 0;
-
-		.featuredBooks__container {
-			.featuredBooks__carousel {
-				.featuredBooks__carousel-item {
-					flex: 0 0 280px;
-				}
-			}
-		}
-	}
-}
-
-@media screen and (min-width: 900px) {
-	.featuredBooks {
-		padding: 5rem 0;
-
-		.featuredBooks__container {
-			.featuredBooks__header {
-				flex-direction: row;
-				text-align: left;
-				justify-content: space-between;
-				width: 100%;
-			}
-
-			.featuredBooks__carousel {
-				.featuredBooks__carousel-item {
-					flex: 0 0 300px;
-				}
-			}
-		}
-	}
-}
-

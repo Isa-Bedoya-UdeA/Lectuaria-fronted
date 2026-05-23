@@ -3,87 +3,54 @@
 /* MOBILE FIRST */
 
 * {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-	padding: 0 !important;
-	margin: 0;
-	font-family: $text;
-	font-size: 0.9rem;
-	color: $text-color;
-	background-color: $bg-light;
-	overflow: visible !important;
+    padding: 0 !important;
+    margin: 0;
+    font-family: $font-body;
+    font-size: 0.9rem;
+    color: $text-primary;
+    background-color: $bg-light;
+    overflow: visible !important;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	font-family: $title;
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-display;
 }
 
 p {
-	color: $gray-dark;
+    color: $gray-600;
 }
 
-.alert {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: fit-content;
-
-	@media screen and (min-width: 500px) {
-		flex-direction: row;
-	}
-}
-
-button,
-input,
-textarea,
-a,
-::placeholder {
-	font-family: $text;
-	color: $text-color;
+button, input, textarea, a, ::placeholder {
+    font-family: $font-body;
+    color: $text-primary;
 }
 
 ::placeholder {
-	color: $gray-dark;
+    color: $gray-600;
 }
 
 a {
-	text-decoration: none;
+    text-decoration: none;
 }
 
-button,
-input {
-	border: none;
-	background: none;
-	padding: 0;
+button, input {
+    border: none;
+    background: none;
+    padding: 0;
 }
 
 svg {
-	color: $text-color;
+    color: $text-primary;
 }
 
 .bookCard__stars svg {
-	color: inherit;
+    color: inherit;
 }
 
 main {
-	margin-top: 4rem;
-}
-
-@media screen and (min-width: 500px) {
-}
-
-@media screen and (min-width: 700px) {
-}
-
-@media screen and (min-width: 900px) {
-}
-
-@media screen and (min-width: 1200px) {
+    margin-top: 4rem;
 }
