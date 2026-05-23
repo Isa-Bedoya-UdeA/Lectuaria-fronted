@@ -1,0 +1,206 @@
+import React, { useState } from "react";
+import Button from "@/components/UI/Button";
+import { useAuth } from "@/context/AuthContext";
+import api from "@/config/api";
+import type { ZipUploadResult, ApiError } from "@/types";
+import { Alert, CircularProgress, LinearProgress } from "@mui/material";
+import "./zipUploadModal.scss";
+
+interface ZipUploadModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess?: () => void;
+}
+
+const ACCEPTED_EXTENSIONS = ["jpg", "jpeg", "png", "webp"];
+
+const ZipUploadModal: React.FC<ZipUploadModalProps> = ({ isOpen, onClose, onSuccess }) => {
+    const { user } = useAuth();
+    const [file, setFile] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [result, setResult] = useState<ZipUploadResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [showGuide, setShowGuide] = useState(false);
+
+    if (!isOpen) return null;
+
+    const handleReset = () => {
+        setFile(null);
+        setResult(null);
+        setError(null);
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const selectedFile = e.target.files[0];
+            if (selectedFile.name.toLowerCase().endsWith('.zip')) {
+                setFile(selectedFile);
+                setError(null);
+            } else {
+                setError("Por favor selecciona un archivo ZIP válido.");
+                setFile(null);
+            }
+        }
+    };
+
+    const handleUpload = async () => {
+        if (!file || !user?.libraryId) return;
+
+        setIsLoading(true);
+        setError(null);
+        setResult(null);
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await api.post<ZipUploadResult>(
+                "/library-books/covers/upload-zip",
+                formData
+            );
+            setResult(response.data);
+            if (onSuccess && response.data.successCount > 0) {
+                onSuccess();
+            }
+        } catch (err) {
+            const apiError = err as { response?: { data?: ApiError } };
+            setError(apiError.response?.data?.message || "Error al procesar el archivo ZIP.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content zip-upload-modal" onClick={e => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2>Subida Masiva de Portadas</h2>
+                    <button className="close-btn" onClick={onClose}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><circle cx="12" cy="12" r="10" /><path d="m15 9l-6 6m0-6l6 6" /></g></svg>
+                    </button>
+                </div>
+
+                <div className="modal-body">
+                    {!result ? (
+                        <>
+                            <p>
+                                Sube un archivo ZIP con imágenes de portadas de libros. Cada archivo debe tener
+                                el ISBN del libro en su nombre (sin extensión) para que pueda ser asociado correctamente.
+                            </p>
+
+                            <div className="template-section">
+                                <Button variant="text" onClick={() => setShowGuide(!showGuide)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2zm6-5h.01" /><path d="M9.1 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3" /></g></svg>
+                                    {showGuide ? "Ocultar guía" : "¿Cómo nombrar los archivos?"}
+                                </Button>
+                            </div>
+
+                            {showGuide && (
+                                <div className="zip-upload-guide">
+                                    <h3>Formato de nombres de archivo</h3>
+                                    <p>Cada imagen debe nombrarse usando el ISBN del libro, sin guiones ni espacios.</p>
+                                    <div className="format-examples">
+                                        <div className="format-example">
+                                            <span className="format-label">✅ Correcto</span>
+                                            <code>9780123456789.jpg</code>
+                                            <code>9788466333333.png</code>
+                                        </div>
+                                        <div className="format-example">
+                                            <span className="format-label">❌ Incorrecto</span>
+                                            <code>978-0123-4567-89.jpg</code>
+                                            <code>portada_libro.jpg</code>
+                                            <code>mi libro.png</code>
+                                        </div>
+                                    </div>
+                                    <p className="guide-note">
+                                        <strong>Nota:</strong> El sistema extrae automáticamente los dígitos del nombre
+                                        de archivo para encontrar el libro correspondiente en tu biblioteca. Los guiones,
+                                        espacios y otros caracteres serán ignorados.
+                                    </p>
+                                    <div className="supported-formats">
+                                        <h4>Formatos de imagen aceptados:</h4>
+                                        <div className="format-tags">
+                                            {ACCEPTED_EXTENSIONS.map(ext => (
+                                                <span key={ext} className="format-tag">.{ext}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className={`file-upload ${file ? 'has-file' : ''}`}>
+                                <input
+                                    type="file"
+                                    id="zipFile"
+                                    accept=".zip"
+                                    onChange={handleFileChange}
+                                    disabled={isLoading}
+                                />
+                                <label htmlFor="zipFile">
+                                    {file ? (
+                                        <span>{file.name}</span>
+                                    ) : (
+                                        <span>Haz clic para seleccionar un archivo ZIP</span>
+                                    )}
+                                </label>
+                            </div>
+
+                            {error && <Alert severity="error" sx={{ mt: 2 }} className="alert">{error}</Alert>}
+
+                            {isLoading && (
+                                <div className="loading-section">
+                                    <p>Procesando archivo... Esto puede tardar unos momentos.</p>
+                                    <LinearProgress />
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className="result-section">
+                            <Alert severity={result.errorCount > 0 ? "warning" : "success"} className="alert">
+                                Proceso completado: {result.successCount} portadas actualizadas.
+                                {result.errorCount > 0 && ` ${result.errorCount} imágenes no pudieron procesarse.`}
+                            </Alert>
+
+                            {result.errors.length > 0 && (
+                                <div className="errors-list">
+                                    <h3>Detalles:</h3>
+                                    <ul>
+                                        {result.errors.map((err: string, i: number) => (
+                                            <li key={i}>{err}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                            <div className="result-summary">
+                                <p><strong>Total procesadas:</strong> {result.totalProcessed}</p>
+                                <p><strong>Actualizadas:</strong> {result.successCount}</p>
+                                <p><strong>Errores:</strong> {result.errorCount}</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <div className="modal-footer">
+                    {!result ? (
+                        <>
+                            <Button variant="outlined" onClick={onClose} disabled={isLoading}>Cancelar</Button>
+                            <Button onClick={handleUpload} disabled={!file || isLoading}>
+                                {isLoading ? <CircularProgress size={20} color="inherit" /> : "Procesar ZIP"}
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="outlined" onClick={handleReset}>
+                                Limpiar y reintentar
+                            </Button>
+                            <Button onClick={onClose}>Cerrar</Button>
+                        </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ZipUploadModal;

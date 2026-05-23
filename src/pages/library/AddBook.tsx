@@ -14,6 +14,7 @@ import useSEO from "@/hooks/useSEO";
 import type { BookPublishRequest } from "@/types";
 import "./addBook.scss";
 import Toast, { type ToastType } from "@/components/UI/Toast";
+import { platformService } from "@/services/platformService";
 
 interface AddBookFormValues {
     isbn: string;
@@ -31,6 +32,7 @@ interface AddBookFormValues {
         digital: boolean;
         physicalCopies?: number;
     };
+    platformId?: string;
 }
 
 const AddBook = () => {
@@ -46,7 +48,8 @@ const AddBook = () => {
         fetchPrefill,
         publish,
         clearPrefill,
-        clearErrors
+        clearErrors,
+        publishWithCover,
     } = useBookPublish();
 
     const { genres: availableGenres } = useGenres();
@@ -54,9 +57,11 @@ const AddBook = () => {
 
     const [isbnSearched, setIsbnSearched] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
-    const [coverMode, setCoverMode] = useState<'external' | 'manual' | 'none'>('external');
+    const [coverMode, setCoverMode] = useState<'external' | 'manual' | 'file' | 'none'>('external');
+    const [coverFile, setCoverFile] = useState<File | null>(null);
     const [authorInput, setAuthorInput] = useState("");
     const [genreInput, setGenreInput] = useState("");
+    const [platforms, setPlatforms] = useState<{ id: string; name: string }[]>([]);
 
     const {
         register,
@@ -97,6 +102,21 @@ const AddBook = () => {
             navigate(PATHS.HOME);
         }
     }, [isAuthenticated, user?.userRole, navigate]);
+
+    // Load platforms from backend
+    useEffect(() => {
+        platformService.getAll().then(data => {
+            setPlatforms(data.map(p => ({ id: String(p.id), name: p.name })));
+        }).catch(() => {
+            // fallback hardcoded if API fails
+            setPlatforms([
+                { id: "1", name: "Amazon Kindle" },
+                { id: "2", name: "Google Play Books" },
+                { id: "3", name: "Apple Books" },
+                { id: "4", name: "Kobo" },
+            ]);
+        });
+    }, []);
 
     // Update availability object when mode changes
     useEffect(() => {
@@ -256,11 +276,17 @@ const AddBook = () => {
                 digital: formValues.availability.digital,
                 physicalCopies: formValues.availability.physical ? formValues.availability.physicalCopies || 1 : undefined,
             },
+            availabilityMode: formValues.availabilityMode,
+            platformId: formValues.platformId ? parseInt(formValues.platformId, 10) : undefined,
             libraryId: user.libraryId, // Usar el libraryId del usuario autenticado
         };
 
         try {
-            await publish(publishData);
+            if (coverMode === 'file' && coverFile) {
+                await publishWithCover(publishData, coverFile);
+            } else {
+                await publish(publishData);
+            }
             setToast({ message: "Libro agregado exitosamente", type: "success" });
 
             setTimeout(() => {
@@ -569,10 +595,18 @@ const AddBook = () => {
                                             </Button>
                                             <Button
                                                 type="button"
+                                                variant={coverMode === 'file' ? 'contained' : 'outlined'}
+                                                onClick={() => setCoverMode('file')}
+                                            >
+                                                Subir imagen
+                                            </Button>
+                                            <Button
+                                                type="button"
                                                 variant={coverMode === 'none' ? 'contained' : 'outlined'}
                                                 onClick={() => {
                                                     setCoverMode('none');
                                                     setValue("coverUrl", "");
+                                                    setCoverFile(null);
                                                 }}
                                             >
                                                 Sin portada
@@ -586,6 +620,21 @@ const AddBook = () => {
                                                     placeholder="https://ejemplo.com/portada.jpg"
                                                     {...register("coverUrl")}
                                                 />
+                                            </div>
+                                        )}
+
+                                        {coverMode === 'file' && (
+                                            <div className="addBook__group" style={{ marginTop: '1rem' }}>
+                                                <input
+                                                    type="file"
+                                                    id="coverFile"
+                                                    accept="image/jpeg,image/png,image/webp"
+                                                    onChange={(e) => {
+                                                        const f = e.target.files?.[0] || null;
+                                                        setCoverFile(f);
+                                                    }}
+                                                />
+                                                {coverFile && <span style={{ marginLeft: '0.5rem', fontSize: '0.875rem' }}>{coverFile.name}</span>}
                                             </div>
                                         )}
 
@@ -667,6 +716,22 @@ const AddBook = () => {
                                                 placeholder="Ej: 5"
                                             />
                                             {errors.availability?.physicalCopies && <span className="error-text">{errors.availability.physicalCopies.message}</span>}
+                                        </div>
+                                    )}
+
+                                    {(watchedAvailabilityMode === 'digital' || watchedAvailabilityMode === 'both') && (
+                                        <div className="addBook__group">
+                                            <label htmlFor="platformId">Plataforma digital</label>
+                                            <select
+                                                id="platformId"
+                                                {...register("platformId")}
+                                                className="platform-select"
+                                            >
+                                                <option value="">Selecciona una plataforma</option>
+                                                {platforms.map(p => (
+                                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                     )}
 

@@ -173,6 +173,11 @@ const MyLibrary = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(6);
 
+    // Search and sort states — sent to server
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortOrder, setSortOrder] = useState<'none' | 'title_asc' | 'title_desc' | 'newest' | 'oldest'>('none');
+    const [debouncedKeyword, setDebouncedKeyword] = useState("");
+
     const {
         books,
         pagination,
@@ -182,14 +187,24 @@ const MyLibrary = () => {
         clearError: clearBooksError
     } = useLibraryBooks();
 
-    // Fetch books initially and when filters change
+    // Debounce search query so we don't spam the server
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedKeyword(searchQuery), 350);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Fetch books when server-side params change
     useEffect(() => {
         if (user?.libraryId) {
-            fetchLibraryBooks(user.libraryId, { page: currentPage - 1, size: pageSize });
+            fetchLibraryBooks(user.libraryId, {
+                page: currentPage - 1,
+                size: pageSize,
+                keyword: debouncedKeyword || undefined,
+                sort: sortOrder === 'none' ? undefined : sortOrder,
+            });
         }
-        // Guardar origen para el botón "Regresar" de BookDetail
         localStorage.setItem("lectuaria_back_path", PATHS.MY_LIBRARY);
-    }, [user?.libraryId, currentPage, pageSize, fetchLibraryBooks]);
+    }, [user?.libraryId, currentPage, pageSize, debouncedKeyword, sortOrder, fetchLibraryBooks]);
 
     // Handlers
     const handlePageChange = useCallback((_: React.ChangeEvent<unknown>, page: number) => {
@@ -199,6 +214,19 @@ const MyLibrary = () => {
     const handlePageSizeChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = Number(e.target.value);
         setPageSize(newSize);
+        setCurrentPage(1);
+    }, []);
+
+    // Search handler
+    const handleSearchChange = useCallback((value: string) => {
+        setSearchQuery(value);
+        setCurrentPage(1);
+    }, []);
+
+    // Sort handler
+    const handleSortChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+        const val = e.target.value as typeof sortOrder;
+        setSortOrder(val);
         setCurrentPage(1);
     }, []);
 
@@ -251,6 +279,28 @@ const MyLibrary = () => {
                     <h2>Catálogo de tu biblioteca</h2>
                     <br />
 
+                    {/* Search bar */}
+                    <div className="books__search" style={{ alignItems: 'flex-end', height: 'auto', gap: '0.75rem', marginBottom: '1rem' }}>
+                        <div className="books__searchbar">
+                            <input
+                                type="text"
+                                placeholder="Buscar en tu biblioteca..."
+                                value={searchQuery}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                            />
+                            {searchQuery && (
+                                <button
+                                    type="button"
+                                    onClick={() => { setSearchQuery(""); setCurrentPage(1); }}
+                                    style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', color: '#666', lineHeight: 1 }}
+                                    aria-label="Limpiar búsqueda"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
                     <article className="books__container__items" style={{ width: '100%', maxWidth: '100%' }}>
                         <div className="books__topbar">
                             <p className="books__count">
@@ -258,6 +308,22 @@ const MyLibrary = () => {
                             </p>
 
                             <div className="books__controls">
+                                {/* Sort controls */}
+                                <div className="books__sort">
+                                    <label htmlFor="sortOrder" style={{ fontSize: '0.85rem', color: '#666' }}>Ordenar por:</label>
+                                    <select
+                                        id="sortOrder"
+                                        value={sortOrder}
+                                        onChange={handleSortChange}
+                                    >
+                                        <option value="none">Sin orden</option>
+                                        <option value="title_asc">A-Z</option>
+                                        <option value="title_desc">Z-A</option>
+                                        <option value="newest">Más recientes</option>
+                                        <option value="oldest">Más antiguos</option>
+                                    </select>
+                                </div>
+
                                 <div className="books__perpage">
                                     <label htmlFor="perPage">Mostrar:</label>
                                     <select
@@ -293,7 +359,9 @@ const MyLibrary = () => {
 
                             {!isLoading && !booksError && books.length === 0 && (
                                 <p className="books__empty" style={{ gridColumn: '1 / -1' }}>
-                                    No se encontraron libros en tu biblioteca.
+                                    {debouncedKeyword
+                                        ? `No se encontraron libros para "${debouncedKeyword}"`
+                                        : "No se encontraron libros en tu biblioteca."}
                                 </p>
                             )}
 
@@ -324,7 +392,7 @@ const MyLibrary = () => {
                 )}
 
                 {/* Bulk Upload Modal */}
-                <BulkUploadModal 
+                <BulkUploadModal
                     isOpen={isBulkUploadOpen}
                     onClose={() => setIsBulkUploadOpen(false)}
                     onSuccess={() => {
@@ -333,6 +401,8 @@ const MyLibrary = () => {
                         }
                     }}
                 />
+
+                
             </div>
         </main>
     );

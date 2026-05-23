@@ -4,6 +4,7 @@ import "./bookCard.scss";
 import Toast, { type ToastType } from "../UI/Toast";
 import Modal from "../UI/Modal";
 import AddToListModal from "../Modals/AddToListModal";
+import EditAvailabilityModal from "../Modals/EditAvailabilityModal";
 import ShareMenu from "../Modals/ShareMenu";
 import FriendSelector from "../Cards/FriendSelector";
 import Button from "../UI/Button";
@@ -44,6 +45,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
     const [isAddListOpen, setIsAddListOpen] = useState(false);
     const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
     const [isHiding, setIsHiding] = useState(false);
+    const [isEditAvailabilityOpen, setIsEditAvailabilityOpen] = useState(false);
 
     // Hook para manejar calificaciones
     const { userRating, averageRating, ratingsCount, isLoading, rateBook } = useRating(book.id);
@@ -197,6 +199,17 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
         navigate(`/my-library/edit-book/${book.id}`);
     };
 
+    const handleEditClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (isBookOwner) {
+            // Si es el creador, ir a EditBook (edición completa del libro)
+            navigate(`/my-library/edit-book/${book.id}`);
+        } else {
+            // Si no es el creador, solo puede editar la disponibilidad
+            setIsEditAvailabilityOpen(true);
+        }
+    };
+
     const handleDeleteClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsDeleteModalOpen(true);
@@ -339,17 +352,15 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                     {/* Botones contextuales - SOLO PARA BIBLIOTECARIOS */}
                     {isLibrarian && (
                         <>
-                            {/* Botón de editar - Solo si es el creador */}
-                            {isBookOwner && (
-                                <Button
-                                    layout="icon"
-                                    className="bookCard__edit"
-                                    onClick={handleEdit}
-                                    aria-label="Editar libro"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497zM15 5l4 4" /></svg>
-                                </Button>
-                            )}
+{/* Botón de editar - Si es el creador abre EditBook, si no solo disponibilidad */}
+                            <Button
+                                layout="icon"
+                                className="bookCard__edit"
+                                onClick={handleEditClick}
+                                aria-label={isBookOwner ? "Editar libro" : "Editar disponibilidad"}
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497zM15 5l4 4" /></svg>
+                            </Button>
 
                             {/* Botón de quitar de biblioteca - Si ha añadido el libro a su biblioteca (sea o no el creador) */}
                             {isBookAddedByUser && (
@@ -596,6 +607,17 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 />,
                 document.body
             )}
+
+            {/* Modal para editar disponibilidad del libro en la biblioteca del bibliotecario */}
+            <EditAvailabilityModal
+                isOpen={isEditAvailabilityOpen}
+                onClose={() => setIsEditAvailabilityOpen(false)}
+                bookId={book.id}
+                bookTitle={book.title}
+                onSuccess={() => {
+                    setToast({ message: "Disponibilidad actualizada correctamente.", type: "success" });
+                }}
+            />
         </div>
     );
 }

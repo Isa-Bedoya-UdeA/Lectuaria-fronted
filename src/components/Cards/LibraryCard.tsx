@@ -7,7 +7,7 @@ interface LibraryCardProps {
 }
 
 const LibraryCard: React.FC<LibraryCardProps> = ({ availability }) => {
-    const { library, physicalAvailable, digitalAvailable } = availability;
+    const { library, physicalAvailable, digitalAvailable, digitalPlatform } = availability;
 
     return (
         <div className="library-card">
@@ -41,7 +41,7 @@ const LibraryCard: React.FC<LibraryCardProps> = ({ availability }) => {
                     )}
                     {digitalAvailable && (
                         <span className="badge available">
-                            Digital
+                            Digital{digitalPlatform ? ` - ${digitalPlatform}` : ""}
                         </span>
                     )}
                 </div>

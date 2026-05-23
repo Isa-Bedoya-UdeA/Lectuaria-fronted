@@ -34,7 +34,8 @@ export interface LibraryAvailability {
     physicalAvailable: boolean;
     physicalCopies?: number;
     digitalAvailable: boolean;
-    digitalPlatform?: string;
+    digitalPlatform?: string; // resolved platform name for display
+    platformId?: number;       // FK to platform table
 }
 
 // Book summary for cards/list views
@@ -51,6 +52,7 @@ export interface BookSummary {
 	userAddedId?: number; // ID del usuario que añadió el libro a la biblioteca
 	createdById?: number; // ID del usuario que creó el libro originalmente
     availableLibraries?: string[]; // Nombres de bibliotecas donde está disponible
+    createdAt?: string; // ISO timestamp for sorting by date (from LibraryBook.addedAt)
 }
 
 // Book detail view (extends summary)
@@ -69,7 +71,6 @@ export interface Availability {
 	physical: boolean;
 	digital: boolean;
 	physicalCopies?: number;
-	digitalPlatform?: string;
 }
 
 // Book publish request (for librarians)
@@ -84,6 +85,8 @@ export interface BookPublishRequest {
 	publicationDate?: string; // ISO date string
 	pages?: number;
 	availability: Availability;
+	availabilityMode?: 'physical' | 'digital' | 'both';
+	platformId?: number;
 	libraryId: number;
 }
 
@@ -120,6 +123,13 @@ export interface BulkUploadResult {
     successes: BookPublishResponse[];
 }
 
+export interface ZipUploadResult {
+    totalProcessed: number;
+    successCount: number;
+    errorCount: number;
+    errors: string[];
+}
+
 // Paginated response wrapper (for book lists)
 export interface PaginatedResponse<T> {
 	content: T[];
@@ -139,6 +149,7 @@ export interface BookQueryParams {
 	size?: number;
 	keyword?: string; // For search
 	keywords?: string; // For multi-keyword search (comma-separated)
+	sort?: string; // For sort: title_asc, title_desc, newest, oldest
 	genreId?: number; // For single genre filter
 	genreIds?: number[]; // For multiple genres filter (OR logic)
 	authorId?: number;

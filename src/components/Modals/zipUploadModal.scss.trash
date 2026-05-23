@@ -1,0 +1,253 @@
+@use "@/styles/vars" as *;
+
+.zip-upload-modal {
+	max-width: 600px;
+	width: 90%;
+
+	.modal-body {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+
+		p {
+			color: $text-color;
+			line-height: 1.5;
+			margin: 0;
+		}
+	}
+
+	.template-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		justify-content: space-between;
+		align-items: center;
+		background: rgba($primary, 0.05);
+		padding: 0.75rem 1rem;
+		border-radius: 8px;
+		border: 1px dashed $primary;
+	}
+
+	.zip-upload-guide {
+		background: $bg-light;
+		padding: 1.25rem;
+		border-radius: 8px;
+		border: 1px solid $gray;
+		animation: slideDown 0.3s ease-out;
+
+		h3 {
+			font-size: 1.1rem;
+			margin: 0 0 0.75rem 0;
+			color: $text-color;
+			font-weight: 700;
+		}
+
+		p {
+			font-size: 0.9rem;
+			color: $text-color;
+			margin: 0 0 1rem 0;
+			line-height: 1.4;
+		}
+
+		.format-examples {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+			margin-bottom: 1rem;
+
+			.format-example {
+				display: flex;
+				flex-direction: column;
+				gap: 0.3rem;
+
+				.format-label {
+					font-size: 0.8rem;
+					font-weight: 700;
+					color: $text-color;
+				}
+
+				code {
+					font-family: monospace;
+					font-size: 0.85rem;
+					background: $bg-normal;
+					padding: 0.25rem 0.5rem;
+					border-radius: 4px;
+					color: $primary;
+					width: fit-content;
+				}
+			}
+		}
+
+		.guide-note {
+			background: rgba($primary, 0.05);
+			padding: 0.75rem;
+			border-radius: 6px;
+			font-size: 0.85rem;
+			border: 1px solid rgba($primary, 0.1);
+		}
+
+		.supported-formats {
+			h4 {
+				font-size: 0.9rem;
+				margin: 0 0 0.5rem 0;
+				color: $text-color;
+				font-weight: 700;
+			}
+
+			.format-tags {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+
+				.format-tag {
+					font-size: 0.8rem;
+					background: $white;
+					border: 1px solid $gray-2;
+					padding: 0.25rem 0.6rem;
+					border-radius: 100px;
+					color: $text-color;
+					font-weight: 600;
+					font-family: monospace;
+				}
+			}
+		}
+	}
+
+	.file-upload {
+		position: relative;
+		border: 2px dashed $gray-2;
+		border-radius: 8px;
+		transition: 0.2s ease;
+
+		input {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			opacity: 0;
+			cursor: pointer;
+			z-index: 2;
+		}
+
+		label {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 3rem 1rem;
+			color: $text-color;
+			font-weight: 600;
+			transition: 0.2s ease;
+		}
+
+		&:hover,
+		&.has-file {
+			border-color: $primary;
+			background: rgba($primary, 0.02);
+
+			label {
+				color: $primary;
+			}
+		}
+
+		&.has-file {
+			border-style: solid;
+		}
+	}
+
+	.loading-section {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+
+		p {
+			font-size: 0.9rem;
+			text-align: center;
+			color: $primary;
+			font-weight: 600;
+		}
+	}
+
+	.result-section {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.errors-list {
+		background: rgba($error, 0.05);
+		padding: 1rem;
+		border-radius: 8px;
+		border: 1px solid rgba($error, 0.1);
+
+		h3 {
+			font-size: 1rem;
+			margin: 0 0 0.75rem 0;
+			color: $error;
+		}
+
+		ul {
+			margin: 0;
+			padding-left: 1.25rem;
+			max-height: 200px;
+			overflow-y: auto;
+
+			li {
+				font-size: 0.85rem;
+				color: $error;
+				margin-bottom: 0.4rem;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+
+	.result-summary {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		background: $bg-normal;
+		padding: 1rem;
+		border-radius: 8px;
+
+		p {
+			margin: 0;
+			font-size: 0.9rem;
+			color: $text-color;
+			font-weight: 600;
+		}
+	}
+
+	@keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.modal-footer {
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+@media screen and (min-width: 500px) {
+	.zip-upload-modal {
+		.template-section {
+			flex-direction: row;
+		}
+
+		.modal-footer {
+			flex-direction: row;
+		}
+
+		.result-summary {
+			flex-direction: row;
+		}
+	}
+}

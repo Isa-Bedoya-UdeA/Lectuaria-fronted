@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import {
 	prefillBookFromIsbn,
 	publishBook,
+	publishBookWithCover,
 } from "../services/bookPublishService";
 import type {
 	BookPublishRequest,
@@ -25,6 +26,7 @@ interface UseBookPublishReturn {
 	// Actions
 	fetchPrefill: (isbn: number) => Promise<void>;
 	publish: (data: BookPublishRequest) => Promise<BookPublishResponse>;
+	publishWithCover: (data: BookPublishRequest, coverFile: File | null) => Promise<BookPublishResponse>;
 	clearPrefill: () => void;
 	clearPublish: () => void;
 	clearErrors: () => void;
@@ -97,6 +99,29 @@ export function useBookPublish(): UseBookPublishReturn {
 		setIsPublishing(false);
 	}, []);
 
+	const publishWithCover = useCallback(
+		async (data: BookPublishRequest, coverFile: File | null): Promise<BookPublishResponse> => {
+			try {
+				setIsPublishing(true);
+				setPublishError(null);
+
+				const response = await publishBookWithCover(data, coverFile);
+				setPublishResponse(response);
+
+				return response;
+			} catch (err) {
+				const apiError = err as ApiError;
+				setPublishError(
+					apiError.message || "Error al publicar el libro",
+				);
+				throw err;
+			} finally {
+				setIsPublishing(false);
+			}
+		},
+		[],
+	);
+
 	const clearErrors = useCallback(() => {
 		setPrefillError(null);
 		setPublishError(null);
@@ -111,6 +136,7 @@ export function useBookPublish(): UseBookPublishReturn {
 		publishError,
 		fetchPrefill,
 		publish,
+		publishWithCover,
 		clearPrefill,
 		clearPublish,
 		clearErrors,

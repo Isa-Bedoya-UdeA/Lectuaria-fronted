@@ -150,6 +150,10 @@
 					color: $secondary;
 					transition: all 0.2s ease;
 				}
+
+				&:hover svg {
+					transform: scale(1.1);
+				}
 			}
 
 			.bookCard__delete {

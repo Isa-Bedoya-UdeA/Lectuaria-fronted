@@ -80,6 +80,25 @@
 				}
 			}
 
+			.books__sort {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+
+				select {
+					padding: 0.3rem 0.6rem;
+					border-radius: 0.4rem;
+					border: 1px solid $gray;
+					background-color: $primary-light;
+					cursor: pointer;
+
+					&:focus {
+						outline: 1px solid $primary;
+						border-color: $primary;
+					}
+				}
+			}
+
 			.books__view-toggle {
 				display: flex;
 				background-color: $primary-light;

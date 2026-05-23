@@ -9,7 +9,8 @@ import { PATHS } from "@/constants/routes";
 import { SITE_INFO } from "@/constants/siteInfo";
 import Button from "@/components/UI/Button";
 import useSEO from "@/hooks/useSEO";
-import { getBookById, updateBook } from "@/services/bookService";
+import { getBookById, updateBook, updateBookWithCover } from "@/services/bookService";
+import { platformService } from "@/services/platformService";
 import type { BookPublishRequest } from "@/types";
 import "./addBook.scss"; // Mismos estilos que AddBook
 import Toast, { type ToastType } from "@/components/UI/Toast";
@@ -29,6 +30,7 @@ interface EditBookFormValues {
         digital: boolean;
         physicalCopies?: number;
     };
+    platformId?: string;
 }
 
 const EditBook = () => {
@@ -46,10 +48,14 @@ const EditBook = () => {
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
     // Opciones para previsualización
-    const [coverMode, setCoverMode] = useState<'external' | 'manual' | 'none'>('external');
+    const [coverMode, setCoverMode] = useState<'external' | 'uploaded' | 'file' | 'none'>('external');
+    const [coverFile, setCoverFile] = useState<File | null>(null);
+    const [uploadedCoverUrl, setUploadedCoverUrl] = useState("");
     const [authorInput, setAuthorInput] = useState("");
     const [genreInput, setGenreInput] = useState("");
     const [watchedIsbn, setWatchedIsbn] = useState("");
+    const [platformIdLoaded, setPlatformIdLoaded] = useState(false);
+    const [platforms, setPlatforms] = useState<{ id: string; name: string }[]>([]);
 
     const {
         register,
@@ -125,7 +131,12 @@ const EditBook = () => {
 
                 if (data.coverUrl) {
                     setValue("coverUrl", data.coverUrl, { shouldValidate: true });
-                    setCoverMode('external');
+                    if (isS3CoverUrl(data.coverUrl)) {
+                        setCoverMode('uploaded');
+                        setUploadedCoverUrl(data.coverUrl);
+                    } else {
+                        setCoverMode('external');
+                    }
                 } else {
                     setCoverMode('none');
                 }
@@ -152,6 +163,10 @@ const EditBook = () => {
                     if (libAvail.physicalCopies !== undefined) {
                         setValue("availability.physicalCopies", libAvail.physicalCopies);
                     }
+                    if (libAvail.platformId) {
+                        setValue("platformId", String(libAvail.platformId));
+                        setPlatformIdLoaded(true);
+                    }
                 }
 
                 setIsLoading(false);
@@ -172,6 +187,25 @@ const EditBook = () => {
         description: `Edita la información de un libro de tu biblioteca en ${SITE_INFO.name}.`,
     });
 
+    // Load platforms from backend
+    useEffect(() => {
+        platformService.getAll().then(data => {
+            setPlatforms(data.map(p => ({ id: String(p.id), name: p.name })));
+        }).catch(() => {});
+    }, []);
+
+    // Helper: detect if a cover URL is an S3/Supabase upload (not OpenLibrary API)
+    const isS3CoverUrl = (url: string): boolean => {
+        if (!url || !url.trim()) return false;
+        return (
+            url.includes("supabase.co/storage") ||
+            url.includes(".webp") ||
+            url.includes(".jpg") ||
+            url.includes(".jpeg") ||
+            url.includes(".png")
+        );
+    };
+
     // Helper: Cover por defecto a través de ISBN de OpenLibrary
     const getBestCoverUrl = (isbnStr: string, backendCover?: string): string => {
         if (backendCover && backendCover.trim() !== "") return backendCover;
@@ -179,6 +213,14 @@ const EditBook = () => {
         const clean = isbnStr.replace(/[^0-9]/g, "");
         return `https://covers.openlibrary.org/b/isbn/${clean}-L.jpg`;
     };
+
+    const fileToBase64 = (file: File): Promise<string> =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
 
     const onSubmit = async (formValues: EditBookFormValues) => {
         if (!id || !user?.libraryId) return;
@@ -196,13 +238,34 @@ const EditBook = () => {
             .map(p => p.trim())
             .filter(p => p.length > 0);
 
+        let coverUrlValue: string | undefined = undefined;
+
+        // If user selected a file, encode it as base64 data URL
+        if (coverMode === 'file' && coverFile) {
+            try {
+                coverUrlValue = await fileToBase64(coverFile);
+            } catch {
+                setSaveError("No se pudo procesar el archivo de portada.");
+                setIsSaving(false);
+                return;
+            }
+        } else if (coverMode === 'uploaded') {
+            // Keep existing uploaded cover
+            coverUrlValue = uploadedCoverUrl || formValues.coverUrl.trim() || undefined;
+        } else if (coverMode === 'external') {
+            coverUrlValue = formValues.coverUrl.trim() || undefined;
+        } else {
+            // none
+            coverUrlValue = undefined;
+        }
+
         const publishData: BookPublishRequest = {
             isbn: Number(watchedIsbn), // Required field format check but not updated backend
             title: formValues.title.trim(),
             authors: authorsList,
             description: formValues.description.trim() || undefined,
             genres: formValues.genres,
-            coverUrl: formValues.coverUrl.trim() || undefined,
+            coverUrl: coverUrlValue,
             publishers: publishersList,
             publicationDate: formValues.publicationDate || undefined,
             pages: formValues.pages ? parseInt(formValues.pages, 10) : undefined,
@@ -211,11 +274,18 @@ const EditBook = () => {
                 digital: formValues.availability.digital,
                 physicalCopies: formValues.availability.physicalCopies,
             },
+            availabilityMode: formValues.availabilityMode,
+            platformId: formValues.platformId ? parseInt(formValues.platformId, 10) : undefined,
             libraryId: user.libraryId,
         };
 
         try {
-            await updateBook(Number(id), publishData);
+            // Use updateBookWithCover when a file is selected, otherwise plain updateBook
+            if (coverMode === 'file' && coverFile) {
+                await updateBookWithCover(Number(id), publishData, coverFile);
+            } else {
+                await updateBook(Number(id), publishData);
+            }
             setToast({ message: "Cambios guardados exitosamente.", type: "success" });
 
             setTimeout(() => {
@@ -379,17 +449,38 @@ const EditBook = () => {
                         <label>Portada</label>
                         <div className="addBook__cover-modes">
                             <Button type="button" variant={coverMode === 'external' ? 'contained' : 'outlined'} onClick={() => { setCoverMode('external'); setValue("coverUrl", getBestCoverUrl(watchedIsbn, watch("coverUrl"))); }}>Portada generada por API</Button>
-                            <Button type="button" variant={coverMode === 'manual' ? 'contained' : 'outlined'} onClick={() => setCoverMode('manual')}>URL Personal</Button>
-                            <Button type="button" variant={coverMode === 'none' ? 'contained' : 'outlined'} onClick={() => { setCoverMode('none'); setValue("coverUrl", ""); }}>Sin portada</Button>
+                            <Button type="button" variant={coverMode === 'uploaded' ? 'contained' : 'outlined'} onClick={() => setCoverMode('uploaded')}>Imagen subida</Button>
+                            <Button type="button" variant={coverMode === 'file' ? 'contained' : 'outlined'} onClick={() => setCoverMode('file')}>Subir nueva imagen</Button>
+                            <Button type="button" variant={coverMode === 'none' ? 'contained' : 'outlined'} onClick={() => { setCoverMode('none'); setValue("coverUrl", ""); setCoverFile(null); }}>Sin portada</Button>
                         </div>
 
-                        {coverMode === 'manual' && (
-                            <div className="addBook__group" style={{ marginTop: '1rem' }}>
-                                <input type="url" placeholder="https://ejemplo.com/portada.jpg" {...register("coverUrl")} />
+                        {coverMode === 'uploaded' && (
+                            <div className="addBook__cover-preview">
+                                <img
+                                    src={uploadedCoverUrl}
+                                    alt="Portada actual"
+                                    onError={(e) => { (e.target as HTMLImageElement).src = "/images/cover/fallback-front.png"; }}
+                                />
+                                <p style={{ fontSize: '0.8rem', color: '#666', marginTop: '0.5rem' }}>Portada actualmente en uso</p>
                             </div>
                         )}
 
-                        {coverMode !== 'none' && (watch("coverUrl") || watchedIsbn) && (
+                        {coverMode === 'file' && (
+                            <div className="addBook__group" style={{ marginTop: '1rem' }}>
+                                <input
+                                    type="file"
+                                    id="editCoverFile"
+                                    accept="image/jpeg,image/png,image/webp"
+                                    onChange={(e) => {
+                                        const f = e.target.files?.[0] || null;
+                                        setCoverFile(f);
+                                    }}
+                                />
+                                {coverFile && <span style={{ marginLeft: '0.5rem', fontSize: '0.875rem' }}>{coverFile.name}</span>}
+                            </div>
+                        )}
+
+                        {coverMode !== 'none' && coverMode !== 'uploaded' && (watch("coverUrl") || watchedIsbn) && (
                             <div className="addBook__cover-preview">
                                 <img
                                     src={watch("coverUrl") || getBestCoverUrl(watchedIsbn)}
@@ -477,6 +568,22 @@ const EditBook = () => {
                                         placeholder="Ej: 5"
                                     />
                                     {errors.availability?.physicalCopies && <span className="error-text">{errors.availability.physicalCopies.message}</span>}
+                                </div>
+                            )}
+
+                            {(platformIdLoaded || watch("availabilityMode") === 'digital' || watch("availabilityMode") === 'both') && (
+                                <div className="addBook__group">
+                                    <label htmlFor="platformId">Plataforma digital</label>
+                                    <select
+                                        id="platformId"
+                                        {...register("platformId")}
+                                        className="platform-select"
+                                    >
+                                        <option value="">Selecciona una plataforma</option>
+                                        {platforms.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             )}
                         </div>

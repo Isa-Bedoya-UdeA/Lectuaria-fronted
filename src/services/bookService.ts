@@ -373,6 +373,36 @@ export const updateBook = async (
 	}
 };
 
+/**
+ * Update a book with an optional cover image file (multipart/form-data).
+ * Used when librarian re-uploads a local image during edit.
+ */
+export const updateBookWithCover = async (
+	bookId: number,
+	data: BookPublishRequest,
+	coverFile?: File | null,
+): Promise<BookDetail> => {
+	try {
+		if (coverFile) {
+			// Encode cover file as data URL so it can be sent as JSON
+			data.coverUrl = await fileToBase64(coverFile);
+		}
+		const response = await api.put<BookDetail>(`/books/${bookId}`, data);
+		return response.data;
+	} catch (error: unknown) {
+		const apiError = error as { response?: { data?: ApiError } };
+		throw apiError.response?.data || { message: "Failed to update book" };
+	}
+};
+
+const fileToBase64 = (file: File): Promise<string> =>
+	new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => resolve(reader.result as string);
+		reader.onerror = reject;
+		reader.readAsDataURL(file);
+	});
+
 export const getFeaturedSections = async (): Promise<import("../types").FeaturedSections> => {
 	try {
 		const response = await api.get<import("../types").FeaturedSections>("/books/featured");

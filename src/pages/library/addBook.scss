@@ -336,6 +336,8 @@
 		.addBook__cover-preview {
 			margin-top: 1.5rem;
 			display: flex;
+			flex-direction: column;
+			align-items: center;
 			justify-content: center;
 			background-color: $bg-normal;
 			padding: 2rem;
