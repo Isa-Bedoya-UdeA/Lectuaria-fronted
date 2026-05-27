@@ -26,6 +26,12 @@ const processQueue = (error: unknown | null) => {
 	failedQueue = [];
 };
 
+// Helper to check if we should attempt token refresh (only if token exists)
+const shouldAttemptRefresh = (): boolean => {
+	const token = localStorage.getItem("accessToken");
+	return !!token; // Only try refresh if there's a token to refresh
+};
+
 // Create axios instance with default config
 const api: AxiosInstance = axios.create({
 	baseURL: API_BASE_URL,
@@ -63,6 +69,12 @@ api.interceptors.response.use(
 		
 		// Handle 401 Unauthorized - token expired or invalid
 		if (axios.isAxiosError(error) && error.response?.status === 401 && !originalConfig?._retry) {
+			// Only try to refresh if we have a token
+			if (!shouldAttemptRefresh()) {
+				// No token, just reject silently
+				return Promise.reject(error);
+			}
+
 			if (isRefreshing) {
 				// If already refreshing, queue this request
 				return new Promise((resolve, reject) => {

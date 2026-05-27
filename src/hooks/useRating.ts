@@ -40,7 +40,10 @@ export const useRating = (bookId: number) => {
             setReviewText(response.reviewText || "");
             setReviewStatus(response.reviewStatus || null);
         } catch (err: any) {
-            console.error("Error loading user rating:", err);
+            // Only log non-auth errors (401/403 are expected for unauthenticated users)
+            if (err?.response?.status !== 401 && err?.response?.status !== 403) {
+                console.error("Error loading user rating:", err);
+            }
             setError(err.response?.data?.message || "Error al cargar calificación");
         } finally {
             setIsLoading(false);
