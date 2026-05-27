@@ -24,7 +24,6 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose, onSu
 
     if (!isOpen) return null;
 
-    // Limpiar el estado para permitir reintentos
     const handleReset = () => {
         setFile(null);
         setResult(null);
@@ -72,7 +71,6 @@ const BulkUploadModal: React.FC<BulkUploadModalProps> = ({ isOpen, onClose, onSu
         formData.append("file", file);
 
         try {
-            // El interceptor de Axios se encargará de agregar el token JWT y configurar correctamente los headers
             const response = await api.post<BulkUploadResult>("/library-books/bulk-upload", formData);
             setResult(response.data);
             if (onSuccess && response.data.successCount > 0) {

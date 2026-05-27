@@ -33,12 +33,10 @@ export function useAuth(): UseAuthReturn {
 	const [error, setError] = useState<string | null>(null);
 	const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-	// Verificar autenticación al montar el componente
 	useEffect(() => {
 		const token = localStorage.getItem("accessToken");
 		if (token) {
 			refreshProfile().catch(() => {
-				// Token inválido o expirado
 				localStorage.removeItem("accessToken");
 				localStorage.removeItem("userRole");
 			});
@@ -54,7 +52,6 @@ export function useAuth(): UseAuthReturn {
 			setUser(profile);
 			setError(null);
 			setValidationErrors([]);
-			// Guardar rol para acceso rápido
 			localStorage.setItem("userRole", profile.userRole);
 		} catch (err) {
 			const apiError = err as ApiError;
@@ -93,7 +90,6 @@ export function useAuth(): UseAuthReturn {
 		try {
 			await logoutService();
 		} finally {
-			// Siempre limpiar estado local
 			setUser(null);
 			localStorage.removeItem("userRole");
 			setError(null);

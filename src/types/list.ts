@@ -11,7 +11,7 @@ export interface UserListDTO {
     bookCount: number;
     createdAt: string;
     books?: BookSummary[];
-    userId?: number; // ID del usuario dueño de la lista
+    userId?: number;
 }
 
 export interface CreateListRequestDTO {

@@ -4,8 +4,6 @@ import { getBookByIsbn } from "../services/bookService";
 
 import type { BookDetail } from "../types";
 
-
-
 interface UseBookDetailReturn {
 
 	book: BookDetail | null;
@@ -34,10 +32,9 @@ export function useBookDetail(): UseBookDetailReturn {
 
 	const fetchBook = useCallback(async (isbn: number): Promise<void> => {
 
-		try {
+try {
 
 			setIsLoading(true);
-
 			setError(null);
 
 
@@ -52,11 +49,9 @@ export function useBookDetail(): UseBookDetailReturn {
 
 			
 
-			// Si el error indica que es público pero no autenticado, no mostrar error
+
 
 			if (apiError.isPublic) {
-
-				// Intentar obtener el libro sin autenticación
 
 				try {
 

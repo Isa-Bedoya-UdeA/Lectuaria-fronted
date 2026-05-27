@@ -21,7 +21,6 @@ const ShareMenu = ({ onShareWithFriends, onCopyLink, anchorEl, onClose, onShareW
         e.nativeEvent.stopImmediatePropagation();
         onShareWithFriendsStart?.();
         onClose();
-        // No navegar, solo cerrar el menú y llamar al handler
         onShareWithFriends();
     };
 

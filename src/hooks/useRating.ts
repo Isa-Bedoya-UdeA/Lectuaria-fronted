@@ -13,12 +13,10 @@ export const useRating = (bookId: number) => {
     const [error, setError] = useState<string | null>(null);
     const { user } = useAuth();
 
-    // Cargar calificación del usuario cuando cambia el libro o el usuario
     useEffect(() => {
         if (bookId && user) {
             loadUserRating();
         } else {
-            // Resetear si no hay usuario o libro
             setUserRating(0);
             setAverageRating(0);
             setRatingsCount(0);
@@ -40,7 +38,6 @@ export const useRating = (bookId: number) => {
             setReviewText(response.reviewText || "");
             setReviewStatus(response.reviewStatus || null);
         } catch (err: any) {
-            // Only log non-auth errors (401/403 are expected for unauthenticated users)
             if (err?.response?.status !== 401 && err?.response?.status !== 403) {
                 console.error("Error loading user rating:", err);
             }

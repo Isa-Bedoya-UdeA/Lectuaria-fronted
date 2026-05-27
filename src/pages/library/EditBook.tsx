@@ -12,7 +12,7 @@ import useSEO from "@/hooks/useSEO";
 import { getBookById, updateBook, updateBookWithCover } from "@/services/bookService";
 import { platformService } from "@/services/platformService";
 import type { BookPublishRequest } from "@/types";
-import "./addBook.scss"; // Mismos estilos que AddBook
+import "./addBook.scss";
 import Toast, { type ToastType } from "@/components/UI/Toast";
 
 interface EditBookFormValues {

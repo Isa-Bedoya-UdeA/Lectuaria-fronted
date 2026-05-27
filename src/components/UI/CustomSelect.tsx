@@ -29,7 +29,6 @@ const CustomSelect = ({
         if (!disabled) {
             setAnchorEl(event.currentTarget);
             setOpen(true);
-            // Guardar el ancho del botón trigger
             setTriggerWidth(event.currentTarget.offsetWidth);
         }
     };

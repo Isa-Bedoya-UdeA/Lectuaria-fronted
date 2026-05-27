@@ -31,11 +31,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<ProfileResponse | null>(null);
-    const [isLoading, setIsLoading] = useState(true); // Iniciar como true hasta verificar auth
+    const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
-    // Limpiar errores al desmontar (cuando el usuario navega a otra página)
     useEffect(() => {
         return () => {
             setError(null);
@@ -43,12 +42,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         };
     }, []);
 
-    // Verificar autenticación al montar
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                // Siempre intentamos obtener el perfil. 
-                // Si no hay token o expiró, el interceptor de api.ts intentará el refresh silencioso.
                 const profile = await getProfile();
                 setUser(profile);
                 if (profile.userRole) {
@@ -56,7 +52,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                     localStorage.setItem("isAuthenticated", "true");
                 }
             } catch (err) {
-                // Solo limpiamos si realmente no se pudo recuperar la sesión
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("userRole");
                 localStorage.removeItem("isAuthenticated");
@@ -141,7 +136,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const clearError = useCallback(() => setError(null), []);
     const clearValidationErrors = useCallback(() => setValidationErrors([]), []);
 
-    // Función para limpiar todos los errores
     const clearAllErrors = useCallback(() => {
         setError(null);
         setValidationErrors([]);

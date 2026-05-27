@@ -19,7 +19,6 @@ export const prefillBookFromIsbn = async (
 			response?: { data?: ApiError; status?: number };
 		};
 
-		// 404 means book not found in external sources - this is expected, not an error
 		if (apiError.response?.status === 404) {
 			return null;
 		}
@@ -31,15 +30,10 @@ export const prefillBookFromIsbn = async (
 	}
 };
 
-/**
- * Publish a book or associate existing book to librarian's library
- * Handles both: new book creation AND adding existing book to library
- */
 export const publishBook = async (
 	data: BookPublishRequest,
 ): Promise<BookPublishResponse> => {
 	try {
-		// Client-side validation before sending to backend
 		if (!data.isbn || !data.title || data.authors.length === 0) {
 			throw {
 				message: "Datos incompletos",
@@ -74,10 +68,6 @@ export const publishBook = async (
 	}
 };
 
-/**
- * Publish a book with an optional cover image file (multipart/form-data).
- * Used when librarian uploads a local image instead of providing a URL.
- */
 export const publishBookWithCover = async (
 	data: BookPublishRequest,
 	coverFile?: File | null,
@@ -102,7 +92,6 @@ export const publishBookWithCover = async (
 			} as ApiError;
 		}
 
-		// Encode cover file as data URL so it can be sent as JSON
 		if (coverFile) {
 			const base64 = await fileToBase64(coverFile);
 			data.coverUrl = base64;

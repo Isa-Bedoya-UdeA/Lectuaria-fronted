@@ -13,7 +13,6 @@ import BulkUploadModal from "@/components/Modals/BulkUploadModal";
 import { getMyLibraryStatistics } from "@/services/libraryService";
 import type { LibraryStatisticsDTO } from "@/types";
 import "./myLibrary.scss";
-// Mismos estilos que el catálogo
 import "@/pages/books/books.scss";
 import Toast, { type ToastType } from "@/components/UI/Toast";
 

@@ -1,8 +1,5 @@
 import api from "../config/api";
 
-/**
- * Types for friend activity
- */
 export interface FriendActivityDTO {
     id: number;
     userId: number;
@@ -26,9 +23,6 @@ export interface FriendActivityDTO {
     helpfulCount?: number;
 }
 
-/**
- * Get friend activity feed
- */
 export const getFriendActivity = async (usernameSlug: string): Promise<FriendActivityDTO[]> => {
     try {
         const response = await api.get<FriendActivityDTO[]>(`/users/${usernameSlug}/activity`);
@@ -39,9 +33,6 @@ export const getFriendActivity = async (usernameSlug: string): Promise<FriendAct
     }
 };
 
-/**
- * Get friend activity for a specific user
- */
 export const getFriendActivityById = async (userId: number): Promise<FriendActivityDTO[]> => {
     try {
         const response = await api.get<FriendActivityDTO[]>(`/users/activity/${userId}`);

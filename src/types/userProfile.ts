@@ -1,5 +1,3 @@
-// Types for user profile viewing (US-0016)
-
 export type FriendshipStatus = "NONE" | "PENDING" | "ACCEPTED" | "SELF";
 
 export type Visibility = "PUBLIC" | "FRIENDS" | "PRIVATE";

@@ -57,7 +57,6 @@ const FriendCard = ({ user, onAdd, onRemove, onAccept, onReject, onCancel }: Fri
                 </div>
 
                 <div className="friendCard__actions">
-                    {/* Ya son amigos → eliminar */}
                     {user.friendshipStatus === "friends" && onRemove && (
                         <button
                             title="Eliminar amistad"
@@ -73,7 +72,6 @@ const FriendCard = ({ user, onAdd, onRemove, onAccept, onReject, onCancel }: Fri
                         </button>
                     )}
 
-                    {/* Sin relación → agregar */}
                     {user.friendshipStatus === "none" && onAdd && (
                         <button title="Agregar amigo" onClick={() => onAdd(user.id)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M19 8v6m3-3h-6" /></g></svg>
@@ -81,7 +79,6 @@ const FriendCard = ({ user, onAdd, onRemove, onAccept, onReject, onCancel }: Fri
                         </button>
                     )}
 
-                    {/* Solicitud enviada → cancelar */}
                     {user.friendshipStatus === "pending_sent" && onCancel && user.friendshipRequestId && (
                         <button
                             title="Cancelar solicitud"
@@ -97,7 +94,6 @@ const FriendCard = ({ user, onAdd, onRemove, onAccept, onReject, onCancel }: Fri
                         </button>
                     )}
 
-                    {/* Solicitud recibida → aceptar / rechazar */}
                     {user.friendshipStatus === "pending_received" && user.friendshipRequestId && (
                         <>
                             <button title="Aceptar solicitud" onClick={() => onAccept && onAccept(user.friendshipRequestId!)}>

@@ -1,4 +1,3 @@
-// src/services/authService.ts
 import api, { setAuthToken, clearAuthData } from "../config/api";
 import type {
 	RegisterRequest,
@@ -10,17 +9,12 @@ import type {
 	ApiError,
 } from "../types";
 
-/**
- * Login user - stores accessToken in localStorage, refreshToken via HttpOnly cookie
- */
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 	try {
 		const response = await api.post<LoginResponse>("/auth/login", data);
 
-		// Guardar accessToken para requests futuros (Authorization header)
 		if (response.data.accessToken) {
 			setAuthToken(response.data.accessToken);
-			// El refreshToken se maneja automáticamente vía cookie HttpOnly
 		}
 
 		return response.data;
@@ -30,7 +24,6 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 			apiError.response?.data?.message || "Error al iniciar sesión";
 		const errors = apiError.response?.data?.errors;
 
-		// Lanzar error con mensajes de validación si existen
 		throw {
 			message,
 			errors: errors || [message],
@@ -38,16 +31,10 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 	}
 };
 
-/**
- * Register new user or librarian
- * - For READER users: send username
- * - For LIBRARIAN users: send library object with zone info
- */
 export const register = async (
 	data: RegisterRequest,
 ): Promise<RegisterResponse> => {
 	try {
-		// Validación básica del lado del cliente
 		if (data.password !== data.confirmPassword) {
 			throw {
 				message: "Las contraseñas no coinciden",
@@ -73,21 +60,14 @@ export const register = async (
 	}
 };
 
-/**
- * Logout user - calls backend to invalidate refreshToken cookie
- */
 export const logout = async (): Promise<void> => {
 	try {
 		await api.post("/auth/logout");
 	} finally {
-		// Siempre limpiar datos locales, incluso si la llamada falla
 		clearAuthData();
 	}
 };
 
-/**
- * Get current authenticated user profile
- */
 export const getProfile = async (): Promise<ProfileResponse> => {
 	try {
 		const response = await api.get<ProfileResponse>("/auth/me");
@@ -101,9 +81,6 @@ export const getProfile = async (): Promise<ProfileResponse> => {
 	}
 };
 
-/**
- * Update user profile (common fields + librarian-specific fields)
- */
 export const updateProfile = async (
 	data: ProfileUpdateRequest,
 ): Promise<ProfileResponse> => {

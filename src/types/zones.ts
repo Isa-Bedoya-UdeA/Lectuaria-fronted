@@ -3,5 +3,4 @@ export interface Zone {
 	name: string;
 }
 
-// Response for listing zones (array)
 export type ZonesResponse = Zone[];

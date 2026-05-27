@@ -1,23 +1,19 @@
-// Genre with description (for hover tooltips)
 export interface Genre {
 	id: number;
 	name: string;
 	description?: string;
 }
 
-// Author (simplified)
 export interface Author {
 	id: number;
 	name: string;
 }
 
-// Publisher (simplified)
 export interface Publisher {
 	id: number;
 	name: string;
 }
 
-// Library info for filters and cards
 export interface LibrarySummary {
     id: number;
     name: string;
@@ -34,11 +30,10 @@ export interface LibraryAvailability {
     physicalAvailable: boolean;
     physicalCopies?: number;
     digitalAvailable: boolean;
-    digitalPlatform?: string; // resolved platform name for display
-    platformId?: number;       // FK to platform table
+    digitalPlatform?: string;
+    platformId?: number;
 }
 
-// Book summary for cards/list views
 export interface BookSummary {
 	id: number;
 	isbn: number;
@@ -48,14 +43,13 @@ export interface BookSummary {
 	averageRating: number;
 	ratingsCount: number;
 	coverUrl?: string;
-	libraryId?: number; // ID de la biblioteca que creó el libro
-	userAddedId?: number; // ID del usuario que añadió el libro a la biblioteca
-	createdById?: number; // ID del usuario que creó el libro originalmente
-    availableLibraries?: string[]; // Nombres de bibliotecas donde está disponible
-    createdAt?: string; // ISO timestamp for sorting by date (from LibraryBook.addedAt)
+	libraryId?: number;
+	userAddedId?: number;
+	createdById?: number;
+    availableLibraries?: string[];
+    createdAt?: string;
 }
 
-// Book detail view (extends summary)
 export interface BookDetail extends BookSummary {
 	description?: string;
 	publishers: string[];
@@ -66,14 +60,12 @@ export interface BookDetail extends BookSummary {
     availability?: LibraryAvailability[];
 }
 
-// Availability for library book publishing
 export interface Availability {
 	physical: boolean;
 	digital: boolean;
 	physicalCopies?: number;
 }
 
-// Book publish request (for librarians)
 export interface BookPublishRequest {
 	isbn: number;
 	title: string;
@@ -90,7 +82,6 @@ export interface BookPublishRequest {
 	libraryId: number;
 }
 
-// Book publish response
 export interface BookPublishResponse {
 	bookId: number;
 	title: string;
@@ -99,7 +90,6 @@ export interface BookPublishResponse {
 	message: string;
 }
 
-// Prefill response from external APIs (Google Books first, OpenLibrary fallback - partial book data)
 export interface BookPrefillData {
 	isbn: number;
 	title: string;
@@ -114,7 +104,6 @@ export interface BookPrefillData {
 	bookExistsInUserLibrary: boolean;
 }
 
-// Bulk Upload Result
 export interface BulkUploadResult {
     totalProcessed: number;
     successCount: number;
@@ -130,7 +119,6 @@ export interface ZipUploadResult {
     errors: string[];
 }
 
-// Paginated response wrapper (for book lists)
 export interface PaginatedResponse<T> {
 	content: T[];
 	pageNumber: number;
@@ -143,22 +131,21 @@ export interface PaginatedResponse<T> {
 	hasPrevious: boolean;
 }
 
-// Search/Filter query parameters
 export interface BookQueryParams {
 	page?: number;
 	size?: number;
-	keyword?: string; // For search
-	keywords?: string; // For multi-keyword search (comma-separated)
-	sort?: string; // For sort: title_asc, title_desc, newest, oldest
-	genreId?: number; // For single genre filter
-	genreIds?: number[]; // For multiple genres filter (OR logic)
+	keyword?: string;
+	keywords?: string;
+	sort?: string;
+	genreId?: number;
+	genreIds?: number[];
 	authorId?: number;
 	minRating?: number;
-    libraryIds?: number[]; // For library filter
-    startYear?: number; // For year range filter
-    endYear?: number; // For year range filter
-    year?: number; // For exact year filter (used in top-rated)
-    formatTypes?: string[]; // For format filter (array of "physical" and/or "digital")
+    libraryIds?: number[];
+    startYear?: number;
+    endYear?: number;
+    year?: number;
+    formatTypes?: string[];
 }
 
 export interface FeaturedSections {

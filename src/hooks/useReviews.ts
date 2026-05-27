@@ -59,8 +59,6 @@ export function useReviews(): UseReviewsReturn {
 		try {
 			setIsLoading(true);
 			await modifyReview(reviewId, request);
-			// Podríamos refrescar o actualizar localmente. Refrescar es más seguro.
-			// Nota: El hook no sabe el bookId actual. Podríamos requerirlo si queremos refrescar.
 		} catch (err) {
 			setError((err as Error).message || "Error updating review");
 			throw err;

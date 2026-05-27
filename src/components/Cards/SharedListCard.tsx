@@ -9,8 +9,6 @@ const SharedListCard = ({ sharedList }: { sharedList: SharedList }) => {
         if (sharedList.publicToken) {
             navigate(`/shared/${sharedList.publicToken}`);
         } else {
-            // For LISTED lists without publicToken, this shouldn't happen with the new system
-            // but keeping as fallback
             navigate(`/lists/${sharedList.listId}`);
         }
     };

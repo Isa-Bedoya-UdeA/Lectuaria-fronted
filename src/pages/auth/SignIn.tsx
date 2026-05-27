@@ -1,4 +1,3 @@
-// src/pages/auth/SignIn.tsx
 import { Link, useNavigate } from "react-router-dom";
 import "./auth.scss";
 import { PATHS } from "@/constants/routes";
@@ -19,10 +18,9 @@ const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
-    // Limpiar errores al montar el componente
     useEffect(() => {
         clearAllErrors();
-    }, []);
+    }, [clearAllErrors]);
 
     useSEO({
         title: `Iniciar sesión | ${SITE_INFO.name}`,
@@ -39,7 +37,6 @@ const SignIn = () => {
                 rememberMe: data.rememberMe
             });
             setToast({ message: "¡Bienvenido de vuelta!", type: "success" });
-            // Redirigir después de un breve delay para mostrar el mensaje
             setTimeout(() => {
                 const userRole = localStorage.getItem("userRole");
                 if (userRole === "LIBRARIAN") {
@@ -49,7 +46,6 @@ const SignIn = () => {
                 }
             }, 1500);
         } catch {
-            // El error ya está manejado por el hook useAuth
         }
     };
 
@@ -60,7 +56,6 @@ const SignIn = () => {
                 <p>Bienvenido de vuelta a {SITE_INFO.name}</p>
             </section>
 
-            {/* Mostrar errores de validación del backend */}
             {validationErrors.length > 0 && (
                 <Toast
                     message={validationErrors.join(", ")}
@@ -69,7 +64,6 @@ const SignIn = () => {
                 />
             )}
 
-            {/* Mostrar error general */}
             {error && !validationErrors.length && (
                 <Toast
                     message={error === "Credenciales inválidas" 

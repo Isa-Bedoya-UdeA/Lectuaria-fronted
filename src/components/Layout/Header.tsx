@@ -23,7 +23,6 @@ const Header = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const { lists, fetchLists } = useUserLists({ autoFetch: false });
 
-    // Helper to check if we're on a specific profile tab
     const isOnProfileTab = (tab?: string) => {
         const isOnProfile = location.pathname === PATHS.PROFILE;
         if (!isOnProfile) return false;
@@ -42,7 +41,6 @@ const Header = () => {
             fetchNotifications();
             fetchUnreadCount();
             
-            // Configurar polling automático cada 30 segundos
             const interval = setInterval(() => {
                 fetchNotifications();
                 fetchUnreadCount();

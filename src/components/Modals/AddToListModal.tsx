@@ -17,9 +17,7 @@ const AddToListModal = ({ isOpen, onClose, bookId, bookTitle }: AddToListModalPr
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Cargar listas solo cuando el modal se abre
-    useEffect(() => {
-        if (isOpen) {
+    if (isOpen) {
             fetchLists();
         }
     }, [isOpen, fetchLists]);
@@ -57,7 +55,7 @@ const AddToListModal = ({ isOpen, onClose, bookId, bookTitle }: AddToListModalPr
                         <div className="addToList__list">
                             {isLoading && <p>Cargando listas...</p>}
                             {lists
-                                .filter(list => list.name !== "Favoritos") // Filtrar lista de favoritos
+                                .filter(list => list.name !== "Favoritos")
                                 .map(list => (
                                 <button
                                     key={list.id}

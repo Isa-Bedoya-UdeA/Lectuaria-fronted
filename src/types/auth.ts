@@ -1,5 +1,3 @@
-// src/types/auth.ts
-
 // Roles que coinciden EXACTAMENTE con el backend (UserRole.java)
 export type UserRole = "READER" | "LIBRARIAN" | "ADMIN";
 

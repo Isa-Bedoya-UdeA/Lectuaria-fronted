@@ -29,7 +29,6 @@ const EditAvailabilityModal: React.FC<EditAvailabilityModalProps> = ({
     initialDigitalPlatformId,
     onSuccess
 }) => {
-    // Derivar el modo inicial desde los valores recibidos
     const getInitialMode = (): AvailabilityMode => {
         if (initialPhysicalCopies != null && initialPhysicalCopies > 0 && initialDigitalAvailable) return 'both';
         if (initialDigitalAvailable) return 'digital';
@@ -47,9 +46,7 @@ const EditAvailabilityModal: React.FC<EditAvailabilityModalProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Cargar plataformas al abrir y resetear el modo
-    useEffect(() => {
-        if (isOpen) {
+    if (isOpen) {
             setMode(getInitialMode());
             setPhysicalCopies(initialPhysicalCopies ?? 0);
             setDigitalPlatformId(initialDigitalPlatformId ?? null);
@@ -121,7 +118,6 @@ const EditAvailabilityModal: React.FC<EditAvailabilityModalProps> = ({
                     </select>
                 </div>
 
-                {/* Copias físicas - solo si es Físico o Ambos */}
                 {(mode === 'physical' || mode === 'both') && (
                     <div className="form-group">
                         <label htmlFor="physicalCopies">Cantidad de copias físicas</label>
@@ -141,7 +137,6 @@ const EditAvailabilityModal: React.FC<EditAvailabilityModalProps> = ({
                     </div>
                 )}
 
-                {/* Plataforma digital - solo si es Digital o Ambos */}
                 {(mode === 'digital' || mode === 'both') && (
                     <div className="form-group">
                         <label htmlFor="digitalPlatform">Plataforma digital</label>

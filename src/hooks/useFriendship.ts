@@ -62,7 +62,6 @@ export const useFriendship = () => {
         setLoading(true);
         try {
             await friendshipService.sendFriendshipRequest(receiverId);
-            // Actualizar el estado local de búsqueda
             setSearchResults(prev => prev.map(u => u.id === receiverId ? { ...u, friendshipStatus: 'pending_sent' } : u));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Error al enviar solicitud');
@@ -103,7 +102,6 @@ export const useFriendship = () => {
         setLoading(true);
         try {
             await friendshipService.cancelFriendshipRequest(requestId);
-            // Esto típicamente lo llamamos desde la búsqueda donde vemos a quién enviamos
             setSearchResults(prev => prev.map(u => u.friendshipRequestId === requestId ? { ...u, friendshipStatus: 'none', friendshipRequestId: null } : u));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Error al cancelar solicitud');

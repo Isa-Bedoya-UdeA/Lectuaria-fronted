@@ -82,11 +82,9 @@ const ListCard = ({ list, onDelete }: ListCardProps) => {
                 setSelectedFriends([]);
                 setShareMessage("");
             } else if (result.successfulShares === 0) {
-                // Todos fallaron
                 const errorMessage = result.errorMessages.join(". ");
                 setToast({ message: errorMessage || result.message, type: "error" });
             } else {
-                // Algunos fallaron, otros fueron exitosos
                 const errorMessage = result.errorMessages.join(". ");
                 setToast({ 
                     message: `${result.message}. Errores: ${errorMessage}`, 
@@ -182,7 +180,6 @@ const ListCard = ({ list, onDelete }: ListCardProps) => {
                 onCopyLink={handleCopyLink}
             />
 
-            {/* Modal para compartir con amigos */}
             {isShareModalOpen && createPortal(
                 <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsShareModalOpen(false); }}>
                     <div className="modal-content share-modal" onClick={e => e.stopPropagation()}>

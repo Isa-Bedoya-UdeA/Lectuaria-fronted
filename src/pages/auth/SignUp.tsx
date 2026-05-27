@@ -1,4 +1,3 @@
-// src/pages/auth/SignUp.tsx
 import { Link, useNavigate } from "react-router-dom";
 import "./auth.scss";
 import { PATHS } from "@/constants/routes";

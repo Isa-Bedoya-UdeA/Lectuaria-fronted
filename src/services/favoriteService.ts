@@ -10,7 +10,6 @@ export const getFavoritesList = async (): Promise<UserListDTO | null> => {
         const favoritesList = response.data.find(list => list.name === "Favoritos");
         return favoritesList || null;
     } catch (error: any) {
-        // Only log non-auth errors
         if (error?.response?.status !== 401 && error?.response?.status !== 403) {
             console.error("Error fetching favorites list:", error);
         }
@@ -23,7 +22,6 @@ export const getFavoritesList = async (): Promise<UserListDTO | null> => {
  */
 export const addToFavorites = async (bookId: number): Promise<void> => {
     try {
-        // Get all lists and find favorites list in one call
         const lists = await api.get<UserListDTO[]>("/lists");
         const favoritesList = lists.data.find(list => list.name === "Favoritos");
         
@@ -33,7 +31,6 @@ export const addToFavorites = async (bookId: number): Promise<void> => {
         
         await api.post(`/lists/${favoritesList.id}/books/${bookId}?force=false`);
     } catch (error: any) {
-        // Only log non-auth errors
         if (error?.response?.status !== 401 && error?.response?.status !== 403) {
             console.error("Error adding to favorites:", error);
         }
@@ -46,7 +43,6 @@ export const addToFavorites = async (bookId: number): Promise<void> => {
  */
 export const removeFromFavorites = async (bookId: number): Promise<void> => {
     try {
-        // Get all lists and find favorites list in one call
         const lists = await api.get<UserListDTO[]>("/lists");
         const favoritesList = lists.data.find(list => list.name === "Favoritos");
         
@@ -56,7 +52,6 @@ export const removeFromFavorites = async (bookId: number): Promise<void> => {
         
         await api.delete(`/lists/${favoritesList.id}/books/${bookId}`);
     } catch (error: any) {
-        // Only log non-auth errors
         if (error?.response?.status !== 401 && error?.response?.status !== 403) {
             console.error("Error removing from favorites:", error);
         }
@@ -76,11 +71,9 @@ export const isBookInFavorites = async (bookId: number): Promise<boolean> => {
             return false;
         }
         
-        // Get list details to check if book is in favorites
         const listDetails = await api.get<UserListDTO>(`/lists/${favoritesList.id}`);
         return listDetails.data.books?.some(book => book.id === bookId) || false;
     } catch (error: any) {
-        // Only log non-auth errors (401/403 are expected for unauthenticated users)
         if (error?.response?.status !== 401 && error?.response?.status !== 403) {
             console.error("Error checking favorites status:", error);
         }

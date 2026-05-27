@@ -18,7 +18,6 @@ export const useFavorites = () => {
             const list = await getFavoritesList();
             setFavoritesList(list?.id || null);
         } catch (err: any) {
-            // Silently handle 401/403 errors - user is not authenticated
             if (err?.response?.status === 401 || err?.response?.status === 403) {
                 setFavoritesList(null);
                 return;
@@ -34,7 +33,6 @@ export const useFavorites = () => {
         setError(null);
         try {
             await addToFavorites(bookId);
-            // Refresh the favorites list ID
             await loadFavoritesList();
         } catch (err: any) {
             setError(err?.message || "Error al agregar a favoritos");
@@ -49,7 +47,6 @@ export const useFavorites = () => {
         setError(null);
         try {
             await removeFromFavorites(bookId);
-            // Refresh the favorites list ID
             await loadFavoritesList();
         } catch (err: any) {
             setError(err?.message || "Error al quitar de favoritos");
@@ -63,23 +60,18 @@ export const useFavorites = () => {
         try {
             return await isBookInFavorites(bookId);
         } catch (err: any) {
-            // Silently handle errors - return false for unauthenticated users
-            // Don't log 401/403 as these are expected when not logged in
             if (err?.response?.status === 401 || err?.response?.status === 403) {
                 return false;
             }
-            // Only log unexpected errors
             console.error("Error checking favorite status:", err);
             return false;
         }
     }, []);
 
     useEffect(() => {
-        // Solo cargar favoritos si el usuario está autenticado y no es bibliotecario
         const userRole = localStorage.getItem('userRole');
         const accessToken = localStorage.getItem('accessToken');
         
-        // Solo cargar si hay un token Y no es bibliotecario
         if (accessToken && userRole !== 'LIBRARIAN') {
             loadFavoritesList();
         }

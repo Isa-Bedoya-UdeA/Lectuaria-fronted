@@ -10,7 +10,7 @@ import type { ProfileUpdateRequest } from "@/types/auth";
 
 interface LibraryInfoFormProps {
     onCancel: () => void;
-    onSuccess?: () => void; // Callback opcional para notificar éxito al padre
+    onSuccess?: () => void;
 }
 
 const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
@@ -38,11 +38,8 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
         reset
     } = useForm<ProfileUpdateRequest>({
         defaultValues: {
-            // Campos comunes
             photoUrl: user?.photoUrl || "",
             biography: user?.biography || "",
-
-            // Campos específicos de biblioteca (LIBRARIAN)
             libraryName: user?.libraryName || "",
             libraryLocation: user?.libraryAddress || "",
             contactInfo: user?.libraryContactEmail || user?.email || "",
@@ -55,7 +52,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
     // Watch para preview de avatar
     const watchedPhotoUrl = watch("photoUrl");
 
-    // Resetear formulario si cambia el usuario
     useEffect(() => {
         if (user?.userRole === "LIBRARIAN") {
             reset({
@@ -71,15 +67,10 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
         }
     }, [user, reset]);
 
-    // Ya no es necesario limpiar errores manualmente con watch(), 
-    // react-hook-form lo maneja o se limpian al enviar el form.
-
     const onSubmit = async (data: ProfileUpdateRequest) => {
         try {
-            // Validación adicional del lado del cliente
 
 
-            // Llamar a la API para actualizar perfil
             await updateProfile({
                 ...data,
                 libraryName: data.libraryName?.trim(),
@@ -93,18 +84,15 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
 
             setShowSuccess(true);
 
-            // Notificar éxito al componente padre si existe el callback
             if (onSuccess) {
                 onSuccess();
             }
 
-            // Cerrar formulario después de mostrar éxito
             setTimeout(() => {
                 onCancel();
             }, 1500);
 
         } catch (err: any) {
-            // Error managed by field-level errors or authError (not shown as Alert)
         }
     };
 
@@ -114,7 +102,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
         <section className="libraryInfoForm">
             <h3>Editar datos de la biblioteca</h3>
 
-            {/* Error al cargar zonas (mantenemos este porque es crítico y no tiene campo asociado) */}
             {zonesError && (
                 <div className="error-text" style={{ marginBottom: '1rem', textAlign: 'center' }}>
                     No se pudieron cargar las zonas. Intenta de nuevo.
@@ -122,7 +109,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
             )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="libraryInfoForm__form">
-                {/* Avatar / Logo de la biblioteca */}
                 <div className="libraryInfoForm__avatar-section">
                     <div className="avatar-preview">
                         <img
@@ -156,7 +142,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     </div>
                 </div>
 
-                {/* Nombre de la biblioteca */}
                 <div className="libraryInfoForm__group">
                     <label htmlFor="libraryName">Nombre de la biblioteca *</label>
                     <input
@@ -174,7 +159,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     )}
                 </div>
 
-                {/* Descripción / Biografía */}
                 <div className="libraryInfoForm__group">
                     <label htmlFor="biography">Descripción</label>
                     <textarea
@@ -188,7 +172,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     <small>{watch("biography")?.length || 0}/500</small>
                 </div>
 
-                {/* Email y Teléfono en fila */}
                 <div className="libraryInfoForm__row">
                     <div className="libraryInfoForm__group">
                         <label htmlFor="contactInfo">Email de contacto *</label>
@@ -222,7 +205,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     </div>
                 </div>
 
-                {/* Horario de atención */}
                 <div className="libraryInfoForm__group">
                     <label htmlFor="officeHours">Horario de atención *</label>
                     <input
@@ -239,7 +221,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     )}
                 </div>
 
-                {/* Dirección */}
                 <div className="libraryInfoForm__group">
                     <label htmlFor="libraryLocation">Dirección *</label>
                     <input
@@ -256,7 +237,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     )}
                 </div>
 
-                {/* Zona/Comuna - Dropdown */}
                 <div className="libraryInfoForm__group">
                     <label htmlFor="idZone">Comuna/Zona *</label>
 
@@ -279,7 +259,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                     )}
                 </div>
 
-                {/* Botones de acción */}
                 <div className="libraryInfoForm__actions">
                     <Button type="submit" disabled={isLoading}>
                         {isLoading ? (
@@ -302,7 +281,6 @@ const LibraryInfoForm = ({ onCancel, onSuccess }: LibraryInfoFormProps) => {
                 </div>
             </form>
 
-            {/* Snackbar de éxito */}
             <Snackbar
                 open={showSuccess}
                 autoHideDuration={2000}

@@ -1,19 +1,13 @@
-// src/context/BooksContext.tsx
 import { createContext, useContext, useState, type ReactNode, useCallback } from "react";
 import { getBooks, getBookById, searchBooks, getBooksByGenre, getBooksByGenres } from "../services/bookService";
 import type { BookSummary, BookDetail, BookQueryParams, ApiError } from "../types";
 
 interface BooksContextType {
-    // Books list
     books: BookSummary[];
-    // Current book detail
     currentBook: BookDetail | null;
-    // Loading states
     isLoading: boolean;
     isLoadingDetail: boolean;
-    // Error states
     error: string | null;
-    // Pagination
     pagination: {
         pageNumber: number;
         pageSize: number;
@@ -22,7 +16,6 @@ interface BooksContextType {
         hasNext: boolean;
         hasPrevious: boolean;
     };
-    // Actions
     fetchBooks: (params?: BookQueryParams) => Promise<void>;
     fetchBookDetail: (id: number) => Promise<void>;
     searchBooks: (keywords: string, params?: Omit<BookQueryParams, "keywords">) => Promise<void>;
@@ -41,7 +34,6 @@ export const BooksProvider = ({ children }: { children: ReactNode }) => {
     const [isLoadingDetail, setIsLoadingDetail] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Pagination state
     const [pagination, setPagination] = useState({
         pageNumber: 0,
         pageSize: 12,
@@ -51,7 +43,6 @@ export const BooksProvider = ({ children }: { children: ReactNode }) => {
         hasPrevious: false,
     });
 
-    // Fetch books list with pagination
     const fetchBooks = useCallback(async (params: BookQueryParams = {}): Promise<void> => {
         try {
             setIsLoading(true);
@@ -77,7 +68,6 @@ export const BooksProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-    // Fetch single book detail
     const fetchBookDetail = useCallback(async (id: number): Promise<void> => {
         try {
             setIsLoadingDetail(true);
@@ -94,7 +84,6 @@ export const BooksProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-    // Search books by keywords
     const searchBooksHandler = useCallback(async (
         keywords: string,
         params: Omit<BookQueryParams, "keywords"> = {}
@@ -128,7 +117,6 @@ export const BooksProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-    // Filter by single genre
     const fetchByGenre = useCallback(async (
         genreId: number,
         params: Omit<BookQueryParams, "genreId"> = {}
@@ -157,7 +145,6 @@ export const BooksProvider = ({ children }: { children: ReactNode }) => {
         }
     }, []);
 
-    // Filter by multiple genres (OR logic)
     const fetchByGenres = useCallback(async (
         genreIds: number[],
         params: Omit<BookQueryParams, "genreIds"> = {}

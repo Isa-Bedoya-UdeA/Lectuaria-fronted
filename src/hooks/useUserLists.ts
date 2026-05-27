@@ -9,7 +9,7 @@ import {
 import type { UserListDTO, CreateListRequestDTO } from "../types";
 
 interface UseUserListsOptions {
-	autoFetch?: boolean; // Si es false, no hace fetch automático
+	autoFetch?: boolean;
 }
 
 export const useUserLists = (options?: UseUserListsOptions) => {

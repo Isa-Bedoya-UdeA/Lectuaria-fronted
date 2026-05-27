@@ -29,9 +29,7 @@ const MoveBookModal = ({
     const [isMoving, setIsMoving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Cargar listas cuando el modal se abre
-    useEffect(() => {
-        if (isOpen) {
+    if (isOpen) {
             fetchLists();
         }
     }, [isOpen, fetchLists]);
@@ -56,7 +54,6 @@ const MoveBookModal = ({
         }
     };
 
-    // Filtrar listas disponibles (excluir la lista actual)
     const availableLists = lists.filter(list => list.id !== currentListId);
 
     if (!isOpen) return null;

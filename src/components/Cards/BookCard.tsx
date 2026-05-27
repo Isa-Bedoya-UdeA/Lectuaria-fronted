@@ -18,9 +18,6 @@ import { useFriendship } from "@/hooks/useFriendship";
 import { useFavorites } from "@/hooks/useFavorites";
 import * as bookShareService from "@/services/bookShareService";
 
-// Nota: Los estados de favorito/compartir/lista son locales para UI
-// En producción, se sincronizarían con el backend vía API
-
 interface BookCardProps {
     book: BookSummary;
     viewMode?: 'grid' | 'list';
@@ -47,23 +44,13 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
     const [isHiding, setIsHiding] = useState(false);
     const [isEditAvailabilityOpen, setIsEditAvailabilityOpen] = useState(false);
 
-    // Hook para manejar calificaciones
     const { userRating, averageRating, ratingsCount, isLoading, rateBook } = useRating(book.id);
-
-    // Hook para manejar favoritos
-    const { 
-        checkBookIsFavorite, 
-        addBookToFavorites, 
-        removeBookFromFavorites
-    } = useFavorites();
+    const { checkBookIsFavorite, addBookToFavorites, removeBookFromFavorites } = useFavorites();
     
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Cargar estado de favorito al montar el componente (solo para lectores autenticados)
     useEffect(() => {
         const loadFavoriteStatus = async () => {
-            // No cargar favoritos si es bibliotecario o no está autenticado
-            const accessToken = localStorage.getItem('accessToken');
             if (user?.userRole === 'LIBRARIAN' || !accessToken) {
                 return;
             }
@@ -71,7 +58,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 const favoriteStatus = await checkBookIsFavorite(book.id);
                 setIsFavorite(favoriteStatus);
             } catch (err) {
-                // Silently handle - don't log 401/403 errors for unauthenticated users
             }
         };
         
@@ -89,7 +75,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
 
     const handleToggleFavorite = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        // No permitir agregar favoritos si es bibliotecario
         if (user?.userRole === 'LIBRARIAN') {
             setToast({ message: "Los bibliotecarios no pueden agregar favoritos", type: "info" });
             return;
@@ -157,12 +142,16 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 setIsShareModalOpen(false);
                 setSelectedFriends([]);
                 setShareMessage("");
+            }
+            if (result.failedShares === 0) {
+                setToast({ message: result.message, type: "success" });
+                setIsShareModalOpen(false);
+                setSelectedFriends([]);
+                setShareMessage("");
             } else if (result.successfulShares === 0) {
-                // Todos fallaron
                 const errorMessage = result.errorMessages.join(". ");
                 setToast({ message: errorMessage || result.message, type: "error" });
             } else {
-                // Algunos fallaron, otros fueron exitosos
                 const errorMessage = result.errorMessages.join(". ");
                 setToast({ 
                     message: `${result.message}. Errores: ${errorMessage}`, 
@@ -198,10 +187,8 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
     const handleEditClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (isBookOwner) {
-            // Si es el creador, ir a EditBook (edición completa del libro)
             navigate(`/my-library/edit-book/${book.id}`);
         } else {
-            // Si no es el creador, solo puede editar la disponibilidad
             setIsEditAvailabilityOpen(true);
         }
     };
@@ -261,7 +248,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 </div>
 
                 <div className="bookCard__tools">
-                    {/* Botón de favoritos - SOLO PARA LECTORES */}
                     {!isLibrarian && (
                         <>
                             {onRemoveFromList && (
@@ -314,9 +300,8 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                                 </svg>
                             </Button>
                         </>
-                    )}
+                    </Button>
 
-                    {/* Botón de compartir - PARA TODOS (lectores y bibliotecarios) */}
                     <Button
                         layout="icon"
                         className="bookCard__share"
@@ -345,10 +330,8 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                         </svg>
                     </Button>
 
-                    {/* Botones contextuales - SOLO PARA BIBLIOTECARIOS */}
                     {isLibrarian && (
                         <>
-{/* Botón de editar - Si es el creador abre EditBook, si no solo disponibilidad */}
                             <Button
                                 layout="icon"
                                 className="bookCard__edit"
@@ -358,7 +341,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497zM15 5l4 4" /></svg>
                             </Button>
 
-                            {/* Botón de quitar de biblioteca - Si ha añadido el libro a su biblioteca (sea o no el creador) */}
                             {isBookAddedByUser && (
                                 <Button
                                     layout="icon"
@@ -464,7 +446,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 <div className="bookCard__stars">
                     {user && user.userRole === 'READER' ? (
                         <>
-                            {/* Estrellas interactivas para usuarios lectores */}
                             <Rating
                                 name={`user-rating-${book.id}`}
                                 value={userRating || averageRating || book.averageRating}
@@ -480,7 +461,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                             />
                         </>
                     ) : (
-                        // Estrellas de solo lectura para bibliotecarios o usuarios no logueados
                         <Rating
                             name={`rating-${book.id}`}
                             value={averageRating || book.averageRating}
@@ -495,7 +475,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 </div>
             </div>
 
-            {/* Modal de Confirmación de Eliminación */}
             <Modal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
@@ -506,7 +485,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 cancelText="Mantener"
             />
 
-            {/* Modal para agregar a lista */}
             <AddToListModal
                 isOpen={isAddListOpen}
                 onClose={() => setIsAddListOpen(false)}
@@ -514,7 +492,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 bookTitle={book.title}
             />
 
-            {/* Modal para mover libro */}
             {isMoveModalOpen && createPortal(
                 <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsMoveModalOpen(false); }}>
                     <div className="modal-content move-modal" onClick={e => e.stopPropagation()}>
@@ -540,7 +517,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 document.body
             )}
 
-            {/* Modal para compartir con amigos */}
             {isShareModalOpen && createPortal(
                 <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsShareModalOpen(false); }}>
                     <div className="modal-content share-modal" onClick={e => e.stopPropagation()}>
@@ -585,7 +561,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 document.body
             )}
 
-            {/* Share Menu */}
             <ShareMenu
                 anchorEl={shareMenuAnchor}
                 onClose={handleCloseShareMenu}
@@ -594,7 +569,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 onCopyLink={handleCopyLink}
             />
 
-            {/* Toast para Feedback */}
             {toast && createPortal(
                 <Toast
                     message={toast.message}
@@ -604,7 +578,6 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                 document.body
             )}
 
-            {/* Modal para editar disponibilidad del libro en la biblioteca del bibliotecario */}
             <EditAvailabilityModal
                 isOpen={isEditAvailabilityOpen}
                 onClose={() => setIsEditAvailabilityOpen(false)}

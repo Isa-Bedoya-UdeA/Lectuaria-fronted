@@ -11,7 +11,6 @@ import type {
 	ApiError,
 } from "../types";
 
-// Create public API instance without auth interceptors
 const publicApi = axios.create({
 	baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api",
 	headers: {
@@ -20,9 +19,6 @@ const publicApi = axios.create({
 	timeout: 10000,
 });
 
-/**
- * Get paginated list of books
- */
 export const getBooks = async (
 	params: BookQueryParams = {},
 ): Promise<PaginatedResponse<BookSummary>> => {
@@ -32,7 +28,7 @@ export const getBooks = async (
 			{
 				params,
 				paramsSerializer: {
-					indexes: null, // Don't use brackets for array parameters: formatTypes=physical&formatTypes=digital
+					indexes: null,
 				}
 			},
 		);
@@ -43,9 +39,6 @@ export const getBooks = async (
 	}
 };
 
-/**
- * Get book details by ID
- */
 export const getBookById = async (id: number): Promise<BookDetail> => {
 	try {
 		const response = await api.get<BookDetail>(`/books/${id}`);
@@ -55,7 +48,6 @@ export const getBookById = async (id: number): Promise<BookDetail> => {
 			response?: { status?: number; data?: ApiError };
 		};
 
-		// Si es un error 401 (no autenticado), intentar con API pública
 		if (apiError.response?.status === 401) {
 			try {
 				const publicResponse = await publicApi.get<BookDetail>(
@@ -78,9 +70,6 @@ export const getBookById = async (id: number): Promise<BookDetail> => {
 	}
 };
 
-/**
- * Get book details by ISBN
- */
 export const getBookByIsbn = async (isbn: number): Promise<BookDetail> => {
 	try {
 		const response = await api.get<BookDetail>(`/books/isbn/${isbn}`);
@@ -90,7 +79,6 @@ export const getBookByIsbn = async (isbn: number): Promise<BookDetail> => {
 			response?: { status?: number; data?: ApiError };
 		};
 
-		// Si es un error 401 (no autenticado), intentar con API pública
 		if (apiError.response?.status === 401) {
 			try {
 				const publicResponse = await publicApi.get<BookDetail>(
@@ -113,9 +101,6 @@ export const getBookByIsbn = async (isbn: number): Promise<BookDetail> => {
 	}
 };
 
-/**
- * Search books by keywords (title, author, or genre)
- */
 export const searchBooks = async (
 	keywords: string,
 	params: Omit<BookQueryParams, "keywords"> = {},
@@ -133,7 +118,6 @@ export const searchBooks = async (
 			response?: { status?: number; data?: ApiError };
 		};
 
-		// Fallback to public API for unauthenticated users
 		if (
 			apiError.response?.status === 401 ||
 			apiError.response?.status === 403
@@ -161,9 +145,6 @@ export const searchBooks = async (
 	}
 };
 
-/**
- * Filter books by single genre
- */
 export const getBooksByGenre = async (
 	genreId: number,
 	params: Omit<BookQueryParams, "genreId"> = {},
@@ -184,9 +165,6 @@ export const getBooksByGenre = async (
 	}
 };
 
-/**
- * Filter books by library
- */
 export const getBooksByLibrary = async (
 	libraryId: number,
 	params: Omit<BookQueryParams, "libraryId"> = {},
@@ -207,9 +185,6 @@ export const getBooksByLibrary = async (
 	}
 };
 
-/**
- * Filter books by multiple genres (OR logic)
- */
 export const getBooksByGenres = async (
 	genreIds: number[],
 	params: Omit<BookQueryParams, "genreIds"> = {},
@@ -232,9 +207,6 @@ export const getBooksByGenres = async (
 	}
 };
 
-/**
- * Get top-rated books
- */
 export const getTopRatedBooks = async (
 	params: BookQueryParams = {},
 ): Promise<PaginatedResponse<BookSummary>> => {
@@ -254,9 +226,6 @@ export const getTopRatedBooks = async (
 	}
 };
 
-/**
- * Prefill book data from OpenLibrary via backend
- */
 export const prefillBookFromIsbn = async (
 	isbn: number,
 ): Promise<BookPrefillData> => {
@@ -275,14 +244,10 @@ export const prefillBookFromIsbn = async (
 	}
 };
 
-/**
- * Publish a book (librarians only)
- */
 export const publishBook = async (
 	data: BookPublishRequest,
 ): Promise<BookPublishResponse> => {
 	try {
-		// Validate required fields
 		if (
 			!data.isbn ||
 			!data.title ||
@@ -325,9 +290,6 @@ export const getPopularBooks = async (
 	}
 };
 
-/**
- * Remove a book from the user's library
- */
 export const removeBookFromLibrary = async (
 	bookId: number,
 ): Promise<string> => {
@@ -344,9 +306,6 @@ export const removeBookFromLibrary = async (
 	}
 };
 
-/**
- * Delete a book completely (Admin)
- */
 export const deleteBook = async (bookId: number): Promise<string> => {
 	try {
 		const response = await api.delete<string>(`/books/${bookId}`);
@@ -357,9 +316,6 @@ export const deleteBook = async (bookId: number): Promise<string> => {
 	}
 };
 
-/**
- * Update a book (Creator or Admin)
- */
 export const updateBook = async (
 	bookId: number,
 	data: BookPublishRequest,
@@ -373,10 +329,6 @@ export const updateBook = async (
 	}
 };
 
-/**
- * Update a book with an optional cover image file (multipart/form-data).
- * Used when librarian re-uploads a local image during edit.
- */
 export const updateBookWithCover = async (
 	bookId: number,
 	data: BookPublishRequest,
@@ -384,7 +336,6 @@ export const updateBookWithCover = async (
 ): Promise<BookDetail> => {
 	try {
 		if (coverFile) {
-			// Encode cover file as data URL so it can be sent as JSON
 			data.coverUrl = await fileToBase64(coverFile);
 		}
 		const response = await api.put<BookDetail>(`/books/${bookId}`, data);

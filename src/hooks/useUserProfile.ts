@@ -23,7 +23,6 @@ export const useUserProfile = (usernameSlug: string) => {
             const data = await userProfileService.getUserProfile(usernameSlug);
             setProfile(data);
             setStats(data.stats);
-            // Cargar actividad de amigos si es amigo
             if (data.friendshipStatus === "ACCEPTED") {
                 try {
                     const activity = await friendActivityService.getFriendActivity(usernameSlug);
@@ -49,8 +48,6 @@ export const useUserProfile = (usernameSlug: string) => {
         setIsLoading(true);
         setError(null);
         try {
-            // Temporarily use a mock implementation since getUserReviews doesn't exist
-            // This should be implemented in the backend service
             setReviews([]);
             setReviewsTotal(0);
             setReviewsPage(page);
