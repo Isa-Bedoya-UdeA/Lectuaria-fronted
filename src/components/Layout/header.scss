@@ -292,7 +292,8 @@ header {
     box-shadow: $shadow-xl;
     animation: fadeIn 0.2s ease;
 
-    a {
+    a,
+    .profile-nav-btn {
         display: block;
         padding: 0.625rem 0.875rem;
         border-radius: $radius-md;
@@ -301,6 +302,11 @@ header {
         color: $text-primary;
         text-decoration: none;
         transition: background-color $transition-base, color $transition-base;
+        background: none;
+        border: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
 
         &:hover {
             background-color: $primary-light;

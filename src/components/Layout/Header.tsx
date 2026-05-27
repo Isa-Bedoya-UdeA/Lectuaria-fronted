@@ -2,7 +2,7 @@ import { SITE_INFO } from "@/constants/siteInfo";
 import { PATHS } from "@/constants/routes";
 import { Avatar, IconButton, Popover, Tooltip } from "@mui/material";
 import { useState, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import StyledBadge from "../UI/StyledBadge";
 import "./header.scss";
 import { cyan } from "@mui/material/colors";
@@ -15,12 +15,21 @@ import { getNotifications, getUnreadCount, markAsRead, markAllAsRead, deleteAllN
 const Header = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [isOpen, setIsOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
     const [notificationsAnchorEl, setNotificationsAnchorEl] = useState<HTMLButtonElement | null>(null);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const { lists, fetchLists } = useUserLists({ autoFetch: false });
+
+    // Helper to check if we're on a specific profile tab
+    const isOnProfileTab = (tab?: string) => {
+        const isOnProfile = location.pathname === PATHS.PROFILE;
+        if (!isOnProfile) return false;
+        if (!tab) return location.search === '' || location.search === '?';
+        return location.search === `?tab=${tab}` || location.search === `&tab=${tab}`;
+    };
 
     useEffect(() => {
         if (user && user.userRole !== "LIBRARIAN") {
@@ -284,56 +293,51 @@ const Header = () => {
                                     Crear cuenta
                                 </NavLink>
                             </>
-                        ) : (
-                            <>
-                                {user.userRole === "LIBRARIAN" ? (
-                                    <NavLink
-                                        to={PATHS.MY_LIBRARY}
-                                        className={({ isActive }) => isActive ? "active-link" : ""}
-                                        onClick={handleClose}
-                                    >
-                                        Mi biblioteca
-                                    </NavLink>
                                 ) : (
                                     <>
-                                        <NavLink
-                                            to={PATHS.PROFILE}
-                                            end
-                                            className={({ isActive }) => isActive ? "active-link" : ""}
-                                            onClick={handleClose}
-                                        >
-                                            Mi cuenta
-                                        </NavLink>
-                                        <NavLink
-                                            to={`${PATHS.PROFILE}?tab=estadisticas`}
-                                            className={({ isActive }) => isActive ? "active-link" : ""}
-                                            onClick={handleClose}
-                                        >
-                                            Estadísticas de lectura
-                                        </NavLink>
-                                        <NavLink
-                                            to={`${PATHS.PROFILE}?tab=social`}
-                                            className={({ isActive }) => isActive ? "active-link" : ""}
-                                            onClick={handleClose}
-                                        >
-                                            Actividad social
-                                        </NavLink>
-                                        <NavLink
-                                            to={`${PATHS.PROFILE}?tab=amigos`}
-                                            className={({ isActive }) => isActive ? "active-link" : ""}
-                                            onClick={handleClose}
-                                        >
-                                            Mis amigos
-                                        </NavLink>
-                                        <NavLink
-                                            to={PATHS.SHARED_WITH_ME}
-                                            className={({ isActive }) => isActive ? "active-link" : ""}
-                                            onClick={handleClose}
-                                        >
-                                            Compartidos conmigo
-                                        </NavLink>
-                                    </>
-                                )}
+                                        {user.userRole === "LIBRARIAN" ? (
+                                            <NavLink
+                                                to={PATHS.MY_LIBRARY}
+                                                className={() => isOnProfileTab() && location.pathname === PATHS.MY_LIBRARY ? "active-link" : ""}
+                                                onClick={handleClose}
+                                            >
+                                                Mi biblioteca
+                                            </NavLink>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    className={`profile-nav-btn ${isOnProfileTab() ? "active-link" : ""}`}
+                                                    onClick={() => { navigate(PATHS.PROFILE); handleClose(); }}
+                                                >
+                                                    Mi cuenta
+                                                </button>
+                                                <button
+                                                    className={`profile-nav-btn ${isOnProfileTab("estadisticas") ? "active-link" : ""}`}
+                                                    onClick={() => { navigate(`${PATHS.PROFILE}?tab=estadisticas`); handleClose(); }}
+                                                >
+                                                    Estadísticas de lectura
+                                                </button>
+                                                <button
+                                                    className={`profile-nav-btn ${isOnProfileTab("social") ? "active-link" : ""}`}
+                                                    onClick={() => { navigate(`${PATHS.PROFILE}?tab=social`); handleClose(); }}
+                                                >
+                                                    Actividad social
+                                                </button>
+                                                <button
+                                                    className={`profile-nav-btn ${isOnProfileTab("amigos") ? "active-link" : ""}`}
+                                                    onClick={() => { navigate(`${PATHS.PROFILE}?tab=amigos`); handleClose(); }}
+                                                >
+                                                    Mis amigos
+                                                </button>
+                                                <NavLink
+                                                    to={PATHS.SHARED_WITH_ME}
+                                                    className={() => location.pathname === PATHS.SHARED_WITH_ME ? "active-link" : ""}
+                                                    onClick={handleClose}
+                                                >
+                                                    Compartidos conmigo
+                                                </NavLink>
+                                            </>
+                                        )}
                                 <button className="logout-btn" onClick={handleLogout}>
                                     Cerrar Sesión
                                 </button>

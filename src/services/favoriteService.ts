@@ -10,7 +10,10 @@ export const getFavoritesList = async (): Promise<UserListDTO | null> => {
         const favoritesList = response.data.find(list => list.name === "Favoritos");
         return favoritesList || null;
     } catch (error: any) {
-        console.error("Error fetching favorites list:", error);
+        // Only log non-auth errors
+        if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+            console.error("Error fetching favorites list:", error);
+        }
         return null;
     }
 };
@@ -30,7 +33,10 @@ export const addToFavorites = async (bookId: number): Promise<void> => {
         
         await api.post(`/lists/${favoritesList.id}/books/${bookId}?force=false`);
     } catch (error: any) {
-        console.error("Error adding to favorites:", error);
+        // Only log non-auth errors
+        if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+            console.error("Error adding to favorites:", error);
+        }
         throw error;
     }
 };
@@ -50,7 +56,10 @@ export const removeFromFavorites = async (bookId: number): Promise<void> => {
         
         await api.delete(`/lists/${favoritesList.id}/books/${bookId}`);
     } catch (error: any) {
-        console.error("Error removing from favorites:", error);
+        // Only log non-auth errors
+        if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+            console.error("Error removing from favorites:", error);
+        }
         throw error;
     }
 };
@@ -71,7 +80,10 @@ export const isBookInFavorites = async (bookId: number): Promise<boolean> => {
         const listDetails = await api.get<UserListDTO>(`/lists/${favoritesList.id}`);
         return listDetails.data.books?.some(book => book.id === bookId) || false;
     } catch (error: any) {
-        console.error("Error checking favorites status:", error);
+        // Only log non-auth errors (401/403 are expected for unauthenticated users)
+        if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+            console.error("Error checking favorites status:", error);
+        }
         return false;
     }
 };

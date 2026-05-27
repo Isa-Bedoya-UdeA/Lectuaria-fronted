@@ -19,11 +19,11 @@ export const useFavorites = () => {
             setFavoritesList(list?.id || null);
         } catch (err: any) {
             // Silently handle 401/403 errors - user is not authenticated
-            if (err.response?.status === 401 || err.response?.status === 403) {
+            if (err?.response?.status === 401 || err?.response?.status === 403) {
                 setFavoritesList(null);
                 return;
             }
-            setError(err.message || "Error al cargar favoritos");
+            setError(err?.message || "Error al cargar favoritos");
         } finally {
             setIsLoading(false);
         }
@@ -37,7 +37,7 @@ export const useFavorites = () => {
             // Refresh the favorites list ID
             await loadFavoritesList();
         } catch (err: any) {
-            setError(err.message || "Error al agregar a favoritos");
+            setError(err?.message || "Error al agregar a favoritos");
             throw err;
         } finally {
             setIsLoading(false);
@@ -52,7 +52,7 @@ export const useFavorites = () => {
             // Refresh the favorites list ID
             await loadFavoritesList();
         } catch (err: any) {
-            setError(err.message || "Error al quitar de favoritos");
+            setError(err?.message || "Error al quitar de favoritos");
             throw err;
         } finally {
             setIsLoading(false);
@@ -64,9 +64,11 @@ export const useFavorites = () => {
             return await isBookInFavorites(bookId);
         } catch (err: any) {
             // Silently handle errors - return false for unauthenticated users
-            if (err.response?.status === 401 || err.response?.status === 403) {
+            // Don't log 401/403 as these are expected when not logged in
+            if (err?.response?.status === 401 || err?.response?.status === 403) {
                 return false;
             }
+            // Only log unexpected errors
             console.error("Error checking favorite status:", err);
             return false;
         }

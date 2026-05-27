@@ -59,18 +59,19 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
     
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Cargar estado de favorito al montar el componente (solo para lectores)
+    // Cargar estado de favorito al montar el componente (solo para lectores autenticados)
     useEffect(() => {
         const loadFavoriteStatus = async () => {
-            // No cargar favoritos si es bibliotecario
-            if (user?.userRole === 'LIBRARIAN') {
+            // No cargar favoritos si es bibliotecario o no está autenticado
+            const accessToken = localStorage.getItem('accessToken');
+            if (user?.userRole === 'LIBRARIAN' || !accessToken) {
                 return;
             }
             try {
                 const favoriteStatus = await checkBookIsFavorite(book.id);
                 setIsFavorite(favoriteStatus);
             } catch (err) {
-                console.error("Error checking favorite status:", err);
+                // Silently handle - don't log 401/403 errors for unauthenticated users
             }
         };
         

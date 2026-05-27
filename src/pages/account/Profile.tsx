@@ -477,8 +477,23 @@ const Profile = () => {
         }
     }, [isEditing, user, reset]);
 
+    // Map tab index to URL
+    const getTabUrl = (tabIndex: number): string => {
+        switch (tabIndex) {
+            case 1: return `${PATHS.PROFILE}?tab=settings`;
+            case 2: return `${PATHS.PROFILE}?tab=amigos`;
+            case 3: return `${PATHS.PROFILE}?tab=requests`;
+            case 4: return `${PATHS.PROFILE}?tab=estadisticas`;
+            case 5: return `${PATHS.PROFILE}?tab=social`;
+            default: return PATHS.PROFILE;
+        }
+    };
+
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
+        // Update URL when tab changes
+        const newUrl = getTabUrl(newValue);
+        window.history.pushState({}, '', newUrl);
     };
 
     const handleLogout = () => {

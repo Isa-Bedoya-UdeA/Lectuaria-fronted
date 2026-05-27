@@ -68,19 +68,23 @@ const BookDetail = () => {
 
     const [isFavorite, setIsFavorite] = useState(false);
 
-    // Cargar estado de favoritos cuando se carga el libro
+    // Cargar estado de favoritos cuando se carga el libro (solo si está autenticado)
     useEffect(() => {
         const loadFavoriteStatus = async () => {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken || user?.userRole === 'LIBRARIAN') {
+                return;
+            }
             try {
                 const favoriteStatus = await checkBookIsFavorite(book?.id || 0);
                 setIsFavorite(favoriteStatus);
             } catch (err) {
-                console.error("Error checking favorite status:", err);
+                // Silently handle - don't log 401/403 errors for unauthenticated users
             }
         };
 
         loadFavoriteStatus();
-    }, [book?.id, checkBookIsFavorite]);
+    }, [book?.id, checkBookIsFavorite, user?.userRole]);
     const [isAddListOpen, setIsAddListOpen] = useState(false);
     const [selectedSort, setSelectedSort] = useState<string>("most_recent");
     const [reviewText, setReviewText] = useState("");
