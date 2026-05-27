@@ -18,6 +18,11 @@ export const useFavorites = () => {
             const list = await getFavoritesList();
             setFavoritesList(list?.id || null);
         } catch (err: any) {
+            // Silently handle 401/403 errors - user is not authenticated
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                setFavoritesList(null);
+                return;
+            }
             setError(err.message || "Error al cargar favoritos");
         } finally {
             setIsLoading(false);
@@ -58,15 +63,22 @@ export const useFavorites = () => {
         try {
             return await isBookInFavorites(bookId);
         } catch (err: any) {
+            // Silently handle errors - return false for unauthenticated users
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                return false;
+            }
             console.error("Error checking favorite status:", err);
             return false;
         }
     }, []);
 
     useEffect(() => {
-        // Solo cargar favoritos para lectores, no para bibliotecarios
+        // Solo cargar favoritos si el usuario está autenticado y no es bibliotecario
         const userRole = localStorage.getItem('userRole');
-        if (userRole !== 'LIBRARIAN') {
+        const accessToken = localStorage.getItem('accessToken');
+        
+        // Solo cargar si hay un token Y no es bibliotecario
+        if (accessToken && userRole !== 'LIBRARIAN') {
             loadFavoritesList();
         }
     }, [loadFavoritesList]);

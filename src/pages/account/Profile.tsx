@@ -338,14 +338,25 @@ const SocialActivitiesSection = ({ usernameSlug }: { usernameSlug: string }) => 
     );
 };
 
+// Helper function to compute tab value from URL params
+const getTabFromParams = (searchParams: URLSearchParams, userRole?: string): number => {
+    const tab = searchParams.get('tab');
+    if (tab === 'requests') return 3;
+    if (tab === 'friends' || tab === 'amigos') return 2;
+    if (tab === 'notifications' || tab === 'settings') return 1;
+    if ((tab === 'estadisticas' || tab === 'statistics') && userRole === 'READER') return 4;
+    if ((tab === 'social' || tab === 'actividad') && userRole === 'READER') return 5;
+    return 0;
+};
+
 const Profile = () => {
     const { user, logout, updateProfile, isLoading, error, clearError } = useAuth();
-    const [value, setValue] = useState<number>(0);
+    const [searchParams] = useSearchParams();
+    const [value, setValue] = useState<number>(() => getTabFromParams(searchParams, user?.userRole));
     const [isEditing, setIsEditing] = useState(false);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
     const [preferences, setPreferences] = useState<NotificationPreference[]>([]);
     const [preferencesLoading, setPreferencesLoading] = useState(false);
 
@@ -364,27 +375,19 @@ const Profile = () => {
     const { friends, requests, searchResults, loading, loadFriends, loadPendingRequests, searchUsers, sendRequest, acceptRequest, rejectRequest, cancelRequest, removeFriend } = useFriendship();
     const { lists, fetchLists } = useUserLists({ autoFetch: false });
 
+    // Handle tab changes from URL query param (for browser back/forward navigation)
     useEffect(() => {
-        loadFriends();
-        loadPendingRequests();
-        fetchLists();
-    }, [loadFriends, loadPendingRequests, fetchLists]);
+        setValue(getTabFromParams(searchParams, user?.userRole));
+    }, [searchParams, user?.userRole]);
 
-    // Handle tab from URL query param
+    // Load data when user is available
     useEffect(() => {
-        const tab = searchParams.get('tab');
-        if (tab === 'requests') {
-            setValue(3);
-        } else if (tab === 'friends' || tab === 'amigos') {
-            setValue(2);
-        } else if (tab === 'notifications' || tab === 'settings') {
-            setValue(1);
-        } else if ((tab === 'estadisticas' || tab === 'statistics') && user?.userRole === 'READER') {
-            setValue(4);
-        } else if ((tab === 'social' || tab === 'actividad') && user?.userRole === 'READER') {
-            setValue(5);
+        if (user) {
+            loadFriends();
+            loadPendingRequests();
+            fetchLists();
         }
-    }, [searchParams, user]);
+    }, [user, loadFriends, loadPendingRequests, fetchLists]);
 
     useEffect(() => {
         if (user && value === 1) {

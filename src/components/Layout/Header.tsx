@@ -298,6 +298,7 @@ const Header = () => {
                                     <>
                                         <NavLink
                                             to={PATHS.PROFILE}
+                                            end
                                             className={({ isActive }) => isActive ? "active-link" : ""}
                                             onClick={handleClose}
                                         >
