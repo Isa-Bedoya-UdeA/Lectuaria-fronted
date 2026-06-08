@@ -17,7 +17,8 @@ const AddToListModal = ({ isOpen, onClose, bookId, bookTitle }: AddToListModalPr
     const [isCreating, setIsCreating] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    if (isOpen) {
+    useEffect(() => {
+        if (isOpen) {
             fetchLists();
         }
     }, [isOpen, fetchLists]);

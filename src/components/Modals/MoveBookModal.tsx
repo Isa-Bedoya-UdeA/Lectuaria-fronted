@@ -29,7 +29,8 @@ const MoveBookModal = ({
     const [isMoving, setIsMoving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    if (isOpen) {
+    useEffect(() => {
+        if (isOpen) {
             fetchLists();
         }
     }, [isOpen, fetchLists]);

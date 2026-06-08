@@ -51,12 +51,11 @@ export function useBookPublish(): UseBookPublishReturn {
 
 			const data = await prefillBookFromIsbn(isbn);
 			setPrefillData(data);
-} catch (err) {
-			setTimeout(() => {
-				setPrefillError(
-					apiError.message || "Error al buscar información del libro",
-				);
-			}, 3000);
+		} catch (err) {
+			const apiError = err as ApiError;
+			setPrefillError(
+				apiError.message || "Error al buscar información del libro",
+			);
 			setPrefillData(null);
 		} finally {
 			setIsPrefillLoading(false);
@@ -70,6 +69,10 @@ export function useBookPublish(): UseBookPublishReturn {
 				setPublishError(null);
 
 				const response = await publishBook(data);
+				setPublishResponse(response);
+				return response;
+			} catch (err) {
+				const apiError = err as ApiError;
 				setPublishError(
 					apiError.message || "Error al publicar el libro",
 				);

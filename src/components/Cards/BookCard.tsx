@@ -51,7 +51,8 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
 
     useEffect(() => {
         const loadFavoriteStatus = async () => {
-            if (user?.userRole === 'LIBRARIAN' || !accessToken) {
+            const hasToken = typeof window !== 'undefined' && !!localStorage.getItem("accessToken");
+            if (user?.userRole === 'LIBRARIAN' || !hasToken) {
                 return;
             }
             try {
@@ -300,7 +301,7 @@ const BookCard = ({ book, viewMode = 'grid', onRemoveFromList, onMoveBook, onHid
                                 </svg>
                             </Button>
                         </>
-                    </Button>
+                    )}
 
                     <Button
                         layout="icon"

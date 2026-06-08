@@ -46,7 +46,8 @@ const EditAvailabilityModal: React.FC<EditAvailabilityModalProps> = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    if (isOpen) {
+    useEffect(() => {
+        if (isOpen) {
             setMode(getInitialMode());
             setPhysicalCopies(initialPhysicalCopies ?? 0);
             setDigitalPlatformId(initialDigitalPlatformId ?? null);

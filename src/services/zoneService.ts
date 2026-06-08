@@ -7,9 +7,8 @@ import type { Zone, ZonesResponse, ApiError } from "../types";
  */
 export const getZones = async (): Promise<ZonesResponse> => {
 	try {
-		const response = await api.get<ZonesResponse>("/zones");
-		const list = unwrapCollection<Zone>(response);
-		return { zones: list };
+		const response = await api.get("/zones");
+		return unwrapCollection<Zone>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to fetch zones" };
