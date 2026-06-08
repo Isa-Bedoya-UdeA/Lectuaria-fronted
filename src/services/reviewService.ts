@@ -1,4 +1,5 @@
 import api from "../config/api";
+import { unwrapEntity, unwrapPaged } from "./apiHateoas";
 import type { Review, ReviewUpsertRequest } from "@/types";
 
 export const getBookReviews = async (
@@ -12,7 +13,8 @@ export const getBookReviews = async (
 			params: { page, size, sort },
 		});
 
-		const data = response.data.content || [];
+		const paged = unwrapPaged<any>(response);
+		const data = paged.content || [];
 
 		return data.map((dto: any) => ({
 			id: dto.reviewId.toString(),
@@ -38,7 +40,7 @@ export const saveReview = async (
 	request: ReviewUpsertRequest,
 ): Promise<Review> => {
 	const response = await api.post(`/books/${bookId}/reviews`, request);
-	return response.data;
+	return unwrapEntity<Review>(response);
 };
 
 export const updateReview = async (
@@ -46,7 +48,7 @@ export const updateReview = async (
 	request: ReviewUpsertRequest,
 ): Promise<Review> => {
 	const response = await api.put(`/books/reviews/${reviewId}`, request);
-	return response.data;
+	return unwrapEntity<Review>(response);
 };
 
 export const deleteReview = async (reviewId: string): Promise<void> => {

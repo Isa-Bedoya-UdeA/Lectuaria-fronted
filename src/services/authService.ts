@@ -1,4 +1,5 @@
 import api, { setAuthToken, clearAuthData } from "../config/api";
+import { unwrapEntity } from "./apiHateoas";
 import type {
 	RegisterRequest,
 	RegisterResponse,
@@ -46,7 +47,7 @@ export const register = async (
 			"/auth/register",
 			data,
 		);
-		return response.data;
+		return unwrapEntity<RegisterResponse>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		const message =
@@ -71,7 +72,7 @@ export const logout = async (): Promise<void> => {
 export const getProfile = async (): Promise<ProfileResponse> => {
 	try {
 		const response = await api.get<ProfileResponse>("/auth/me");
-		return response.data;
+		return unwrapEntity<ProfileResponse>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		const message =
@@ -86,7 +87,7 @@ export const updateProfile = async (
 ): Promise<ProfileResponse> => {
 	try {
 		const response = await api.put<ProfileResponse>("/auth/me", data);
-		return response.data;
+		return unwrapEntity<ProfileResponse>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		const message =

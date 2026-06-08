@@ -1,4 +1,5 @@
 import api from "../config/api";
+import { unwrapEntity } from "./apiHateoas";
 import type {
 	BookPublishRequest,
 	BookPublishResponse,
@@ -13,7 +14,7 @@ export const prefillBookFromIsbn = async (
 		const response = await api.get<BookPrefillData>(
 			`/books/prefill/${isbn}`,
 		);
-		return response.data;
+		return unwrapEntity<BookPrefillData>(response);
 	} catch (error: unknown) {
 		const apiError = error as {
 			response?: { data?: ApiError; status?: number };
@@ -57,7 +58,7 @@ export const publishBook = async (
 			"/books/publish",
 			data,
 		);
-		return response.data;
+		return unwrapEntity<BookPublishResponse>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		const message =
@@ -101,7 +102,7 @@ export const publishBookWithCover = async (
 			"/books/publish-with-cover",
 			data,
 		);
-		return response.data;
+		return unwrapEntity<BookPublishResponse>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		const message =

@@ -1,4 +1,5 @@
 import api from "../config/api";
+import { unwrapCollection, unwrapEntity } from "./apiHateoas";
 import type { Zone, ZonesResponse, ApiError } from "../types";
 
 /**
@@ -7,7 +8,8 @@ import type { Zone, ZonesResponse, ApiError } from "../types";
 export const getZones = async (): Promise<ZonesResponse> => {
 	try {
 		const response = await api.get<ZonesResponse>("/zones");
-		return response.data;
+		const list = unwrapCollection<Zone>(response);
+		return { zones: list };
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to fetch zones" };
@@ -20,7 +22,7 @@ export const getZones = async (): Promise<ZonesResponse> => {
 export const getZoneById = async (id: number): Promise<Zone> => {
 	try {
 		const response = await api.get<Zone>(`/zones/${id}`);
-		return response.data;
+		return unwrapEntity<Zone>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Zone not found" };

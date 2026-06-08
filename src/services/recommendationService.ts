@@ -1,4 +1,5 @@
 import api from "../config/api";
+import { unwrapCollection } from "./apiHateoas";
 import type { BookSummary } from "@/types";
 
 export interface RecommendationDTO {
@@ -10,7 +11,7 @@ export interface RecommendationDTO {
 
 export const getRecommendations = async (size = 10): Promise<RecommendationDTO[]> => {
     const response = await api.get(`/home/recommendations`, { params: { size } });
-    return response.data;
+    return unwrapCollection<RecommendationDTO>(response);
 };
 
 export const hideRecommendation = async (bookId: number): Promise<void> => {

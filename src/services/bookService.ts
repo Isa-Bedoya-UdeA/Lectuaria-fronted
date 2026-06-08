@@ -1,5 +1,6 @@
 import api from "../config/api";
 import axios from "axios";
+import { unwrapEntity, unwrapPagedAsLegacy, unwrapCollection } from "./apiHateoas";
 import type {
 	BookSummary,
 	BookDetail,
@@ -32,7 +33,7 @@ export const getBooks = async (
 				}
 			},
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to fetch books" };
@@ -42,7 +43,7 @@ export const getBooks = async (
 export const getBookById = async (id: number): Promise<BookDetail> => {
 	try {
 		const response = await api.get<BookDetail>(`/books/${id}`);
-		return response.data;
+		return unwrapEntity<BookDetail>(response);
 	} catch (error: unknown) {
 		const apiError = error as {
 			response?: { status?: number; data?: ApiError };
@@ -53,7 +54,7 @@ export const getBookById = async (id: number): Promise<BookDetail> => {
 				const publicResponse = await publicApi.get<BookDetail>(
 					`/books/${id}`,
 				);
-				return publicResponse.data;
+				return unwrapEntity<BookDetail>(publicResponse);
 			} catch (publicError) {
 				const publicApiError = publicError as {
 					response?: { data?: ApiError };
@@ -73,7 +74,7 @@ export const getBookById = async (id: number): Promise<BookDetail> => {
 export const getBookByIsbn = async (isbn: number): Promise<BookDetail> => {
 	try {
 		const response = await api.get<BookDetail>(`/books/isbn/${isbn}`);
-		return response.data;
+		return unwrapEntity<BookDetail>(response);
 	} catch (error: unknown) {
 		const apiError = error as {
 			response?: { status?: number; data?: ApiError };
@@ -84,7 +85,7 @@ export const getBookByIsbn = async (isbn: number): Promise<BookDetail> => {
 				const publicResponse = await publicApi.get<BookDetail>(
 					`/books/isbn/${isbn}`,
 				);
-				return publicResponse.data;
+				return unwrapEntity<BookDetail>(publicResponse);
 			} catch (publicError) {
 				const publicApiError = publicError as {
 					response?: { data?: ApiError };
@@ -112,7 +113,7 @@ export const searchBooks = async (
 				params: { ...params, keywords },
 			},
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as {
 			response?: { status?: number; data?: ApiError };
@@ -128,7 +129,7 @@ export const searchBooks = async (
 				>("/books/search", {
 					params: { ...params, keywords },
 				});
-				return publicResponse.data;
+				return unwrapPagedAsLegacy<BookSummary>(publicResponse);
 			} catch (publicError) {
 				const publicApiError = publicError as {
 					response?: { data?: ApiError };
@@ -154,7 +155,7 @@ export const getBooksByGenre = async (
 			`/books/genre/${genreId}`,
 			{ params },
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw (
@@ -174,7 +175,7 @@ export const getBooksByLibrary = async (
 			`/books/library/${libraryId}`,
 			{ params },
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw (
@@ -196,7 +197,7 @@ export const getBooksByGenres = async (
 				params: { ...params, genreIds },
 			},
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw (
@@ -215,7 +216,7 @@ export const getTopRatedBooks = async (
 			"/books/top-rated",
 			{ params },
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw (
@@ -233,7 +234,7 @@ export const prefillBookFromIsbn = async (
 		const response = await api.get<BookPrefillData>(
 			`/books/prefill/${isbn}`,
 		);
-		return response.data;
+		return unwrapEntity<BookPrefillData>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw (
@@ -261,7 +262,7 @@ export const publishBook = async (
 			"/books/publish",
 			data,
 		);
-		return response.data;
+		return unwrapEntity<BookPublishResponse>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to publish book" };
@@ -279,7 +280,7 @@ export const getPopularBooks = async (
 			"/books/popular",
 			{ params },
 		);
-		return response.data;
+		return unwrapPagedAsLegacy<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw (
@@ -322,7 +323,7 @@ export const updateBook = async (
 ): Promise<BookDetail> => {
 	try {
 		const response = await api.put<BookDetail>(`/books/${bookId}`, data);
-		return response.data;
+		return unwrapEntity<BookDetail>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to update book" };
@@ -339,7 +340,7 @@ export const updateBookWithCover = async (
 			data.coverUrl = await fileToBase64(coverFile);
 		}
 		const response = await api.put<BookDetail>(`/books/${bookId}`, data);
-		return response.data;
+		return unwrapEntity<BookDetail>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to update book" };
@@ -357,7 +358,7 @@ const fileToBase64 = (file: File): Promise<string> =>
 export const getFeaturedSections = async (): Promise<import("../types").FeaturedSections> => {
 	try {
 		const response = await api.get<import("../types").FeaturedSections>("/books/featured");
-		return response.data;
+		return unwrapEntity<import("../types").FeaturedSections>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to fetch featured sections" };
@@ -367,7 +368,7 @@ export const getFeaturedSections = async (): Promise<import("../types").Featured
 export const getSimilarBooks = async (bookId: number): Promise<BookSummary[]> => {
 	try {
 		const response = await api.get<BookSummary[]>(`/books/${bookId}/similar`);
-		return response.data;
+		return unwrapCollection<BookSummary>(response);
 	} catch (error: unknown) {
 		const apiError = error as { response?: { data?: ApiError } };
 		throw apiError.response?.data || { message: "Failed to fetch similar books" };

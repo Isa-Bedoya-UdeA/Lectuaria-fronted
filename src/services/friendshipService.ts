@@ -1,19 +1,20 @@
 import api from "../config/api";
+import { unwrapCollection } from "./apiHateoas";
 import type { UserSearchResponseDTO } from "../types";
 
 export const searchReaders = async (query: string): Promise<UserSearchResponseDTO[]> => {
     const response = await api.get(`/friendships/search?query=${encodeURIComponent(query)}`);
-    return response.data;
+    return unwrapCollection<UserSearchResponseDTO>(response);
 };
 
 export const getFriends = async (): Promise<UserSearchResponseDTO[]> => {
     const response = await api.get('/friendships');
-    return response.data;
+    return unwrapCollection<UserSearchResponseDTO>(response);
 };
 
 export const getPendingRequests = async (): Promise<UserSearchResponseDTO[]> => {
     const response = await api.get('/friendships/requests/pending');
-    return response.data;
+    return unwrapCollection<UserSearchResponseDTO>(response);
 };
 
 export const sendFriendshipRequest = async (receiverId: number): Promise<void> => {

@@ -1,4 +1,5 @@
 import api from '../config/api';
+import { unwrapCollection, unwrapEntity } from "./apiHateoas";
 import type { UserListShare, UserListShareLink } from '../types/notifications';
 
 export const shareListWithFriends = async (
@@ -11,8 +12,8 @@ export const shareListWithFriends = async (
 
 export const shareListWithFriend = async (listId: number, friendId: number): Promise<UserListShare> => {
     try {
-        const response = await api.post<UserListShare>(`/user-list-shares/${listId}/share/${friendId}`);
-        return response.data;
+        const response = await api.post(`/user-list-shares/${listId}/share/${friendId}`);
+        return unwrapEntity<UserListShare>(response);
     } catch (error: unknown) {
         const apiError = error as { response?: { data?: { message?: string } } };
         throw apiError.response?.data || { message: "Failed to share list with friend" };
@@ -21,8 +22,8 @@ export const shareListWithFriend = async (listId: number, friendId: number): Pro
 
 export const getListShares = async (listId: number): Promise<UserListShare[]> => {
     try {
-        const response = await api.get<UserListShare[]>(`/user-list-shares/public-link/${listId}`);
-        return response.data;
+        const response = await api.get(`/user-list-shares/public-link/${listId}`);
+        return unwrapCollection<UserListShare>(response);
     } catch (error: unknown) {
         const apiError = error as { response?: { data?: { message?: string } } };
         throw apiError.response?.data || { message: "Failed to get list shares" };
@@ -40,8 +41,8 @@ export const removeListShare = async (shareId: number): Promise<void> => {
 
 export const createPublicShareLink = async (listId: number): Promise<UserListShareLink> => {
     try {
-        const response = await api.post<UserListShareLink>(`/user-list-shares/public-link/${listId}`);
-        return response.data;
+        const response = await api.post(`/user-list-shares/public-link/${listId}`);
+        return unwrapEntity<UserListShareLink>(response);
     } catch (error: unknown) {
         const apiError = error as { response?: { data?: { message?: string } } };
         throw apiError.response?.data || { message: "Failed to create public share link" };
@@ -50,8 +51,8 @@ export const createPublicShareLink = async (listId: number): Promise<UserListSha
 
 export const getListShareLinks = async (listId: number): Promise<UserListShareLink[]> => {
     try {
-        const response = await api.get<UserListShareLink[]>(`/user-list-shares/public-link/${listId}`);
-        return response.data;
+        const response = await api.get(`/user-list-shares/public-link/${listId}`);
+        return unwrapCollection<UserListShareLink>(response);
     } catch (error: unknown) {
         const apiError = error as { response?: { data?: { message?: string } } };
         throw apiError.response?.data || { message: "Failed to get list share links" };
@@ -69,8 +70,8 @@ export const deactivateShareLink = async (linkId: number): Promise<void> => {
 
 export const getSharedListByToken = async (token: string): Promise<UserListShare> => {
     try {
-        const response = await api.get<UserListShare>(`/user-list-shares/public/${token}`);
-        return response.data;
+        const response = await api.get(`/user-list-shares/public/${token}`);
+        return unwrapEntity<UserListShare>(response);
     } catch (error: unknown) {
         const apiError = error as { response?: { data?: { message?: string } } };
         throw apiError.response?.data || { message: "Failed to get shared list" };

@@ -1,4 +1,5 @@
 import api from "../config/api";
+import { unwrapCollection } from "./apiHateoas";
 
 export interface FriendActivityDTO {
     id: number;
@@ -26,7 +27,7 @@ export interface FriendActivityDTO {
 export const getFriendActivity = async (usernameSlug: string): Promise<FriendActivityDTO[]> => {
     try {
         const response = await api.get<FriendActivityDTO[]>(`/users/${usernameSlug}/activity`);
-        return response.data;
+        return unwrapCollection<FriendActivityDTO>(response);
     } catch (error: any) {
         console.error("Error fetching friend activity:", error);
         throw error;
@@ -36,7 +37,7 @@ export const getFriendActivity = async (usernameSlug: string): Promise<FriendAct
 export const getFriendActivityById = async (userId: number): Promise<FriendActivityDTO[]> => {
     try {
         const response = await api.get<FriendActivityDTO[]>(`/users/activity/${userId}`);
-        return response.data;
+        return unwrapCollection<FriendActivityDTO>(response);
     } catch (error: any) {
         console.error("Error fetching friend activity by ID:", error);
         throw error;
