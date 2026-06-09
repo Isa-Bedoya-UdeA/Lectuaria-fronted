@@ -98,6 +98,12 @@ export function unwrapCollection<T>(response: AxiosResponse<unknown>): T[] {
 
 /**
  * Extrae el contenido de un PagedModel<T> junto con la metadata de paginacion.
+ *
+ * Tolera los dos shapes reales que produce el backend de Lectuaria:
+ *  1) Spring HATEOAS 2.x estandar: { content: T[], page: {...}, _links: {...} }
+ *  2) Construccion manual del backend (HateoasLinkBuilder.wrapPage):
+ *     { _embedded: { <relName>List: T[] }, page: { size, totalElements, totalPages, number }, _links: {...} }
+ *
  * Si la respuesta es un PaginatedResponse legacy, mapea los campos al
  * mismo shape para que el resto del cliente no cambie.
  */
@@ -118,9 +124,18 @@ export function unwrapPaged<T>(
   if (!body || typeof body !== "object") {
     return emptyPage<T>();
   }
-  const b = body as HateoasPagedResponse<T> & { hasNext?: boolean; hasPrevious?: boolean };
+  const b = body as HateoasPagedResponse<T> & { hasNext?: boolean; hasPrevious?: boolean; _embedded?: Record<string, T[]> };
 
-  const content = Array.isArray(b.content) ? b.content : [];
+  // 1) content directo (PagedModel estandar de Spring HATEOAS)
+  let content: T[] = Array.isArray(b.content) ? b.content : [];
+
+  // 2) fallback: _embedded.<relName>List (backend custom)
+  if (content.length === 0 && b._embedded) {
+    const first = Object.values(b._embedded).find((arr) => Array.isArray(arr));
+    if (first) {
+      content = first as T[];
+    }
+  }
 
   const totalElements = b.totalElements ?? b.page?.totalElements ?? 0;
   const totalPages = b.totalPages ?? b.page?.totalPages ?? 0;
