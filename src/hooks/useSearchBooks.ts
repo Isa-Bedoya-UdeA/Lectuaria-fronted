@@ -42,7 +42,15 @@ export function useSearchBooks(): UseSearchBooksReturn {
 			formatTypes: string[] = [],
 			minRating: number = 0,
 		): Promise<void> => {
-			if (!keywords.trim() && libraryIds.length === 0 && genreIds.length === 0) {
+			if (
+				!keywords.trim() &&
+				libraryIds.length === 0 &&
+				genreIds.length === 0 &&
+				minRating <= 0 &&
+				!startYear &&
+				!endYear &&
+				formatTypes.length === 0
+			) {
 				setResults([]);
 				return;
 			}
