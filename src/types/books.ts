@@ -142,6 +142,12 @@ export interface BookQueryParams {
 	authorId?: number;
 	minRating?: number;
     libraryIds?: number[];
+    /**
+     * El controller /books/search del backend espera minYear/maxYear
+     * (no startYear/endYear). Se mantienen los alias para compatibilidad.
+     */
+    minYear?: number;
+    maxYear?: number;
     startYear?: number;
     endYear?: number;
     year?: number;

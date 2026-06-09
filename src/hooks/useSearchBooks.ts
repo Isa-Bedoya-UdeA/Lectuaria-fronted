@@ -59,14 +59,16 @@ export function useSearchBooks(): UseSearchBooksReturn {
 				setIsLoading(true);
 				setError(null);
 
-				const response = await searchBooks(keywords.trim(), {
-					page,
-					size,
-					libraryIds,
-					genreIds,
-					startYear: startYear || undefined,
-					endYear: endYear || undefined,
-					formatTypes: formatTypes.length > 0 ? formatTypes : undefined,
+			const response = await searchBooks(keywords.trim(), {
+				page,
+				size,
+				libraryIds,
+				genreIds,
+				// El controller del backend /books/search espera minYear/maxYear
+				// (no startYear/endYear). Renombramos para que el filtro llegue.
+				minYear: startYear || undefined,
+				maxYear: endYear || undefined,
+				formatTypes: formatTypes.length > 0 ? formatTypes : undefined,
 					minRating: minRating > 0 ? minRating : undefined
 				});
 
