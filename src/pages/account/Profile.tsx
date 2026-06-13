@@ -372,7 +372,7 @@ const Profile = () => {
     const [privacySuccess, setPrivacySuccess] = useState(false);
     const [privacyError, setPrivacyError] = useState<string | null>(null);
 
-    const { friends, requests, searchResults, loading, loadFriends, loadPendingRequests, searchUsers, sendRequest, acceptRequest, rejectRequest, cancelRequest, removeFriend } = useFriendship();
+    const { friends, requests, searchResults, loading, friendsLoaded, requestsLoaded, loadFriends, loadPendingRequests, searchUsers, sendRequest, acceptRequest, rejectRequest, cancelRequest, removeFriend } = useFriendship();
     const { lists, fetchLists } = useUserLists({ autoFetch: false });
 
     // Handle tab changes from URL query param (for browser back/forward navigation)
@@ -974,7 +974,9 @@ const Profile = () => {
                             <div className="profile__userFriends">
                                 <p>Mis amigos</p>
                                 <div className="profile__friendsList">
-                                    {friends.length > 0 ? (
+                                    {!friendsLoaded ? (
+                                        <p className="profile__empty">Cargando tus amigos...</p>
+                                    ) : friends.length > 0 ? (
                                         [...friends].sort((a, b) => a.fullName.localeCompare(b.fullName)).map(f => (
                                             <FriendCard key={f.id} user={f} onRemove={removeFriend} />
                                         ))
@@ -986,7 +988,9 @@ const Profile = () => {
                         )}
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={3} className="profile__pending__tab">
-                        {requests.length > 0 ? (
+                        {!requestsLoaded ? (
+                            <p className="profile__empty">Buscando solicitudes...</p>
+                        ) : requests.length > 0 ? (
                             <div className="profile__pendingList">
                                 {requests.map((r: UserSearchResponseDTO) => (
                                     <FriendCard

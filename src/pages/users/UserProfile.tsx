@@ -117,9 +117,21 @@ const UserProfile = () => {
     const isSelf = user && user.id === profile.id;
     const isFriend = profile?.friendshipStatus === "ACCEPTED";
 
-    const showReviews = isSelf || !profile.privacy || profile.privacy.reviewsVisibility !== "PRIVATE";
-    const showReadingLists = isSelf || !profile.privacy || profile.privacy.readingListsVisibility !== "PRIVATE";
-    const showFriends = isSelf || !profile.privacy || profile.privacy.friendsVisibility !== "PRIVATE";
+    // Cada sub-seccion respeta su propia configuracion de privacidad del
+    // dueno del perfil: PUBLIC lo ve cualquiera, FRIENDS solo amigos, PRIVATE
+    // solo el dueno. Visitantes anonimos solo ven PUBLIC.
+    const showReviews = isSelf
+        || (profile.privacy?.reviewsVisibility === "PUBLIC")
+        || (profile.privacy?.reviewsVisibility === "FRIENDS" && isFriend);
+    const showReadingLists = isSelf
+        || (profile.privacy?.readingListsVisibility === "PUBLIC")
+        || (profile.privacy?.readingListsVisibility === "FRIENDS" && isFriend);
+    const showReadingListsActivity = isSelf
+        || (profile.privacy?.readingListsActivityVisibility === "PUBLIC")
+        || (profile.privacy?.readingListsActivityVisibility === "FRIENDS" && isFriend);
+    const showFriends = isSelf
+        || (profile.privacy?.friendsVisibility === "PUBLIC")
+        || (profile.privacy?.friendsVisibility === "FRIENDS" && isFriend);
 
     return (
         <main className="userProfile">
@@ -222,8 +234,12 @@ const UserProfile = () => {
                     </section>
                 )}
 
-                {/* Activity section - only visible if friend */}
-                {isFriend && friendActivity && friendActivity.length > 0 && (
+                {/* Activity section - se muestra si el visitante tiene al menos una
+                    sub-seccion visible segun la configuracion de privacidad del
+                    dueno del perfil. Antes estaba limitada a isFriend, lo que
+                    bloqueaba a visitantes anonimos incluso cuando la privacidad
+                    estaba en PUBLIC. */}
+                {friendActivity && friendActivity.length > 0 && (showReviews || showReadingListsActivity) && (
                     <section className="userProfile__activity">
                         <h2 className="userProfile__activity-title">Actividad reciente</h2>
                         <div className="userProfile__activity-sections">
@@ -251,7 +267,7 @@ const UserProfile = () => {
                                                             status: (review.status as "draft" | "published" | "hidden" | "DRAFT" | "PUBLISHED") || "published",
                                                             helpfulCount: review.helpfulCount || 0
                                                         }}
-                                                        bookTitle={review.bookTitle || ""}
+                                                        bookTitle={review.listName || ""}
                                                         bookIsbn={review.bookIsbn || ""}
                                                     />
                                                 ))}
@@ -260,7 +276,7 @@ const UserProfile = () => {
                                 )}
 
                             {/* Libros añadidos a listas */}
-                            {friendActivity
+                            {showReadingListsActivity && friendActivity
                                 .filter(activity => activity.activityType === 'BOOK_ADDED_TO_LIST')
                                 .length > 0 && (
                                     <div className="userProfile__activity-section">

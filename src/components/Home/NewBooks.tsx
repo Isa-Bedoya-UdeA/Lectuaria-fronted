@@ -6,6 +6,7 @@ import Button from "@/components/UI/Button";
 import "./newBooks.scss";
 import { PATHS } from "@/constants/routes";
 import { Link } from "react-router-dom";
+import { getErrorMessage } from "@/utils/errorMessage";
 
 const NewBooks = () => {
     const [books, setBooks] = useState<BookSummary[]>([]);
@@ -19,7 +20,7 @@ const NewBooks = () => {
                 const response = await getNewBooks({ page: 0, size: 8 });
                 setBooks(response.content);
             } catch (err: any) {
-                setError(err.message || "Error al cargar libros nuevos");
+                setError(getErrorMessage(err, "No se pudieron cargar los libros nuevos. Intenta de nuevo en unos momentos."));
             } finally {
                 setIsLoading(false);
             }

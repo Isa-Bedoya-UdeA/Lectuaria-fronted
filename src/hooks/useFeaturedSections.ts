@@ -16,7 +16,7 @@ export const useFeaturedSections = () => {
             setSections(data);
         } catch (err: any) {
             console.error("Error fetching featured sections:", err);
-            setError(err.message || "Failed to fetch featured sections");
+            setError(err.message || "No se pudieron cargar las secciones destacadas.");
         } finally {
             setIsLoading(false);
         }

@@ -9,6 +9,8 @@ export const useFriendship = () => {
     const [requests, setRequests] = useState<UserSearchResponseDTO[]>([]);
     const [searchResults, setSearchResults] = useState<UserSearchResponseDTO[]>([]);
     const [loading, setLoading] = useState(false);
+    const [friendsLoaded, setFriendsLoaded] = useState(false);
+    const [requestsLoaded, setRequestsLoaded] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const isReader = user?.userRole === 'READER' || user?.userRole === 'ADMIN';
@@ -24,6 +26,7 @@ export const useFriendship = () => {
             setError(err.response?.data?.message || 'Error al cargar amigos');
         } finally {
             setLoading(false);
+            setFriendsLoaded(true);
         }
     }, [isReader]);
 
@@ -38,6 +41,7 @@ export const useFriendship = () => {
             setError(err.response?.data?.message || 'Error al cargar solicitudes');
         } finally {
             setLoading(false);
+            setRequestsLoaded(true);
         }
     }, [isReader]);
 
@@ -129,6 +133,8 @@ export const useFriendship = () => {
         requests,
         searchResults,
         loading,
+        friendsLoaded,
+        requestsLoaded,
         error,
         isPending: loading,
         loadFriends,
