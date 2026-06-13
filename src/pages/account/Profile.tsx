@@ -596,7 +596,19 @@ const Profile = () => {
                                     <h3>{lists.length}</h3>
                                     <p>Listas</p>
                                 </div>
-                                <div className="profile__friends">
+                                <div
+                                    className="profile__friends"
+                                    onClick={() => navigate(`${PATHS.PROFILE}?tab=friends`)}
+                                    style={{ cursor: 'pointer' }}
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            navigate(`${PATHS.PROFILE}?tab=friends`);
+                                        }
+                                    }}
+                                >
                                     <h3>{friends.length}</h3>
                                     <p>Amigos</p>
                                 </div>

@@ -75,21 +75,6 @@
         a {
             text-decoration: none;
         }
-
-        @media screen and (min-width: 768px) {
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: flex-start;
-
-            > div {
-                text-align: left;
-                max-width: 30ch;
-            }
-
-            h2 {
-                font-size: 1.75rem;
-            }
-        }
     }
 
     &__empty {

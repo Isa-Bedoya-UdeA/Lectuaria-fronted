@@ -50,21 +50,6 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
-
-        @media screen and (min-width: 768px) {
-            flex-direction: row;
-            justify-content: space-between;
-            align-items: flex-start;
-
-            > div {
-                text-align: left;
-                max-width: 30ch;
-            }
-
-            h2 {
-                font-size: 1.75rem;
-            }
-        }
     }
 
     &__loading {
@@ -150,7 +135,7 @@
         scroll-snap-type: x mandatory;
         scrollbar-width: thin;
         scrollbar-color: $secondary $gray-700;
-        align-items: flex-start;
+        align-items: stretch;
 
         &::-webkit-scrollbar {
             height: 6px;
@@ -167,6 +152,15 @@
         &-item {
             flex: 0 0 200px;
             scroll-snap-align: start;
+            // Que la card dentro estire a la altura de la mas alta del row
+            display: flex;
+
+            > .bookCard {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
 
             @media screen and (min-width: 480px) {
                 flex: 0 0 220px;

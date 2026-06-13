@@ -127,6 +127,15 @@
             background-color: rgba($secondary, 0.15);
             border-left: 3px solid $secondary;
             margin-top: auto;
+            // Igualar alto entre cards sin recortar el texto:
+            // - flex-grow para que ocupe el espacio sobrante cuando la card
+            //   de al lado es mas baja
+            // - min-height para reservar al menos 2 lineas y que cards con
+            //   reason corto no se vean mas bajas que las de reason largo
+            flex-grow: 1;
+            min-height: 2.6em;
+            display: flex;
+            align-items: center;
         }
     }
 }
