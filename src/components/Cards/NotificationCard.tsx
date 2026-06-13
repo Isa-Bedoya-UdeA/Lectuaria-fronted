@@ -91,19 +91,27 @@ const NotificationCard = ({ notification, onMarkAsRead, onDelete }: Notification
                 }
                 break;
             case NotificationType.REVIEW:
-                if (notification.referenceId) {
+                // Para reseñas, referenceId es el ISBN del libro reseñado
+                // (lo establece BookRatingServiceImpl al crear la notificacion).
+                if (notification.referenceId != null) {
                     navigate(`/books/${notification.referenceId}`);
                 }
                 break;
             case NotificationType.SHARED:
-                if (notification.message.includes("libro")) {
+                // Regla de oro (compartida con backend):
+                //   - Si trae shareToken => es una lista compartida.
+                //     Navegamos al token publico (ruta /shared/:token).
+                //   - Si NO trae shareToken y es SHARED => es un libro
+                //     compartido. referenceId es el ISBN del libro
+                //     (lo establece BookSharedNotificationListener), asi
+                //     que la ruta /books/:isbn funciona directo.
+                // Esto evita depender del texto del mensaje (que es fragil:
+                // una lista llamada "Mis libros" rompe la heuristica de
+                // "includes('libro')" / "includes('lista')").
+                if (notification.shareToken) {
+                    navigate(`/shared/${notification.shareToken}`);
+                } else if (notification.referenceId != null) {
                     navigate(`/books/${notification.referenceId}`);
-                } else if (notification.message.includes("lista")) {
-                    if (notification.shareToken) {
-                        navigate(`/shared/${notification.shareToken}`);
-                    } else {
-                        navigate(`/lists/${notification.referenceId}`);
-                    }
                 }
                 break;
         }
