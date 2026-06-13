@@ -2,11 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import {
 	getMyLists,
 	createCustomList,
+	updateCustomList,
 	addBookToList,
 	removeBookFromList,
 	deleteList as apiDeleteList,
 } from "../services/listService";
-import type { UserListDTO, CreateListRequestDTO } from "../types";
+import type { UserListDTO, CreateListRequestDTO, UpdateListRequestDTO } from "../types";
 
 interface UseUserListsOptions {
 	autoFetch?: boolean;
@@ -42,6 +43,21 @@ export const useUserLists = (options?: UseUserListsOptions) => {
 			return newList;
 		} catch (err: any) {
 			setError(err.response?.data?.message || "Error al crear la lista");
+			throw err;
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const updateList = async (listId: number, data: UpdateListRequestDTO) => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			const updated = await updateCustomList(listId, data);
+			setLists((prev) => prev.map((l) => (l.id === listId ? updated : l)));
+			return updated;
+		} catch (err: any) {
+			setError(err.response?.data?.message || "Error al editar la lista");
 			throw err;
 		} finally {
 			setIsLoading(false);
@@ -91,6 +107,7 @@ export const useUserLists = (options?: UseUserListsOptions) => {
 		error,
 		fetchLists,
 		createList,
+		updateList,
 		addToList,
 		removeFromList,
 		deleteList,

@@ -19,3 +19,9 @@ export interface CreateListRequestDTO {
     description?: string;
     visibility: 'PUBLIC' | 'LISTED' | 'PRIVATE';
 }
+
+export interface UpdateListRequestDTO {
+    name?: string;
+    description?: string;
+    visibility?: 'PUBLIC' | 'LISTED' | 'PRIVATE';
+}

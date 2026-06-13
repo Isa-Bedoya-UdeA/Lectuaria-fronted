@@ -491,9 +491,12 @@ const Profile = () => {
 
     const handleChange = (_: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
-        // Update URL when tab changes
+        // Update URL when tab changes. Se usa navigate (no pushState) para que
+        // React Router notifique a useLocation() en otros componentes (ej. el
+        // popover del Header), evitando que el resaltado del item activo quede
+        // desincronizado al cambiar de tab.
         const newUrl = getTabUrl(newValue);
-        window.history.pushState({}, '', newUrl);
+        navigate(newUrl);
     };
 
     const handleLogout = () => {

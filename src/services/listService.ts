@@ -1,6 +1,6 @@
 import api from "../config/api";
 import { unwrapCollection, unwrapEntity } from "./apiHateoas";
-import type { UserListDTO, CreateListRequestDTO } from "../types";
+import type { UserListDTO, CreateListRequestDTO, UpdateListRequestDTO } from "../types";
 
 export const getMyLists = async (): Promise<UserListDTO[]> => {
 	const response = await api.get("/lists");
@@ -16,6 +16,14 @@ export const createCustomList = async (
 	data: CreateListRequestDTO,
 ): Promise<UserListDTO> => {
 	const response = await api.post("/lists", data);
+	return unwrapEntity<UserListDTO>(response);
+};
+
+export const updateCustomList = async (
+	listId: number,
+	data: UpdateListRequestDTO,
+): Promise<UserListDTO> => {
+	const response = await api.patch(`/lists/${listId}`, data);
 	return unwrapEntity<UserListDTO>(response);
 };
 

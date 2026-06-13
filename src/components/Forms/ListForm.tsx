@@ -1,22 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../UI/Button";
-import type { CreateListRequestDTO } from "../../types/list";
 import "./listForm.scss";
 
+// El form siempre manda los tres campos, pero el tipo de la peticion
+// puede ser Create (requeridos) o Update (todos opcionales). En el form
+// los requerimos via UI (campo name obligatorio), asi que podemos tipar
+// el submit con CreateListRequestDTO sin perder seguridad de tipos.
 interface ListFormProps {
-    onSubmit: (data: CreateListRequestDTO) => Promise<void>;
+    onSubmit: (data: {
+        name: string;
+        description: string;
+        visibility: 'PUBLIC' | 'LISTED' | 'PRIVATE';
+    }) => Promise<void>;
     onCancel: () => void;
     submitLabel?: string;
+    initialValues?: {
+        name?: string;
+        description?: string | null;
+        visibility?: 'PUBLIC' | 'LISTED' | 'PRIVATE';
+    };
 }
 
 type ListVisibility = 'PUBLIC' | 'LISTED' | 'PRIVATE';
 
-const ListForm = ({ onSubmit, onCancel, submitLabel = "Crear lista" }: ListFormProps) => {
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [visibility, setVisibility] = useState<ListVisibility>('LISTED');
+const ListForm = ({ onSubmit, onCancel, submitLabel = "Crear lista", initialValues }: ListFormProps) => {
+    const [name, setName] = useState(initialValues?.name ?? "");
+    const [description, setDescription] = useState(initialValues?.description ?? "");
+    const [visibility, setVisibility] = useState<ListVisibility>(initialValues?.visibility ?? 'LISTED');
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Si initialValues cambia (caso raro en edición, p.ej. tras recargar),
+    // sincronizamos el estado del form. Asi no nos quedamos con valores
+    // obsoletos si el padre re-pasa los datos.
+    useEffect(() => {
+        if (initialValues) {
+            setName(initialValues.name ?? "");
+            setDescription(initialValues.description ?? "");
+            setVisibility(initialValues.visibility ?? 'LISTED');
+        }
+    }, [initialValues?.name, initialValues?.description, initialValues?.visibility]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

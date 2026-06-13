@@ -11,6 +11,7 @@ import Button from "@/components/UI/Button";
 import Modal from "@/components/UI/Modal";
 import ShareMenu from "@/components/Modals/ShareMenu";
 import MoveBookModal from "@/components/Modals/MoveBookModal";
+import EditListModal from "@/components/Modals/EditListModal";
 import { useUserLists } from "@/hooks/useUserLists";
 import { Chip } from "@mui/material";
 import { createPublicShareLink } from "@/services/listShareService";
@@ -27,8 +28,9 @@ const ListDetail = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [deleteError, setDeleteError] = useState<string | null>(null);
-    const { deleteList } = useUserLists({ autoFetch: false });
+    const { deleteList, updateList } = useUserLists({ autoFetch: false });
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [shareMenuAnchor, setShareMenuAnchor] = useState<HTMLElement | null>(null);
     const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
@@ -195,21 +197,35 @@ const ListDetail = () => {
                     <div className="listDetail__header-right">
                         {isOwner && (
                             <>
-                                <Button variant="outlined" className="list__share-btn" onClick={handleToggleShare}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.59 13.51l6.83 3.98" /><path d="M15.41 6.51l-6.82 3.98" /></g></svg>
-                                    Compartir
-                                </Button>
-                                <ShareMenu
-                                    anchorEl={shareMenuAnchor}
-                                    onClose={handleCloseShareMenu}
-                                    onShareWithFriends={handleShareWithFriends}
-                                    onCopyLink={handleCopyLink}
-                                />
-                                {list.listType === 'CUSTOM' && (
-                                    <Button variant="outlined" className="list__delete-btn" onClick={() => setIsDeleteModalOpen(true)}>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6" /></svg>
-                                        Eliminar lista
+                                {list.visibility !== 'PRIVATE' && (
+                                    <Button variant="outlined" className="list__share-btn" onClick={handleToggleShare}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.59 13.51l6.83 3.98" /><path d="M15.41 6.51l-6.82 3.98" /></g></svg>
+                                        Compartir
                                     </Button>
+                                )}
+                                {list.visibility !== 'PRIVATE' && (
+                                    <ShareMenu
+                                        anchorEl={shareMenuAnchor}
+                                        onClose={handleCloseShareMenu}
+                                        onShareWithFriends={handleShareWithFriends}
+                                        onCopyLink={handleCopyLink}
+                                    />
+                                )}
+                                {list.listType === 'CUSTOM' && (
+                                    <>
+                                        <Button
+                                            variant="outlined"
+                                            className="list__edit-btn"
+                                            onClick={() => setIsEditModalOpen(true)}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1l1-4Z" /></g></svg>
+                                            Editar lista
+                                        </Button>
+                                        <Button variant="outlined" className="list__delete-btn" onClick={() => setIsDeleteModalOpen(true)}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2m-6 5v6m4-6v6" /></g></svg>
+                                            Eliminar lista
+                                        </Button>
+                                    </>
                                 )}
                             </>
                         )}
@@ -251,6 +267,28 @@ const ListDetail = () => {
                 message={`¿Estás seguro de que deseas eliminar la lista "${list.name}"? Esta acción no se puede deshacer.`}
                 confirmText="Eliminar permanentemente"
                 cancelText="Cancelar"
+            />
+            <EditListModal
+                isOpen={isEditModalOpen}
+                list={list}
+                onClose={() => setIsEditModalOpen(false)}
+                onSave={async (data) => {
+                    try {
+                        // Mapeo desde el shape del form (siempre con los 3
+                        // campos) al DTO de update (todos opcionales). Si el
+                        // usuario no cambio un valor, el backend lo conserva.
+                        await updateList(list.id, {
+                            name: data.name,
+                            description: data.description,
+                            visibility: data.visibility
+                        });
+                        setIsEditModalOpen(false);
+                        fetchListDetails();
+                    } catch {
+                        // El error ya lo muestra el hook via setError si queremos;
+                        // el ListForm interno ya pinta el toast.
+                    }
+                }}
             />
             {isShareModalOpen && (
                 <div className="modal-overlay" onClick={(e) => { e.stopPropagation(); setIsShareModalOpen(false); }}>
